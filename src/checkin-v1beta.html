@@ -189,7 +189,7 @@
             height: 20%;
         }
 
-        span#login-tip-admin {
+        span#login-tip-user, span#login-tip-admin {
             text-align: center;
             user-select: none;
             opacity: 0.8;
@@ -373,6 +373,10 @@
         }
 
         span#message-mark-top-margin {
+            height: 20%;
+        }
+
+        span#message-mark-bottom-margin {
             height: 25%;
         }
 
@@ -386,7 +390,6 @@
             justify-content: left;
             gap: 12px;
         }
-
 
         p#message-mark-text {
             text-align: center;
@@ -402,6 +405,66 @@
             display: flex;
             flex-direction: row;
             justify-content: right;
+            gap: 10px;
+        }
+
+    </style>
+
+    <!--遮罩内容 输入表单-->
+    <style>
+        div#form-mark-dialog {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            justify-content: start;
+
+            flex-grow: 1;
+            height: 100%;
+        }
+
+        span#form-mark-top-margin {
+            height: 15%;
+        }
+
+        span#form-mark-bottom-margin {
+            height: 25%;
+        }
+
+        div#form-mark-rect {
+            background: white;
+            padding: 24px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: left;
+            gap: 12px;
+        }
+
+        button.form-mark-btn {
+            padding: 6px 14px;
+            cursor: pointer;
+        }
+
+        div#form-mark-btn-group {
+            display: flex;
+            flex-direction: row;
+            justify-content: right;
+            gap: 10px;
+        }
+
+        div#form-mark-input-group {
+            display: flex;
+            flex-direction: column;
+            justify-content: left;
+        }
+
+        span#form-mark-input-title {
+            display: inline-block;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 0 0 2px 0;
         }
 
     </style>
@@ -502,6 +565,13 @@
 
     <!--树-->
     <style>
+
+        details.tree-widget {
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+        }
+
         /* 顶级节点样式 */
         details.tree-widget > summary {
             list-style: none;
@@ -526,8 +596,10 @@
             gap: 10px; /* 列间距 */
         }
 
-        /* 子列表缩进 */
         ul.tree-items {
+            overflow-y: auto;
+            flex-grow: 1;
+
             padding-left: 12px;
             padding-right: 4px;
             margin: 4px 0;
@@ -562,7 +634,7 @@
 
 <body class="">
 <header class="">
-    <button id="header-btn-startpage" class="">返回首页</button>
+    <button id="header-btn-startpage" class="initiation_hidden">返回首页</button>
     <button id="header-btn-mail" class="">收发</button>
     <button id="header-btn-drive" class="">网盘</button>
     <button id="header-btn-more-left" class="menu-btn">*</button>
@@ -574,6 +646,7 @@
     <section id="login-panel" class="">
         <span id="login-top-margin"></span>
         <div id="login-rect">
+            <span id="login-tip-user" class="hidden"></span>
             <span id="login-tip-admin" class="hidden">管理员</span>
             <label>账号：<input type="text" id="login-input-account"></label>
             <label>密码：<input type="text" id="login-input-password"></label>
@@ -624,6 +697,8 @@
 
 <script>
     const checkin_version = null;
+    const checkin_version_number = null;
+    const checkin_version_is_beta = null;
     const top_level_path = null;
     const backend_panel = false;
     let logged_admin = false;
@@ -642,6 +717,14 @@
     function join_path(url, ...subs) {
         url.pathname = `${url.pathname.replace(/\/+$/, "")}/${subs.join("/")}`;
         return url;
+    }
+
+    async function fetch_get(url, headers) {
+        return await fetch(url, {
+            method: "GET", headers: {
+                ...headers,
+            },
+        });
     }
 
     async function fetch_post_json(url, json, headers) {
@@ -664,6 +747,13 @@
         document.cookie = cookieStr;
     }
 
+    function form_check_string(value, allow_empty = false) {
+        return ((typeof value === "string") && ((!allow_empty && value.length > 0) || allow_empty))
+    }
+
+    function form_check_array(value, allow_empty = false) {
+        return (value instanceof Array) && ((!allow_empty && value.length > 0) || allow_empty)
+    }
 
     /*
     * 遮罩
@@ -690,7 +780,7 @@
         remove() {
             this.mark.classList.add("hidden")
             this.mark.remove();
-            this.element.classList.remove("for-blur-mark");
+            this.element.classList.remove(`for-blur-mark`);
         }
 
         fill() {
@@ -729,10 +819,11 @@
             yellow: "#FFFCDE",
         }
 
-        constructor(element, message, btn_flags, color, confirm_callback) {
+        constructor(element, message, btn_flags, color, close_callback, confirm_callback) {
             super(element)
             this.message = message;
             this.btn_flags = btn_flags;
+            this.close_callback = close_callback;
             this.confirm_callback = confirm_callback;
             this.color = color;
         }
@@ -745,6 +836,7 @@
         <p id="message-mark-text" class="">${this.message}</p>
         <div id="message-mark-btn-group"></div>
     </div>
+    <span id="message-mark-bottom-margin"></span>
 </div>
 `;
             this.mark.insertAdjacentHTML("beforeend", html);
@@ -766,14 +858,20 @@
                 this.btn_group.insertAdjacentHTML("beforeend", `<button class="message-mark-btn">关闭</button>`);
                 let btn = this.btn_group.querySelector(":scope button:last-of-type");
                 btn.addEventListener("click", (event) => {
+                    if (this.close_callback)
+                        this.close_callback()
                     this.remove()
                 });
             }
 
         }
 
-        static report(error, color = MessageMark.colors.red) {
-            const mm = new MessageMark(document.body, error instanceof Error ? `报错：${error}` : error, MessageMark.btnFlags.close, color);
+        static report(error, element = null, close_callback = null, confirm_callback = null, color = MessageMark.colors.red,) {
+
+            if (close_callback === null && error instanceof Error) // 某些异常，重新登录
+                close_callback = () => checkin.check_exception_to_reload(error);
+
+            const mm = new MessageMark(!element ? document.body : element, error instanceof Error ? `报错：${error}` : error, MessageMark.btnFlags.close, color, close_callback, confirm_callback);
             mm.show();
             return mm;
         }
@@ -788,6 +886,103 @@
                 return MessageMark.colors[random_choice(cs)];
             }
         }
+    }
+
+    class FormMark extends BlurMark {
+
+        constructor(element, form, confirm_callback) {
+            super(element)
+            this.form = form;
+            this.confirm_callback = confirm_callback;
+
+            if (!this.confirm_callback)
+                throw new Error("缺少参数 confirm_callback");
+        }
+
+        fill() {
+            let html = `
+<div id="form-mark-dialog">
+    <span id="form-mark-top-margin"></span>
+    <div id="form-mark-rect">
+        <div id="form-mark-input-group"></div>
+        <div id="form-mark-btn-group"></div>
+    </div>
+    <span id="form-mark-bottom-margin"></span>
+</div>
+`;
+            this.mark.insertAdjacentHTML("beforeend", html);
+
+            this.rect = this.mark.querySelector(":scope div#form-mark-rect");
+            this.rect.style.background = MessageMark.get_background_color.call(this);
+
+            // 输入区域
+            this.input_group = this.mark.querySelector(":scope div#form-mark-input-group");
+            for (const formElement of this.form) {
+                this.#add_input_element(formElement)
+            }
+
+            // 按钮
+            this.btn_group = this.mark.querySelector(":scope div#form-mark-btn-group");
+            {
+                this.btn_group.insertAdjacentHTML("beforeend", `<button class="form-mark-btn">确定</button>`);
+                let btn = this.btn_group.querySelector(":scope button:last-of-type");
+                btn.addEventListener("click", (event) => {
+                    this.confirm_callback(this,)
+                });
+            }
+            {
+                this.btn_group.insertAdjacentHTML("beforeend", `<button class="form-mark-btn">关闭</button>`);
+                let btn = this.btn_group.querySelector(":scope button:last-of-type");
+                btn.addEventListener("click", (event) => {
+                    this.remove()
+                });
+            }
+        }
+
+        #add_input_element(row) {
+            if (row.type === "title") {
+                this.#add_input_element_title(row);
+            } else if (row.type === "textarea") {
+                this.#add_input_element_textarea(row);
+            }
+        }
+
+        #add_input_element_title(row) {
+            let html = `
+<label><span id="form-mark-input-title">${row.label}</span></label>
+`;
+            this.input_group.insertAdjacentHTML("beforeend", html);
+            row.label_element = this.input_group.querySelector(":scope > label:last-of-type");
+        }
+
+        #add_input_element_textarea(row) {
+            let html = `
+<label >${row.label}<textarea wrap="soft"></textarea></label>
+`;
+            this.input_group.insertAdjacentHTML("beforeend", html);
+            row.label_element = this.input_group.querySelector(":scope > label:last-of-type");
+            row.input_element = row.label_element.querySelector(":scope > textarea");
+
+            row.input_element.value = row.value;
+            row.input_element.style.width = `${285}px`;
+            row.input_element.style.height = `${256}px`;
+        }
+
+        collect_data() {
+            for (const row of this.form) {
+                if (row.type === "textarea") {
+                    row.value = row.input_element.value;
+                }
+            }
+
+        }
+
+        static get_global_input(form, confirm_callback) {
+            const fm = new FormMark(document.body, form, confirm_callback);
+            fm.show();
+            return fm;
+        }
+
     }
 
     class BlankMark {
@@ -926,84 +1121,6 @@
 
 
     /*
-    * 发起请求
-    * */
-    const subviews = (() => {
-        class _ {
-            constructor(client, api_path) {
-                this.client = client;
-                this.api_path = api_path;
-            }
-
-            api_url() {
-                let url = root_url();
-                return new URL(url + this.api_path);
-            }
-        }
-
-        class Api extends _ {
-            constructor(client) {
-                super(client, "/api");
-
-            }
-        }
-
-        class Admin extends _ {
-            constructor(client) {
-                super(client, "/admin/api");
-            }
-
-            async auth(account, password) {
-                let url = join_path(this.api_url(), "auth");
-                let body = {account, password,}
-                let r = await fetch_post_json(url, body);
-                if (r.status === 200) {
-                    // let d = await r.json();
-                    // this.session_key = d.session_key; // 改为设置cookies吧
-                    return true;
-                } else if (r.status === 401) {
-                    throw new Error(await r.text());
-                }
-                throw new Error(r.status.toString());
-            }
-
-            async fetch_group_list() {
-                let url = join_path(this.api_url(), "group", "list");
-                let body = {}
-                let r = await fetch_post_json(url, body);
-                if (r.status === 200) {
-                    let d = await r.json();
-                    return d;
-                } else if (r.status === 401) {
-                    throw new Error(await r.text());
-                }
-                throw new Error(r.status.toString());
-            }
-        }
-
-        class Me extends _ {
-            constructor(client) {
-                super(client, "/me/api");
-            }
-        }
-
-        class Mail extends _ {
-            constructor(client) {
-                super(client, "/mail/api");
-            }
-        }
-
-        class Drive extends _ {
-            constructor(client) {
-                super(client, "/drive/api");
-            }
-        }
-
-        return {Api, Admin, Me, Mail, Drive};
-    })()
-
-
-    /*
     * 树控件
     * */
     class TreeWidget {
@@ -1042,6 +1159,8 @@
             this.details = this.parent_element.querySelector(":scope details.tree-widget:last-of-type");
             this.details.classList.add("hidden")
             this.summary = this.details.querySelector(":scope > summary");
+            this.container_tree_headers = this.details.querySelector(":scope div.tree-headers");
+            this.container_tree_items = this.details.querySelector(":scope ul");
 
             if (!this.can_fold) {
                 this.details.open = true;
@@ -1057,12 +1176,14 @@
                 this.summary.style.cursor = "pointer";
             }
 
-            this.parent_element.addEventListener("contextmenu", (event) => { // 菜单
+            // 菜单
+            this.parent_element.addEventListener("contextmenu", (event) => {
                 let items = [];
                 let clicking_info = {};
                 if (this.fill_menu) {
                     clicking_info = {
-                        event,
+                        tree_widget: this, event,
+
                         tree_item: event.target.closest(".tree-item"),
 
                         summary: event.target.closest("summary"),
@@ -1091,8 +1212,6 @@
                 });
             });
 
-            this.container_tree_headers = this.details.querySelector(":scope div.tree-headers");
-            this.container_tree_items = this.details.querySelector(":scope ul");
         }
 
         init_headers() {
@@ -1157,6 +1276,99 @@
     }
 
 
+    async function format_error_response(resp) {
+        return `${resp.status} ${await resp.text()}`;
+    }
+
+    /*
+    * 发起请求
+    * */
+    const subviews = (() => {
+        class _ {
+            constructor(client, api_path) {
+                this.client = client;
+                this.api_path = api_path;
+            }
+
+            api_url() {
+                let url = root_url();
+                return new URL(url + this.api_path);
+            }
+        }
+
+        class Api extends _ {
+            constructor(client) {
+                super(client, "/api");
+
+            }
+        }
+
+        class Admin extends _ {
+            constructor(client) {
+                super(client, "/admin/api");
+            }
+
+            async auth(account, password) {
+                let url = join_path(this.api_url(), "auth");
+                let body = {account, password,}
+                let r = await fetch_post_json(url, body);
+                if (r.status === 200) {
+                    // let d = await r.json();
+                    // this.session_key = d.session_key; // 改为设置cookies吧
+                    return true;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async fetch_group_list() {
+                let url = join_path(this.api_url(), "group", "list");
+                let r = await fetch_get(url,);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async new_group(form) {
+                let url = join_path(this.api_url(), "group",);
+                let body = [];
+                for (const formElement of form) {
+                    body.push({
+                        gid: formElement.name,
+                    })
+                }
+                let r = await fetch_post_json(url, body);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+        }
+
+        class Me extends _ {
+            constructor(client) {
+                super(client, "/me/api");
+            }
+        }
+
+        class Mail extends _ {
+            constructor(client) {
+                super(client, "/mail/api");
+            }
+        }
+
+        class Drive extends _ {
+            constructor(client) {
+                super(client, "/drive/api");
+            }
+        }
+
+        return {Api, Admin, Me, Mail, Drive};
+    })()
+
+
     /*
     * 面板右侧 内容
     * */
@@ -1167,12 +1379,14 @@
                 this.panel = panel;
                 this.li = li;
                 this.aside_right = panel.querySelector(":scope .aside-right");
+                this.closed = false;
             }
 
             close_page() {
                 this.li.classList.remove("active")
                 this.loading_mark.remove()
                 this.container.remove()
+                this.closed = true;
             }
 
             open_page() {
@@ -1253,16 +1467,12 @@
 
                 open_page() {
                     super.open_page();
-//                     let html = `
-// `;
-//                     this.container.insertAdjacentHTML("beforeend", html);
-                    // this.container.querySelector(":scope ");
 
                     const tree_headers = [
                         {text: "", width: 40,},
                         {text: "名称", width: -1,},
                     ];
-                    this.tree1 = new TreeWidget(this.container, tree_headers, this.fill_tree_menu)
+                    this.tree1 = new TreeWidget(this.container, tree_headers, this.fill_tree_menu.bind(this))
                     this.tree1.show();
 
                     this.fetch_list();
@@ -1277,7 +1487,7 @@
                         {
                             type: "button",
                             text: "创建",
-                            callback: event => this.open_admin_page(event, true),
+                            callback: event => this.new_group(),
                         },
                         {type: "section", text: "",},
                         {
@@ -1305,6 +1515,7 @@
                     this.loading_mark.show();
                     this.client.subviews.admin.fetch_group_list()
                         .then(result => {
+                            if (this.closed) return;
                             let c = 0;
                             for (const resultElement of result) {
                                 c++;
@@ -1319,8 +1530,71 @@
                             }
                             this.remove_loading_mark();
                         }).catch(error => {
+                        if (this.closed) return;
                         this.remove_loading_mark()
                         MessageMark.report(error);
+                    });
+                }
+
+                new_group() {
+
+                    const _template = [{
+                        name: "",
+                    },]
+
+                    let form = [
+                        {type: "title", label: "创建分组："},
+                        {type: "textarea", label: "", value: JSON.stringify(_template, null, 2),},
+                    ];
+
+                    const confirm_callback = (fm,) => {
+                        fm.collect_data();
+
+                        try {
+                            let _template = JSON.parse(form[1].value)
+
+                            if (!form_check_array(_template))
+                                throw new Error("array");
+                            for (const attr of _template) {
+                                if (!form_check_string(attr.name))
+                                    throw new Error("name");
+                            }
+
+                            fm.remove();
+                            this._new_group(_template);
+
+                        } catch (e) {
+                            MessageMark.report(e, fm.mark)
+                        }
+
+                    }
+
+                    FormMark.get_global_input(form, confirm_callback)
+                }
+
+                _new_group(form) {
+                    this.loading_mark.show();
+                    this.client.subviews.admin.new_group(form)
+                        .then(result => {
+                            if (this.closed) return;
+                            let c = this.tree1.tree_items.length;
+                            for (const resultElement of result) {
+                                c++;
+                                let tree_item = {
+                                    clickable: false,
+                                    columns: [
+                                        {text: c, selectable: false,},
+                                        {text: resultElement.gid, selectable: true,},
+                                    ],
+                                };
+                                this.tree1.add_item(tree_item);
+                            }
+                            this.remove_loading_mark();
+                        }).catch(error => {
+                        if (this.closed) return;
+                        this.remove_loading_mark()
+                        MessageMark.report(error);
+
                     });
                 }
             },
@@ -1399,6 +1673,7 @@
             this.panels = [this.login_panel, this.dashboard_mail, this.dashboard_drive, this.backend_panel,];
 
             this.login_rect = document.getElementById("login-rect"); // 登录
+            this.login_tip_user = document.getElementById("login-tip-user");
             this.login_tip_admin = document.getElementById("login-tip-admin");
             this.login_input_account = document.getElementById("login-input-account");
             this.login_input_password = document.getElementById("login-input-password");
@@ -1532,6 +1807,20 @@
             window.open(url, _self ? "_self" : '_blank')
         }
 
+        check_exception_to_reload(e) {
+            const keywords = ["请重新登录",];
+            for (const keyword of keywords) {
+                if (e.toString().includes(keyword)) {
+                    this.reload_current_page();
+                    return;
+                }
+            }
+        }
+
+        reload_current_page() {
+            window.location.reload();
+        }
+
         current_panel_btn() {
             for (const headerBtn of this.header_btns) {
                 if (headerBtn.classList.contains("selected")) {
@@ -1648,7 +1937,10 @@
         checkin.login_tip_admin.classList.remove("hidden");
     } else {
         checkin.header_btn_startpage.classList.add("hidden");
+
+        checkin.login_tip_user.classList.remove("hidden");
     }
+    checkin.header_btn_startpage.classList.remove("initiation_hidden");
 
 
     // 切换到默认面板
