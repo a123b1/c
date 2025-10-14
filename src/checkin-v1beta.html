@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>checkin</title>
+    <link rel="icon" href="data:;base64,=" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--全局-->
+    <style>
+        .initiation_hidden {
+            display: none !important;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .transparent {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .no-width {
+            width: 0;
+            padding-left: 0;
+            padding-right: 0;
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .no-height {
+            height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        body {
+            background: white;
+            font-family: Arial, sans-serif;
+            margin: 0 0 0 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        span.flex-grow {
+            display: inline-block;
+            flex-grow: 1;
+        }
+
+
+    </style>
+
+    <!--有三角的按钮-->
+    <style>
+        .menu-btn {
+            position: relative; /* 为了伪元素定位 */
+            padding: 8px 16px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* 使用伪元素添加三角 */
+        .menu-btn::after {
+            content: "";
+            position: absolute;
+            right: 6px; /* 距离右边 */
+            bottom: 6px; /* 距离底部 */
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent; /* 左边透明 */
+            border-right: 5px solid transparent; /* 右边透明 */
+            border-top: 5px solid #000000aa; /* 上边黑色三角 */
+        }
+    </style>
+
+    <!--顶部菜单栏-->
+    <style>
+        header {
+            background: #2088ee33;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            padding-left: 8px;
+            padding-right: 8px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+
+            margin-bottom: 8px;
+
+        }
+
+        header > button.selected {
+            font-weight: bold;
+            color: white;
+            background: #2581d5dd;
+        }
+
+        header > button.selected:hover {
+            background: #3e8fe7dd;
+        }
+
+        header > button.selected:active {
+            background: #146dbbdd;
+        }
+
+        header > button {
+            display: inline-block;
+            padding: 8px 20px;
+            font-size: 16px;
+            color: #14589a;
+            background: transparent;
+            transition: all 0.1s ease-in-out;
+            border: 0 solid #3498db;
+            border-radius: 0;
+            cursor: pointer;
+        }
+
+        header > button:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        header > button:active {
+            background: rgba(0, 0, 0, 0.24);
+        }
+
+        header > button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+    </style>
+
+    <!--内容区域 全局-->
+    <style>
+        main {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            flex-grow: 1;
+        }
+
+        main > section:not(.active) {
+            display: none !important;
+        }
+
+        main > section.active {
+            flex-grow: 1;
+
+            display: flex;
+            flex-direction: row;
+
+        }
+
+    </style>
+
+    <!--登录面板-->
+    <style>
+        section#login-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            justify-content: start;
+        }
+
+        div#login-rect {
+            background: rgba(32, 166, 238, 0.2);
+            padding: 24px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: left;
+            gap: 12px;
+        }
+
+        span#login-top-margin {
+            height: 20%;
+        }
+
+        span#login-tip-admin {
+            text-align: center;
+            user-select: none;
+            opacity: 0.8;
+        }
+
+        button#login-btn {
+            padding: 6px 6px;
+            cursor: pointer;
+        }
+
+    </style>
+
+    <!--通用 左右分栏-->
+    <style>
+        .aside-left {
+            width: 160px; /* 初始宽度 */
+            min-width: 100px; /* 最小宽度 */
+            max-width: 80%; /* 最大宽度 */
+            overflow: auto;
+            background-color: rgba(118, 181, 246, 0.15);
+            border-radius: 4px;
+
+            display: flex;
+            flex-direction: column;
+        }
+
+        .aside-right {
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            padding: 8px;
+        }
+
+        .aside-right > div {
+            flex-grow: 1;
+        }
+
+        .aside-divider {
+            width: 3px;
+            cursor: col-resize;
+            background-color: #9b9b9b88;
+            user-select: none;
+
+            margin: 8px 0;
+
+        }
+
+        .aside-divider:hover {
+            background-color: #69696988;
+        }
+    </style>
+
+    <!--通用 左栏按钮列表-->
+    <style>
+        .aside-left > nav {
+            margin: 14px 10px 8px 10px;
+            background-color: #fff;
+            padding: 4px;
+            border-radius: 4px;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+        }
+
+        /* ol 去掉默认序号和 padding */
+        .nav-buttons {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* li 默认样式，无背景 */
+        .nav-buttons li {
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: background-color 0.1s, transform 0.1s;
+            user-select: none;
+        }
+
+        /* 鼠标悬浮效果 */
+        .nav-buttons li:hover {
+            background-color: rgba(0, 123, 255, 0.15); /* 浅蓝色悬浮 */
+        }
+
+        /* 鼠标按下效果 */
+        .nav-buttons li:active {
+            background-color: rgba(0, 123, 255, 0.4); /* 深一些 */
+        }
+
+        /* 选中状态 */
+        .nav-buttons li.active {
+            background-color: rgba(0, 123, 255, 0.2);
+            font-weight: bold;
+            border: #2088ee 0 solid;
+            border-radius: 2px;
+            border-left-width: 4px;
+        }
+
+    </style>
+
+    <!--发信按钮-->
+    <style>
+        #new-mail-btn {
+            padding: 10px 6px;
+            margin: 16px 24px 0 24px;
+            cursor: pointer;
+            transition: background-color 0.1s, transform 0.1s;
+            user-select: none;
+            border: 0 solid #3498db;
+            border-radius: 4px;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+            font-size: 16px;
+            background: white;
+        }
+
+        #new-mail-btn:hover {
+            background-color: rgba(24, 128, 255, 0.15);
+        }
+
+        #new-mail-btn:active {
+            background-color: rgba(0, 123, 255, 0.4);
+        }
+    </style>
+
+    <!--模糊遮罩-->
+    <style>
+        .for-blur-mark {
+            /*对于 遮罩的父级 的设置*/
+            position: relative; /* 关键：让 子div 以它为定位基准 */
+            overflow: hidden; /* 防止 子div 溢出 */
+        }
+
+        div.blur-mark {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+
+            position: absolute;
+            inset: 0; /* 等价于 top:0; right:0; bottom:0; left:0; */
+            z-index: 9;
+
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+        }
+
+    </style>
+
+    <!--遮罩内容 转圈动画-->
+    <style>
+        .spinner-ring {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 6px solid rgba(0, 0, 0, 0.12); /* 环的背景条 */
+            border-top-color: #2563eb; /* 动态颜色（可换） */
+            /* 为了更圆滑可以用 box-shadow 微调 */
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+    </style>
+
+    <!--遮罩内容 文本消息-->
+    <style>
+        div#message-mark-dialog {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            justify-content: start;
+
+            flex-grow: 1;
+            height: 100%;
+        }
+
+        span#message-mark-top-margin {
+            height: 25%;
+        }
+
+        div#message-mark-rect {
+            background: white;
+            padding: 24px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: left;
+            gap: 12px;
+        }
+
+
+        p#message-mark-text {
+            text-align: center;
+            opacity: 0.8;
+        }
+
+        button.message-mark-btn {
+            padding: 6px 14px;
+            cursor: pointer;
+        }
+
+        div#message-mark-btn-group {
+            display: flex;
+            flex-direction: row;
+            justify-content: right;
+        }
+
+    </style>
+
+    <!--空白遮罩-->
+    <style>
+        .for-blank-mark {
+            /*对于 遮罩的父级 的设置*/
+            position: relative; /* 关键：让 子div 以它为定位基准 */
+            overflow: hidden; /* 防止 子div 溢出 */
+        }
+
+        div.blank-mark {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+
+            position: absolute;
+            inset: 0;
+            z-index: 9;
+        }
+    </style>
+
+    <!--遮罩内容 菜单-->
+    <style>
+        div#menu-mark-dialog {
+            flex-grow: 1;
+            height: 100%;
+        }
+
+        div#menu-mark-rect {
+            background: white;
+            padding: 6px 4px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: left;
+            gap: 1px;
+
+            position: absolute;
+        }
+
+        button.menu-mark-action-btn {
+            display: inline-block;
+            padding: 6px 14px;
+            /*font-size: 14px;*/
+            background: transparent;
+            transition: all 0.1s ease-in-out;
+            border: 0 solid #3498db;
+            border-radius: 0;
+            cursor: pointer;
+
+            text-align: left;
+        }
+
+        button.menu-mark-action-btn:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        button.menu-mark-action-btn:active {
+            background: rgba(0, 0, 0, 0.24);
+        }
+
+        button.menu-mark-action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        div.menu-mark-action-section {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 2px;
+            margin: 0;
+            padding: 0;
+            min-height: 1px;
+        }
+
+        .menu-mark-action-section-text {
+            margin: 0;
+            padding: 0;
+            color: #000000aa;
+            font-size: 12px;
+        }
+
+        .menu-mark-action-section-hr {
+            flex-grow: 1;
+            display: inline-block;
+            height: 1px;
+            background-color: #00000066;
+            border: none;
+        }
+
+    </style>
+
+    <!--树-->
+    <style>
+        /* 顶级节点样式 */
+        details.tree-widget > summary {
+            list-style: none;
+            padding: 6px 12px;
+            margin: 0;
+            background-color: #CCE5FF;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            user-select: none;
+            transition: transform 0.1s ease;
+        }
+
+        /*details.tree-widget > summary:hover {*/
+        /*    transform: scale(1.05);*/
+        /*}*/
+
+        /* Flex布局模拟多列 */
+        div.tree-headers {
+            display: flex;
+            width: 100%;
+            gap: 10px; /* 列间距 */
+        }
+
+        /* 子列表缩进 */
+        ul.tree-items {
+            padding-left: 12px;
+            padding-right: 4px;
+            margin: 4px 0;
+        }
+
+        li.tree-item {
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+            margin: 2px 0;
+            padding: 8px 4px;
+            border-radius: 4px;
+        }
+
+        li.tree-item:hover {
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+
+        li.tree-item[data-clickable="true"]:active {
+            background-color: rgba(0, 123, 255, 0.3);
+        }
+
+        li.tree-item.active {
+            background-color: rgba(255, 242, 0, 0.3);
+        }
+
+    </style>
+
+</head>
+
+<!---->
+
+<body class="">
+<header class="">
+    <button id="header-btn-startpage" class="">返回首页</button>
+    <button id="header-btn-mail" class="">收发</button>
+    <button id="header-btn-drive" class="">网盘</button>
+    <button id="header-btn-more-left" class="menu-btn">*</button>
+    <span class="flex-grow"></span>
+    <!--    <button id="header-btn-backend" class="">后台面板</button>-->
+    <button id="header-btn-more-right" class="menu-btn">#</button>
+</header>
+<main>
+    <section id="login-panel" class="">
+        <span id="login-top-margin"></span>
+        <div id="login-rect">
+            <span id="login-tip-admin" class="hidden">管理员</span>
+            <label>账号：<input type="text" id="login-input-account"></label>
+            <label>密码：<input type="text" id="login-input-password"></label>
+            <button id="login-btn">登录</button>
+        </div>
+    </section>
+    <section id="dashboard-mail">
+        <aside class="aside-left">
+            <button id="new-mail-btn">发信</button>
+            <nav>
+                <ol class="nav-buttons">
+                    <!--                    <li>收件箱</li>-->
+                </ol>
+            </nav>
+        </aside>
+        <div class="aside-divider"></div>
+        <aside class="aside-right">
+        </aside>
+    </section>
+    <section id="dashboard-drive">
+        <aside class="aside-left">
+            <nav>
+                <ol class="nav-buttons">
+                </ol>
+            </nav>
+        </aside>
+        <div class="aside-divider"></div>
+        <aside class="aside-right">
+        </aside>
+    </section>
+    <section id="backend-panel">
+        <aside class="aside-left">
+            <nav>
+                <ol class="nav-buttons">
+                </ol>
+            </nav>
+        </aside>
+        <div class="aside-divider"></div>
+        <aside class="aside-right">
+        </aside>
+    </section>
+</main>
+<footer>
+</footer>
+</body>
+
+<!---->
+
+<script>
+    const checkin_version = null;
+    const top_level_path = null;
+    const backend_panel = false;
+    let logged_admin = false;
+    let logged_user = false;
+
+    function current_url() {
+        return new URL(window.location.href.replace(/#$/, ""));
+    }
+
+    function root_url() {
+        let url = current_url();
+        url.pathname = `${top_level_path}`;
+        return url;
+    }
+
+    function join_path(url, ...subs) {
+        url.pathname = `${url.pathname.replace(/\/+$/, "")}/${subs.join("/")}`;
+        return url;
+    }
+
+    async function fetch_post_json(url, json, headers) {
+        return await fetch(url, {
+            method: "POST", headers: {
+                ...headers,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(json),
+        });
+    }
+
+    function random_choice(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function delete_cookie(key, path = '/', domain) {
+        let cookieStr = `${key}=; Max-Age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${path}; SameSite=Strict`;
+        if (domain) cookieStr += `; domain=${domain}`;
+        document.cookie = cookieStr;
+    }
+
+
+    /*
+    * 遮罩
+    * */
+    class BlurMark {
+        constructor(element) {
+            this.element = element;
+            this.init();
+        }
+
+        init() {
+            let html = `<div class="blur-mark" role="status" aria-live="polite" aria-label=""></div>`;
+            this.element.classList.add("for-blur-mark");
+            this.element.insertAdjacentHTML("beforeend", html);
+            this.mark = this.element.querySelector(":scope > div.blur-mark:last-of-type");
+            this.mark.classList.add("hidden")
+        }
+
+        show() {
+            this.fill();
+            this.mark.classList.remove("hidden")
+        }
+
+        remove() {
+            this.mark.classList.add("hidden")
+            this.mark.remove();
+            this.element.classList.remove("for-blur-mark");
+        }
+
+        fill() {
+        }
+
+        increase_z() {
+            this.mark.style.zIndex = (parseInt(window.getComputedStyle(this.mark).zIndex) + 1).toString();
+        }
+    }
+
+    class LoadingMark extends BlurMark {
+        constructor(element) {
+            super(element)
+        }
+
+        fill() {
+            let html = `
+<div class="spinner-ring" aria-hidden="true"></div>
+`;
+            this.mark.insertAdjacentHTML("beforeend", html);
+            this.mark.setAttribute("aria-label", "正在加载");
+        }
+    }
+
+    class MessageMark extends BlurMark {
+
+        static btnFlags = {
+            close: 1,
+            confirm: 2,
+            _: 4,
+        }
+        static colors = {
+            red: "#FCD6D6",
+            blue: "#E0F2FF",
+            // green: "#DBFFE0",
+            yellow: "#FFFCDE",
+        }
+
+        constructor(element, message, btn_flags, color, confirm_callback) {
+            super(element)
+            this.message = message;
+            this.btn_flags = btn_flags;
+            this.confirm_callback = confirm_callback;
+            this.color = color;
+        }
+
+        fill() {
+            let html = `
+<div id="message-mark-dialog">
+    <span id="message-mark-top-margin"></span>
+    <div id="message-mark-rect">
+        <p id="message-mark-text" class="">${this.message}</p>
+        <div id="message-mark-btn-group"></div>
+    </div>
+</div>
+`;
+            this.mark.insertAdjacentHTML("beforeend", html);
+
+            this.rect = this.mark.querySelector(":scope div#message-mark-rect");
+            this.rect.style.background = MessageMark.get_background_color.call(this);
+
+            this.btn_group = this.mark.querySelector(":scope div#message-mark-btn-group");
+            if (this.btn_flags & MessageMark.btnFlags.confirm) {
+                this.btn_group.insertAdjacentHTML("beforeend", `<button class="message-mark-btn">确定</button>`);
+                let btn = this.btn_group.querySelector(":scope button:last-of-type");
+                btn.addEventListener("click", (event) => {
+                    if (this.confirm_callback)
+                        this.confirm_callback()
+                    this.remove()
+                });
+            }
+            if (this.btn_flags & MessageMark.btnFlags.close) {
+                this.btn_group.insertAdjacentHTML("beforeend", `<button class="message-mark-btn">关闭</button>`);
+                let btn = this.btn_group.querySelector(":scope button:last-of-type");
+                btn.addEventListener("click", (event) => {
+                    this.remove()
+                });
+            }
+
+        }
+
+        static report(error, color = MessageMark.colors.red) {
+            const mm = new MessageMark(document.body, error instanceof Error ? `报错：${error}` : error, MessageMark.btnFlags.close, color);
+            mm.show();
+            return mm;
+        }
+
+        static get_background_color() {
+            if (Object.values(MessageMark.colors).includes(this.color)) {
+                return this.color;
+            } else {
+                const cs = Object.keys(MessageMark.colors).filter((i) => {
+                    return !["red", "yellow"].includes(i)
+                })
+                return MessageMark.colors[random_choice(cs)];
+            }
+        }
+    }
+
+    class BlankMark {
+        constructor(element,) {
+            this.element = element;
+            this.filled = false;
+            this.init();
+        }
+
+        init() {
+            let html = `<div class="blank-mark" role="status" aria-live="polite" aria-label=""></div>`;
+            this.element.classList.add("for-blank-mark");
+            this.element.insertAdjacentHTML("beforeend", html);
+            this.mark = this.element.querySelector(":scope > div.blank-mark:last-of-type");
+            this.mark.classList.add("hidden")
+        }
+
+        show() {
+            if (!this.filled)
+                this.fill();
+            this.mark.classList.remove("hidden")
+        }
+
+        remove() {
+            this.mark.classList.add("hidden")
+            this.mark.remove();
+            this.element.classList.remove("for-blank-mark");
+        }
+
+        fill() {
+            this.filled = true;
+        }
+    }
+
+    class MenuMark extends BlankMark {
+        constructor(element, color, emit_position, call_after_close) {
+            super(element)
+            this.color = color;
+            this.emit_position = emit_position;
+            this.call_after_close = call_after_close;
+            this.items = [];
+        }
+
+        fill() {
+            super.fill();
+            let html = `
+<div id="menu-mark-dialog">
+    <div id="menu-mark-rect">
+    </div>
+</div>
+`;
+            this.mark.insertAdjacentHTML("beforeend", html);
+
+            this.dialog = this.mark.querySelector(":scope div#menu-mark-dialog");
+            this.dialog.addEventListener('click', (event) => {
+                if (event.target !== this.dialog)
+                    return;
+                this.remove();
+                if (this.call_after_close)
+                    this.call_after_close();
+            });
+
+            this.rect = this.mark.querySelector(":scope div#menu-mark-rect");
+            this.rect.style.background = MessageMark.get_background_color.call(this);
+
+        }
+
+        static exec(emit_position, items, call_after_close) {
+            let mm = new MenuMark(document.body, MessageMark.colors.blue, emit_position, call_after_close);
+            mm.fill();
+            for (const item of items) {
+                if (item.type === "button") {
+                    mm.add_button(item);
+                } else if (item.type === "section") {
+                    mm.add_section(item);
+                }
+            }
+            mm.show();
+            mm.move_to();
+            return mm;
+        }
+
+        move_to() {
+            const menu = this.rect;
+            const menuWidth = menu.offsetWidth;
+            const menuHeight = menu.offsetHeight;
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            let x = this.emit_position.x;
+            let y = this.emit_position.y;
+            if (x + menuWidth > viewportWidth) {
+                x = viewportWidth - menuWidth - 10;
+            }
+            if (y + menuHeight > viewportHeight) {
+                y = viewportHeight - menuHeight;
+            }
+            menu.style.left = `${x + window.scrollX}px`;
+            menu.style.top = `${y + window.scrollY}px`;
+        }
+
+        add_button(item) {
+            let html = `<button class="menu-mark-action-btn">${item.text}</button>`;
+            this.rect.insertAdjacentHTML("beforeend", html);
+            let btn = this.rect.querySelector(":scope button:last-of-type");
+            this.items.push(btn);
+
+            if (item.disabled) {
+                btn.setAttribute("disabled", "");
+            } else {
+                btn.addEventListener("click", (event) => {
+                    if (item.callback)
+                        item.callback();
+                    this.remove();
+                    if (this.call_after_close)
+                        this.call_after_close();
+                });
+            }
+        }
+
+        add_section(item) {
+            let html = `
+<div class="menu-mark-action-section">
+    <span class="menu-mark-action-section-text">${item.text}</span>
+    <hr class="menu-mark-action-section-hr"/>
+</div>
+`;
+            this.rect.insertAdjacentHTML("beforeend", html);
+            let section = this.rect.querySelector(":scope div.menu-mark-action-section:last-child");
+            if (item.text.length === 0) {
+                section.querySelector(":scope span").classList.add("hidden")
+                section.style.maxHeight = "3px";
+            }
+            this.items.push(section);
+        }
+    }
+
+
+    /*
+    * 发起请求
+    * */
+    const subviews = (() => {
+        class _ {
+            constructor(client, api_path) {
+                this.client = client;
+                this.api_path = api_path;
+            }
+
+            api_url() {
+                let url = root_url();
+                return new URL(url + this.api_path);
+            }
+        }
+
+        class Api extends _ {
+            constructor(client) {
+                super(client, "/api");
+
+            }
+        }
+
+        class Admin extends _ {
+            constructor(client) {
+                super(client, "/admin/api");
+            }
+
+            async auth(account, password) {
+                let url = join_path(this.api_url(), "auth");
+                let body = {account, password,}
+                let r = await fetch_post_json(url, body);
+                if (r.status === 200) {
+                    // let d = await r.json();
+                    // this.session_key = d.session_key; // 改为设置cookies吧
+                    return true;
+                } else if (r.status === 401) {
+                    throw new Error(await r.text());
+                }
+                throw new Error(r.status.toString());
+            }
+
+            async fetch_group_list() {
+                let url = join_path(this.api_url(), "group", "list");
+                let body = {}
+                let r = await fetch_post_json(url, body);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                } else if (r.status === 401) {
+                    throw new Error(await r.text());
+                }
+                throw new Error(r.status.toString());
+            }
+        }
+
+        class Me extends _ {
+            constructor(client) {
+                super(client, "/me/api");
+            }
+        }
+
+        class Mail extends _ {
+            constructor(client) {
+                super(client, "/mail/api");
+            }
+        }
+
+        class Drive extends _ {
+            constructor(client) {
+                super(client, "/drive/api");
+            }
+        }
+
+        return {Api, Admin, Me, Mail, Drive};
+    })()
+
+
+    /*
+    * 树控件
+    * */
+    class TreeWidget {
+
+        static clicking_direction = {
+            header: 0,
+            item: 1,
+            blank: 2,
+        }
+
+        constructor(parent_element, headers, fill_menu, can_fold) {
+            this.parent_element = parent_element;
+            this.headers = headers;
+            this.fill_menu = fill_menu;
+            this.can_fold = can_fold;
+
+            this.tree_headers = [];
+            this.tree_items = [];
+
+            this.init();
+            this.init_headers();
+
+        }
+
+        init() {
+            let html = `
+<details class="tree-widget">
+  <summary>
+    <div class="tree-headers"></div>
+  </summary>
+  <ul class="tree-items"></ul>
+</details>
+`;
+            this.parent_element.classList.add("for-tree-widget");
+            this.parent_element.insertAdjacentHTML("beforeend", html);
+            this.details = this.parent_element.querySelector(":scope details.tree-widget:last-of-type");
+            this.details.classList.add("hidden")
+            this.summary = this.details.querySelector(":scope > summary");
+
+            if (!this.can_fold) {
+                this.details.open = true;
+                this.details.addEventListener('toggle', (e) => {
+                    if (!this.details.open) {
+                        this.details.open = true;
+                    }
+                });
+                this.summary.addEventListener('click', (e) => {
+                    e.preventDefault();
+                });
+            } else {
+                this.summary.style.cursor = "pointer";
+            }
+
+            this.parent_element.addEventListener("contextmenu", (event) => { // 菜单
+                let items = [];
+                let clicking_info = {};
+                if (this.fill_menu) {
+                    clicking_info = {
+                        event,
+                        tree_item: event.target.closest(".tree-item"),
+
+                        summary: event.target.closest("summary"),
+                        tree_header: event.target.closest(".tree-header"),
+                    }
+                    clicking_info.direction = clicking_info.summary ? TreeWidget.clicking_direction.header :
+                        (clicking_info.tree_item ? TreeWidget.clicking_direction.item : TreeWidget.clicking_direction.blank);
+
+                    items.push(...this.fill_menu(clicking_info));
+                }
+
+                if (items.length === 0)
+                    return;
+                event.preventDefault();
+
+                let highlighted = false;
+                if (clicking_info.direction === TreeWidget.clicking_direction.item) {
+                    clicking_info.tree_item.classList.add("active");
+                    highlighted = true;
+                }
+
+                MenuMark.exec({x: event.clientX, y: event.clientY,}, items, () => {
+                    if (highlighted) {
+                        clicking_info.tree_item.classList.remove("active");
+                    }
+                });
+            });
+
+            this.container_tree_headers = this.details.querySelector(":scope div.tree-headers");
+            this.container_tree_items = this.details.querySelector(":scope ul");
+        }
+
+        init_headers() {
+            for (const header of this.headers) {
+                let html = `
+<span class="tree-header">${header.text}</span>
+`;
+                this.container_tree_headers.insertAdjacentHTML("beforeend", html);
+                let tree_header = this.container_tree_headers.querySelector(":scope > span.tree-header:last-of-type");
+                this.tree_headers.push(tree_header);
+                if (header.width === -1) {
+                    tree_header.style.flexGrow = "1";
+                } else {
+                    tree_header.style.width = `${header.width}px`;
+                }
+            }
+
+        }
+
+        add_item(...attrs) {
+            for (const attr of attrs) {
+                let html = `<li class="tree-item"></li>`;
+                this.container_tree_items.insertAdjacentHTML("beforeend", html);
+                let tree_item = this.container_tree_items.querySelector(":scope > li.tree-item:last-of-type");
+                this.tree_items.push(tree_item);
+
+                if (attr.clickable) {
+                    tree_item.dataset.clickable = "true";
+                    tree_item.addEventListener("click", (event) => {
+                        attr.clickable(event);
+                    });
+                }
+
+                let c = 0;
+                for (const column of attr.columns) {
+                    let header = this.headers[c];
+                    c++;
+                    let html = `<span class="tree-item-column">${column.text}</span>`;
+                    tree_item.insertAdjacentHTML("beforeend", html);
+                    let item_column = tree_item.querySelector(":scope > span.tree-item-column:last-of-type");
+                    if (header.width === -1) {
+                        item_column.style.flexGrow = "1";
+                    } else {
+                        item_column.style.width = `${header.width}px`;
+                    }
+                    if (!column.selectable) {
+                        item_column.style.userSelect = "none";
+                    }
+                }
+            }
+        }
+
+        show() {
+            this.details.classList.remove("hidden")
+        }
+
+        remove() {
+            this.details.classList.add("hidden")
+            this.details.remove();
+            this.parent_element.classList.remove("for-tree-widget");
+        }
+    }
+
+
+    /*
+    * 面板右侧 内容
+    * */
+    const contentpages = (() => {
+        class _ {
+            constructor(client, panel, li) {
+                this.client = client;
+                this.panel = panel;
+                this.li = li;
+                this.aside_right = panel.querySelector(":scope .aside-right");
+            }
+
+            close_page() {
+                this.li.classList.remove("active")
+                this.loading_mark.remove()
+                this.container.remove()
+            }
+
+            open_page() {
+                this.li.classList.add("active")
+                let html = `<div></div>`;
+                this.aside_right.insertAdjacentHTML("beforeend", html);
+                this.container = this.aside_right.querySelector(":scope div:last-of-type");
+
+                this.loading_mark = new LoadingMark(this.aside_right);
+
+            }
+
+            remove_loading_mark() {
+                this.loading_mark.remove();
+                this.loading_mark = new LoadingMark(this.aside_right);
+            }
+        }
+
+        /*
+        * 收发
+        * */
+        let dashboard_mail = {
+            inbox(event) {
+
+            },
+
+            sent(event) {
+
+            },
+
+            activity(event) {
+
+            },
+        }
+
+        /*
+        * 网盘
+        * */
+        let dashboard_drive = {
+            myspace(event) {
+
+            },
+
+            newfiles(event) {
+
+            },
+
+            sharewithme(event) {
+
+            },
+
+            root(event) {
+
+            },
+        }
+
+        /*
+        * 后台
+        * */
+        let backend_panel = {
+            activity(event) {
+
+            },
+
+            users(event) {
+
+            },
+
+            groups: class extends _ {
+                constructor(client, panel, li) {
+                    super(client, panel, li);
+                }
+
+                close_page() {
+                    this.tree1.remove()
+                    super.close_page();
+                }
+
+                open_page() {
+                    super.open_page();
+//                     let html = `
+// `;
+//                     this.container.insertAdjacentHTML("beforeend", html);
+                    // this.container.querySelector(":scope ");
+
+                    const tree_headers = [
+                        {text: "", width: 40,},
+                        {text: "名称", width: -1,},
+                    ];
+                    this.tree1 = new TreeWidget(this.container, tree_headers, this.fill_tree_menu)
+                    this.tree1.show();
+
+                    this.fetch_list();
+                }
+
+                fill_tree_menu(clicking_info) {
+                    const items = [];
+                    if (clicking_info.direction === TreeWidget.clicking_direction.header)
+                        return items;
+
+                    items.push(
+                        {
+                            type: "button",
+                            text: "创建",
+                            callback: event => this.open_admin_page(event, true),
+                        },
+                        {type: "section", text: "",},
+                        {
+                            type: "button",
+                            text: "上线状况",
+                            callback: event => this.open_admin_page(event, true),
+                        },
+                        {type: "section", text: "",},
+                        {
+                            type: "button",
+                            text: "删除",
+                            callback: event => this.open_admin_page(event, true),
+                        },
+                    )
+
+                    if (clicking_info.direction !== TreeWidget.clicking_direction.item) {
+                        items[2].disabled = true;
+                        items[4].disabled = true;
+                    }
+
+                    return items;
+                }
+
+                fetch_list() {
+                    this.loading_mark.show();
+                    this.client.subviews.admin.fetch_group_list()
+                        .then(result => {
+                            let c = 0;
+                            for (const resultElement of result) {
+                                c++;
+                                let tree_item = {
+                                    clickable: false,
+                                    columns: [
+                                        {text: c, selectable: false,},
+                                        {text: resultElement.gid, selectable: true,},
+                                    ],
+                                };
+                                this.tree1.add_item(tree_item);
+                            }
+                            this.remove_loading_mark();
+                        }).catch(error => {
+                        this.remove_loading_mark()
+                        MessageMark.report(error);
+                    });
+                }
+            },
+
+
+            disk(event) {
+
+            },
+
+            status(event) {
+
+            },
+
+        }
+
+        return {dashboard_mail, dashboard_drive, backend_panel,};
+    })()
+
+
+    /*
+    * APP
+    * */
+    class Checkin {
+        constructor() {
+            this.subviews = {
+                api: new subviews.Api(this),
+                admin: new subviews.Admin(this),
+                me: new subviews.Me(this),
+                mail: new subviews.Mail(this),
+                drive: new subviews.Drive(this),
+            };
+
+            this.header_btn_mail = document.getElementById("header-btn-mail"); // 切换面板
+            this.header_btn_drive = document.getElementById("header-btn-drive");
+            this.header_btns = [this.header_btn_mail, this.header_btn_drive,];
+            for (const headerBtn of this.header_btns) {
+                headerBtn.addEventListener("click", (event) => {
+                    this.switch_panel_btn(event)
+                });
+            }
+
+            this.header_btn_startpage = document.getElementById("header-btn-startpage"); // 返回首页
+            this.header_btn_startpage.addEventListener("click", (event) => {
+                this.open_startpage(event, true);
+            });
+
+            // this.header_btn_backend = document.getElementById("header-btn-backend"); // 后台面板 A标签，在新分页打开
+            // this.header_btn_backend.addEventListener("click", this.open_admin_page);
+            // this.header_btn_backend.classList.add("hidden");
+
+            this.header_btn_more_left = document.getElementById("header-btn-more-left"); // 左侧 更多
+            this.header_btn_more_left.addEventListener("click", (event) => {
+            });
+            this.header_btn_more_right = document.getElementById("header-btn-more-right"); // 右侧
+            this.header_btn_more_right.addEventListener("click", (event) => {
+                const rect = event.target.getBoundingClientRect();
+                const items = [];
+                if (!backend_panel) {
+                    items.push(
+                        {type: "button", text: "进入后台", callback: event => this.open_admin_page(event, true),},
+                        {type: "section", text: "",},
+                    );
+                }
+                if ((backend_panel && logged_admin) || (!backend_panel && logged_user)) {
+                    items.push(
+                        {type: "button", text: "登出", callback: this.logout.bind(this),},
+                    );
+                }
+                MenuMark.exec({x: rect.left, y: rect.top + rect.height,}, items);
+            });
+
+            this.login_panel = document.getElementById("login-panel"); // 面板
+            this.dashboard_mail = document.getElementById("dashboard-mail");
+            this.dashboard_drive = document.getElementById("dashboard-drive");
+            this.backend_panel = document.getElementById("backend-panel");
+            this.panels = [this.login_panel, this.dashboard_mail, this.dashboard_drive, this.backend_panel,];
+
+            this.login_rect = document.getElementById("login-rect"); // 登录
+            this.login_tip_admin = document.getElementById("login-tip-admin");
+            this.login_input_account = document.getElementById("login-input-account");
+            this.login_input_password = document.getElementById("login-input-password");
+            this.login_btn = document.getElementById("login-btn");
+            this.login_btn.addEventListener("click", (event) => {
+                this.login(event)
+            });
+
+            this.#setup_divider(this.dashboard_mail) // 面板的左右布局
+            this.#setup_divider(this.dashboard_drive)
+            this.#setup_divider(this.backend_panel)
+
+            this.#bind_mainactions(this.dashboard_mail, [ // 控制切换右侧画面 按钮
+                {text: "收件箱", pagetype: contentpages.dashboard_mail.inbox,},
+                {text: "已发送", pagetype: contentpages.dashboard_mail.sent,},
+                {text: "上线情况", pagetype: contentpages.dashboard_mail.activity,},
+            ])
+            this.#bind_mainactions(this.dashboard_drive, [
+                {text: "个人空间", pagetype: contentpages.dashboard_drive.myspace,},
+                {text: "最近新增", pagetype: contentpages.dashboard_drive.newfiles,},
+                {text: "与我共享", pagetype: contentpages.dashboard_drive.sharewithme,},
+                {text: "总盘", pagetype: contentpages.dashboard_drive.root,},
+            ])
+            this.#bind_mainactions(this.backend_panel, [
+                {text: "上线情况", pagetype: contentpages.backend_panel.activity,},
+                {text: "用户列表", pagetype: contentpages.backend_panel.users,},
+                {text: "组列表", pagetype: contentpages.backend_panel.groups,},
+                {text: "储存空间", pagetype: contentpages.backend_panel.disk,},
+                {text: "服务状态", pagetype: contentpages.backend_panel.status,},
+            ])
+
+
+        }
+
+        /*
+        * 面板的分栏 初始化
+        * */
+        #setup_divider(panel) {
+            const divider = panel.querySelector('.aside-divider');
+            const leftAside = panel.querySelector('.aside-left');
+            let isDragging = false;
+
+            divider.addEventListener('mousedown', e => {
+                isDragging = true;
+                panel.style.cursor = 'col-resize';
+            });
+
+            panel.addEventListener('mousemove', e => {
+                if (!isDragging) return;
+
+                let newWidth = e.clientX; // 鼠标到窗口左边的距离
+                // 限制最小/最大宽度
+                if (newWidth < 100) newWidth = 100;
+                if (newWidth > window.innerWidth - 100) newWidth = window.innerWidth - 100;
+
+                leftAside.style.width = newWidth + 'px';
+            });
+
+            panel.addEventListener('mouseup', () => {
+                isDragging = false;
+                panel.style.cursor = 'default';
+            });
+        }
+
+        #bind_mainactions(panel, lis,) {
+            panel.mainactions = lis;
+            let ol = panel.querySelector(":scope nav > ol.nav-buttons");
+            for (const m of lis) {
+                let html = `<li>${m.text}</li>`;
+                ol.insertAdjacentHTML("beforeend", html);
+                let li = ol.querySelector(":scope li:last-child");
+                li.bindmap = m;
+                li.bindmap.element = li;
+                li.addEventListener("click", (event) => {
+                    // li.bindmap.func.call(this, event);
+                    this.switch_content_page(event);
+                });
+            }
+        }
+
+        /*
+        * 登录 登出
+        * */
+        login(event) {
+            this.login_input_account.value = this.login_input_account.value.replace(/\W+/g, "");
+
+            let account = this.login_input_account.value;
+            let password = this.login_input_password.value;
+
+            if (account.length === 0 || password.length === 0) {
+                return;
+            }
+
+            const lm = new LoadingMark(this.login_rect);
+            lm.show();
+
+            if (backend_panel) {
+                this.subviews.admin.auth(account, password)
+                    .then(result => {
+                        lm.remove()
+                        logged_admin = true;
+                        this.switch_panel_to_backend();
+
+                    }).catch(error => {
+                    lm.remove()
+                    MessageMark.report(error);
+                });
+            }
+        }
+
+        logout(event) {
+            if (backend_panel) {
+                delete_cookie("admin_session_id");
+                this.open_admin_page(null, true);
+            } else {
+                delete_cookie("session_id");
+                this.open_startpage(null, true);
+            }
+        }
+
+        /*
+        * 首页和面板相关
+        * */
+        open_startpage(event, _self) {
+            const url = root_url();
+            window.open(url, _self ? "_self" : '_blank')
+        }
+
+        open_admin_page(event, _self) {
+            const url = join_path(root_url(), "admin");
+            window.open(url, _self ? "_self" : '_blank')
+        }
+
+        current_panel_btn() {
+            for (const headerBtn of this.header_btns) {
+                if (headerBtn.classList.contains("selected")) {
+                    return headerBtn;
+                }
+            }
+            return null;
+        }
+
+        switch_panel_to_login() {
+            if (backend_panel) {
+                this.login_panel.classList.add("active");
+            } else {
+                this.switch_panel_btn(null);
+            }
+        }
+
+        switch_panel_to_backend() {
+            if (backend_panel) {
+                this.login_panel.classList.remove("active");
+                this.backend_panel.classList.add("active");
+            }
+        }
+
+        save_selected_panel_id(header_btn) {
+            localStorage.setItem("selected_panel_id", header_btn.id);
+        }
+
+        clear_selected_panel_id() {
+            localStorage.removeItem("selected_panel_id");
+        }
+
+        restore_selected_panel_id() {
+            if (backend_panel)
+                return
+            const id = localStorage.getItem("selected_panel_id");
+            for (const headerBtn of this.header_btns) {
+                if (headerBtn.id === id) {
+                    headerBtn.click();
+                    return;
+                }
+            }
+            this.header_btn_mail.click();
+        }
+
+        switch_panel_btn(event) {
+            if (backend_panel)
+                return;
+            for (const headerBtn of this.header_btns) {
+                headerBtn.classList.remove("selected")
+            }
+            if (event) {
+                event.target.classList.add("selected");
+                this.save_selected_panel_id(event.target);
+            } else {
+                this.clear_selected_panel_id()
+            }
+            this.switch_panel(event);
+        }
+
+        switch_panel(event) {
+            if (backend_panel)
+                return;
+            const btn = this.current_panel_btn();
+            for (const panel of this.panels)
+                panel.classList.remove("active")
+            if (btn === this.header_btn_mail) {
+                this.dashboard_mail.classList.add("active");
+            } else if (btn === this.header_btn_drive) {
+                this.dashboard_drive.classList.add("active");
+            } else {
+                this.login_panel.classList.add("active");
+            }
+        }
+
+        /*
+        * 右侧页面
+        * */
+        current_content_page = null;
+
+        switch_content_page(event) {
+            let li = event.target;
+            const panel = li.closest("section");
+
+            if (this.current_content_page) {
+                this.current_content_page.close_page();
+            }
+
+            this.current_content_page = new li.bindmap.pagetype(this, panel, li);
+            this.current_content_page.open_page();
+
+        }
+
+    }
+
+    const checkin = new Checkin();
+
+
+    // 访问的是admin路径
+    if (backend_panel) {
+        document.title = `${document.title} - 管理`;
+        // checkin.header_btn_backend.classList.remove("hidden");
+        // checkin.header_btn_backend.classList.add("transparent");
+        // checkin.header_btn_backend.classList.add("no-width");
+        // checkin.header_btn_backend.classList.add("no-height");
+        // checkin.header_btn_backend.innerHTML = "";
+        for (const headerBtn of checkin.header_btns) {
+            headerBtn.classList.add("hidden");
+        }
+
+        checkin.header_btn_more_left.classList.add("hidden");
+        // checkin.header_btn_more_right.classList.add("hidden");
+
+        checkin.login_tip_admin.classList.remove("hidden");
+    } else {
+        checkin.header_btn_startpage.classList.add("hidden");
+    }
+
+
+    // 切换到默认面板
+    let switched = false;
+    if (backend_panel) {
+        if (logged_admin) {
+            switched = true;
+            checkin.switch_panel_to_backend();
+        }
+    } else {
+        if (logged_user) {
+            switched = true;
+            checkin.restore_selected_panel_id();
+        }
+    }
+    if (!switched)
+        checkin.switch_panel_to_login();
+
+
+</script>
+
+<!---->
+
+</html>
