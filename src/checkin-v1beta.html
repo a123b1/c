@@ -1291,21 +1291,20 @@
             }
 
             api_url() {
-                let url = root_url();
-                return new URL(url + this.api_path);
+                return join_path(root_url(), ...this.api_path);
             }
         }
 
         class Api extends _ {
             constructor(client) {
-                super(client, "/api");
+                super(client, ["api",]);
 
             }
         }
 
         class Admin extends _ {
             constructor(client) {
-                super(client, "/admin/api");
+                super(client, ["admin", "api",]);
             }
 
             async auth(account, password) {
@@ -1349,19 +1348,19 @@
 
         class Me extends _ {
             constructor(client) {
-                super(client, "/me/api");
+                super(client, ["me", "api",]);
             }
         }
 
         class Mail extends _ {
             constructor(client) {
-                super(client, "/mail/api");
+                super(client, ["mail", "api",]);
             }
         }
 
         class Drive extends _ {
             constructor(client) {
-                super(client, "/drive/api");
+                super(client, ["drive", "api",]);
             }
         }
 
