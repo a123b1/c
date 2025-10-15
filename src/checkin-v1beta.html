@@ -39,6 +39,9 @@
 
         html {
             height: 100%;
+
+            /*height: 100vh;*/
+            /*overflow: hidden;*/
         }
 
         body {
@@ -175,7 +178,7 @@
         }
 
         div#login-rect {
-            background: rgba(32, 166, 238, 0.2);
+            background: #2088ee33;
             padding: 24px;
             box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
             border-radius: 4px;
@@ -319,7 +322,9 @@
         .for-blur-mark {
             /*对于 遮罩的父级 的设置*/
             position: relative; /* 关键：让 子div 以它为定位基准 */
-            overflow: hidden; /* 防止 子div 溢出 */
+            /*overflow: hidden; !* 防止 子div 溢出 *!*/
+
+            overflow: visible;
         }
 
         div.blur-mark {
@@ -389,11 +394,25 @@
             flex-direction: column;
             justify-content: left;
             gap: 12px;
+
+            /*position: absolute;*/
+            /*flex-wrap: wrap;*/
+            /*width: fit-content;*/
+            max-width: calc(90vw - 48px - 16px - 10px); /* 最大宽度不超过视口 - padding - shadow - fit */
         }
 
         p#message-mark-text {
             text-align: center;
-            opacity: 0.8;
+            opacity: 0.9;
+
+            white-space: normal; /* 允许正常换行 */
+            word-wrap: break-word; /* 在单词内换行（旧标准） */
+            overflow-wrap: break-word; /* 在需要时强制换行（新标准） */
+
+            /*white-space: pre-wrap; !* 保留空格，但自动换行 *!*/
+            /*word-break: keep-all; !* 尽量保持单词/字符不换行 *!*/
+            /*overflow-wrap: anywhere; !* 必要时才在单词内换行 *!*/
+
         }
 
         button.message-mark-btn {
@@ -474,7 +493,9 @@
         .for-blank-mark {
             /*对于 遮罩的父级 的设置*/
             position: relative; /* 关键：让 子div 以它为定位基准 */
-            overflow: hidden; /* 防止 子div 溢出 */
+            /*overflow: hidden; !* 防止 子div 溢出 *!*/
+
+            overflow: visible;
         }
 
         div.blank-mark {
@@ -567,7 +588,6 @@
     <style>
 
         details.tree-widget {
-            overflow: visible;
             display: flex;
             flex-direction: column;
         }
@@ -595,6 +615,12 @@
             width: 100%;
             gap: 10px; /* 列间距 */
         }
+
+        /*div.tree-items-warp {*/
+        /*    display: flex;*/
+        /*    flex-direction: column;*/
+        /*    flex-grow: 1;*/
+        /*}*/
 
         ul.tree-items {
             overflow-y: auto;
@@ -626,6 +652,14 @@
             background-color: rgba(255, 242, 0, 0.3);
         }
 
+        .column-mark-inactive {
+            color: red;
+        }
+
+        .column-mark-highlight {
+            background: yellow;
+        }
+
     </style>
 
 </head>
@@ -637,7 +671,8 @@
     <button id="header-btn-startpage" class="initiation_hidden">返回首页</button>
     <button id="header-btn-mail" class="">收发</button>
     <button id="header-btn-drive" class="">网盘</button>
-    <button id="header-btn-more-left" class="menu-btn">*</button>
+    <button id="header-btn-chat" class="">聊天</button>
+    <button id="header-btn-more-left" class="menu-btn">&nbsp;</button>
     <span class="flex-grow"></span>
     <!--    <button id="header-btn-backend" class="">后台面板</button>-->
     <button id="header-btn-more-right" class="menu-btn">#</button>
@@ -647,7 +682,7 @@
         <span id="login-top-margin"></span>
         <div id="login-rect">
             <span id="login-tip-user" class="hidden"></span>
-            <span id="login-tip-admin" class="hidden">管理员</span>
+            <span id="login-tip-admin" class="hidden">服务管理员</span>
             <label>账号：<input type="text" id="login-input-account"></label>
             <label>密码：<input type="text" id="login-input-password"></label>
             <button id="login-btn">登录</button>
@@ -667,6 +702,17 @@
         </aside>
     </section>
     <section id="dashboard-drive">
+        <aside class="aside-left">
+            <nav>
+                <ol class="nav-buttons">
+                </ol>
+            </nav>
+        </aside>
+        <div class="aside-divider"></div>
+        <aside class="aside-right">
+        </aside>
+    </section>
+    <section id="dashboard-chat">
         <aside class="aside-left">
             <nav>
                 <ol class="nav-buttons">
@@ -715,7 +761,7 @@
     }
 
     function join_path(url, ...subs) {
-        url.pathname = `${url.pathname.replace(/\/+$/, "")}/${subs.join("/")}`;
+        url.pathname = `${url.pathname.replace(/\/+$/, "")}/${subs.map(i => i.toString()).join("/")}`;
         return url;
     }
 
@@ -727,9 +773,27 @@
         });
     }
 
+    async function fetch_delete(url, headers) {
+        return await fetch(url, {
+            method: "DELETE", headers: {
+                ...headers,
+            },
+        });
+    }
+
     async function fetch_post_json(url, json, headers) {
         return await fetch(url, {
             method: "POST", headers: {
+                ...headers,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(json),
+        });
+    }
+
+    async function fetch_put_json(url, json, headers) {
+        return await fetch(url, {
+            method: "PUT", headers: {
                 ...headers,
                 "Content-Type": "application/json",
             },
@@ -747,12 +811,49 @@
         document.cookie = cookieStr;
     }
 
+    async function hash_password(text) {
+        // 将字符串转为 Uint8Array
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        // 计算 SHA-256
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        // 转为十六进制字符串
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function format_timestamp_utc8(timestamp, format = 'YYYY-MM-DD HH:mm') {
+        if (!timestamp) return "未知";
+        const date = new Date((timestamp + (8 * 60 * 60)) * 1000);
+        const map = {
+            'YYYY': date.getUTCFullYear(),
+            'MM': String(date.getUTCMonth() + 1).padStart(2, '0'),
+            'DD': String(date.getUTCDate()).padStart(2, '0'),
+            'HH': String(date.getUTCHours()).padStart(2, '0'),
+            'mm': String(date.getUTCMinutes()).padStart(2, '0'),
+            'ss': String(date.getUTCSeconds()).padStart(2, '0')
+        };
+        return format.replace(/YYYY|MM|DD|HH|mm|ss/g, matched => map[matched]);
+    }
+
     function form_check_string(value, allow_empty = false) {
         return ((typeof value === "string") && ((!allow_empty && value.length > 0) || allow_empty))
     }
 
+    function form_check_bool(value,) {
+        return ((typeof value === "boolean"))
+    }
+
+    function form_check_int(value, allow_great_than = -1) {
+        return ((typeof value === "number") && (value > allow_great_than))
+    }
+
     function form_check_array(value, allow_empty = false) {
         return (value instanceof Array) && ((!allow_empty && value.length > 0) || allow_empty)
+    }
+
+    function form_check_object(value,) {
+        return value !== null && typeof value === 'object' && value.constructor === Object;
     }
 
     /*
@@ -855,7 +956,8 @@
                 });
             }
             if (this.btn_flags & MessageMark.btnFlags.close) {
-                this.btn_group.insertAdjacentHTML("beforeend", `<button class="message-mark-btn">关闭</button>`);
+                const _btn_text = (this.btn_flags & MessageMark.btnFlags.confirm) ? "取消" : "关闭";
+                this.btn_group.insertAdjacentHTML("beforeend", `<button class="message-mark-btn">${_btn_text}</button>`);
                 let btn = this.btn_group.querySelector(":scope button:last-of-type");
                 btn.addEventListener("click", (event) => {
                     if (this.close_callback)
@@ -872,6 +974,12 @@
                 close_callback = () => checkin.check_exception_to_reload(error);
 
             const mm = new MessageMark(!element ? document.body : element, error instanceof Error ? `报错：${error}` : error, MessageMark.btnFlags.close, color, close_callback, confirm_callback);
+            mm.show();
+            return mm;
+        }
+
+        static confirm(message, element = null, close_callback = null, confirm_callback = null, color = MessageMark.colors.yellow,) {
+            const mm = new MessageMark(!element ? document.body : element, message, MessageMark.btnFlags.close | MessageMark.btnFlags.confirm, color, close_callback, confirm_callback);
             mm.show();
             return mm;
         }
@@ -931,7 +1039,7 @@
                 });
             }
             {
-                this.btn_group.insertAdjacentHTML("beforeend", `<button class="form-mark-btn">关闭</button>`);
+                this.btn_group.insertAdjacentHTML("beforeend", `<button class="form-mark-btn">取消</button>`);
                 let btn = this.btn_group.querySelector(":scope button:last-of-type");
                 btn.addEventListener("click", (event) => {
                     this.remove()
@@ -964,7 +1072,7 @@
             row.input_element = row.label_element.querySelector(":scope > textarea");
 
             row.input_element.value = row.value;
-            row.input_element.style.width = `${285}px`;
+            row.input_element.style.width = `${350}px`;
             row.input_element.style.height = `${256}px`;
         }
 
@@ -1151,7 +1259,9 @@
   <summary>
     <div class="tree-headers"></div>
   </summary>
-  <ul class="tree-items"></ul>
+<!--  <div class="tree-items-warp">-->
+    <ul class="tree-items"></ul>
+<!--  </div>-->
 </details>
 `;
             this.parent_element.classList.add("for-tree-widget");
@@ -1222,6 +1332,9 @@
                 this.container_tree_headers.insertAdjacentHTML("beforeend", html);
                 let tree_header = this.container_tree_headers.querySelector(":scope > span.tree-header:last-of-type");
                 this.tree_headers.push(tree_header);
+
+                header.element = tree_header;
+
                 if (header.width === -1) {
                     tree_header.style.flexGrow = "1";
                 } else {
@@ -1238,6 +1351,8 @@
                 let tree_item = this.container_tree_items.querySelector(":scope > li.tree-item:last-of-type");
                 this.tree_items.push(tree_item);
 
+                tree_item.attr = attr;
+
                 if (attr.clickable) {
                     tree_item.dataset.clickable = "true";
                     tree_item.addEventListener("click", (event) => {
@@ -1245,23 +1360,39 @@
                     });
                 }
 
-                let c = 0;
-                for (const column of attr.columns) {
-                    let header = this.headers[c];
-                    c++;
-                    let html = `<span class="tree-item-column">${column.text}</span>`;
-                    tree_item.insertAdjacentHTML("beforeend", html);
-                    let item_column = tree_item.querySelector(":scope > span.tree-item-column:last-of-type");
-                    if (header.width === -1) {
-                        item_column.style.flexGrow = "1";
-                    } else {
-                        item_column.style.width = `${header.width}px`;
-                    }
-                    if (!column.selectable) {
-                        item_column.style.userSelect = "none";
-                    }
+                this.update_item(tree_item);
+            }
+        }
+
+        update_item(tree_item) {
+            const item_columns = tree_item.querySelectorAll(":scope > span.tree-item-column");
+            for (const itemColumn of item_columns) itemColumn.remove();
+
+            const attr = tree_item.attr;
+            let c = 0;
+            for (const column of attr.columns) {
+                let header = this.headers[c];
+                c++;
+                let html = `<span class="tree-item-column">${column.text}</span>`;
+                tree_item.insertAdjacentHTML("beforeend", html);
+                let item_column = tree_item.querySelector(":scope > span.tree-item-column:last-of-type");
+                if (header.width === -1) {
+                    item_column.style.flexGrow = "1";
+                } else {
+                    item_column.style.width = `${header.width}px`;
+                }
+                if (!column.selectable) {
+                    item_column.style.userSelect = "none";
+                }
+                if (column.inactive) {
+                    item_column.classList.add("column-mark-inactive")
                 }
             }
+        }
+
+        remove_item(tree_item) {
+            tree_item.remove();
+            this.tree_items.splice(this.tree_items.indexOf(tree_item), 1)
         }
 
         show() {
@@ -1298,7 +1429,16 @@
         class Api extends _ {
             constructor(client) {
                 super(client, ["api",]);
+            }
 
+            async auth(account, password) {
+                let url = join_path(this.api_url(), "auth");
+                let body = {account, password_hash: await hash_password(password),}
+                let r = await fetch_post_json(url, body);
+                if (r.status === 200) {
+                    return true;
+                }
+                throw new Error(await format_error_response(r));
             }
         }
 
@@ -1334,7 +1474,7 @@
                 let body = [];
                 for (const formElement of form) {
                     body.push({
-                        gid: formElement.name,
+                        gid: formElement["名称"],
                     })
                 }
                 let r = await fetch_post_json(url, body);
@@ -1344,6 +1484,89 @@
                 }
                 throw new Error(await format_error_response(r));
             }
+
+            async delete_group(gid) {
+                let url = join_path(this.api_url(), "group", gid);
+                let r = await fetch_delete(url,);
+                if (r.status === 200) {
+                    return
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async fetch_user_list() {
+                let url = join_path(this.api_url(), "user", "list");
+                let r = await fetch_get(url,);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async new_user(form) {
+                let url = join_path(this.api_url(), "user",);
+                let body = [];
+                for (const formElement of form) {
+                    body.push(await this._form2json(formElement))
+                }
+                let r = await fetch_post_json(url, body);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async fetch_user_attr(uid) {
+                let url = join_path(this.api_url(), "user", uid);
+                let r = await fetch_get(url,);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async _form2json(form, is_edit = false) {
+                if (!is_edit && form["密码"].length === 0) throw new Error("密码");
+                const d = {
+                    uid: form["名称"],
+                    password_hash: form["密码"].length > 0 ? await hash_password(form["密码"]) : "",
+                    disabled: form["停用"],
+                    contact_any: form["允许主动与所有用户通信"],
+                    manage_drive: form["允许管理所有用户的网盘"],
+                    free_space: form["储存空间"],
+
+                    groups: form["所属组"],
+                    contact_groups: form["允许主动与这些组通信"],
+                    contact_users: form["允许主动与这些用户通信"],
+
+                };
+                return d;
+            }
+
+
+            async edit_user(form, old_uid) {
+                let url = join_path(this.api_url(), "user", old_uid);
+                let body = await this._form2json(form, true);
+                let r = await fetch_put_json(url, body);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async delete_user(uid) {
+                let url = join_path(this.api_url(), "user", uid);
+                let r = await fetch_delete(url,);
+                if (r.status === 200) {
+                    return
+                }
+                throw new Error(await format_error_response(r));
+            }
+
         }
 
         class Me extends _ {
@@ -1416,6 +1639,10 @@
 
             },
 
+            trashcan(event) {
+
+            },
+
             activity(event) {
 
             },
@@ -1426,6 +1653,10 @@
         * */
         let dashboard_drive = {
             myspace(event) {
+
+            },
+
+            trashcan(event) {
 
             },
 
@@ -1443,6 +1674,15 @@
         }
 
         /*
+         * 聊天
+         * */
+        let dashboard_chat = {
+            myspace(event) {
+
+            },
+        }
+
+        /*
         * 后台
         * */
         let backend_panel = {
@@ -1450,8 +1690,316 @@
 
             },
 
-            users(event) {
+            users: class extends _ {
+                constructor(client, panel, li) {
+                    super(client, panel, li);
+                }
 
+                close_page() {
+                    this.tree1.remove()
+                    super.close_page();
+                }
+
+                open_page() {
+                    super.open_page();
+
+                    const tree_headers = [
+                        {text: "", width: 40,},
+                        {text: "状态", width: 60,},
+                        {text: "名称", width: 120,},
+                        {text: "上次在线", width: 160,},
+                        {text: "所属组", width: -1,},
+                    ];
+                    this.tree1 = new TreeWidget(this.container, tree_headers, this.fill_tree_menu.bind(this))
+                    this.tree1.show();
+
+                    this.fetch_list();
+                }
+
+                fill_tree_menu(clicking_info) {
+                    const items = [];
+                    if (clicking_info.direction === TreeWidget.clicking_direction.header)
+                        return items;
+
+                    items.push(
+                        {
+                            type: "button",
+                            text: "创建",
+                            callback: event => this.new_user(),
+                        },
+                        {type: "section", text: "",},
+                        {
+                            type: "button",
+                            text: "上线情况",
+                            callback: event => this.activity_user(clicking_info),
+                        },
+                        {type: "section", text: "",},
+                        {
+                            type: "button",
+                            text: "编辑",
+                            callback: event => this.edit_user(clicking_info),
+                        },
+                        {type: "section", text: "",},
+                        {
+                            type: "button",
+                            text: "删除",
+                            callback: event => this.delete_user(clicking_info),
+                        },
+                    )
+
+                    if (clicking_info.direction !== TreeWidget.clicking_direction.item) {
+                        items[2].disabled = true;
+                        items[4].disabled = true;
+                        items[6].disabled = true;
+                    }
+
+                    return items;
+                }
+
+                _attrs2columns(attr) {
+                    return [
+                        {text: this.tree1.tree_items.length + 1, selectable: false,},
+                        {
+                            text: attr.disabled ? "暂停" : "正常",
+                            selectable: false,
+                            inactive: attr.disabled
+                        },
+                        {text: attr.uid, selectable: true,},
+                        {text: format_timestamp_utc8(attr.last_login_time), selectable: true,},
+                        {text: `${attr.groups.length}个；${attr.groups.join("、")}`, selectable: true,},
+                    ];
+                }
+
+                add_item(attr) {
+                    let tree_item = {
+                        clickable: false,
+                        columns: this._attrs2columns(attr),
+                    };
+                    this.tree1.add_item(tree_item);
+                }
+
+                update_item(tree_item, user_attr) {
+                    const columns = this._attrs2columns(user_attr);
+                    columns[0] = tree_item.attr.columns[0];
+                    tree_item.attr.columns = columns;
+                    this.tree1.update_item(tree_item);
+                }
+
+                fetch_list() {
+                    this.loading_mark.show();
+                    this.client.subviews.admin.fetch_user_list()
+                        .then(result => {
+                            if (this.closed) return;
+                            for (const resultElement of result) {
+                                this.add_item(resultElement);
+                            }
+                            this.remove_loading_mark();
+                        }).catch(error => {
+                        if (this.closed) return;
+                        this.remove_loading_mark()
+                        MessageMark.report(error);
+                    });
+                }
+
+                _check_form(attr, is_edit = false) {
+                    if (!form_check_bool(attr["停用"])) throw new Error("停用");
+                    if (!form_check_string(attr["名称"])) throw new Error("名称");
+                    if (!form_check_string(attr["密码"], is_edit)) throw new Error("密码");
+                    if (is_edit) {
+                        if (attr["密码"] === "不变") attr["密码"] = "";
+                    }
+
+                    const free_space = attr["储存空间"];
+                    let free_space_number = /^(\d+)mb$/.exec(free_space.toString())
+                    if (!form_check_string(free_space) || !free_space_number) throw new Error("储存空间");
+                    free_space_number = parseInt(free_space_number[1]);
+                    if (!form_check_int(free_space_number)) throw new Error("储存空间-数值");
+                    attr["储存空间"] = free_space_number;
+
+                    const groups = attr["所属组"];
+                    if (!form_check_array(groups, true)) throw new Error("所属组");
+                    for (const group of groups) {
+                        if (!form_check_string(group)) throw new Error("所属组-组名");
+                    }
+
+                    if (!form_check_bool(attr["允许主动与所有用户通信"])) throw new Error("允许主动与所有用户通信");
+
+                    const contact_groups = attr["允许主动与这些组通信"];
+                    if (!form_check_array(contact_groups, true)) throw new Error("允许主动与这些组通信");
+                    for (const contact_group of contact_groups) {
+                        if (!form_check_string(contact_group)) throw new Error("允许主动与这些组通信-组名");
+                    }
+
+                    const contact_users = attr["允许主动与这些用户通信"];
+                    if (!form_check_array(contact_users, true)) throw new Error("允许主动与这些用户通信");
+                    for (const contact_user of contact_users) {
+                        if (!form_check_string(contact_user)) throw new Error("允许主动与这些用户通信-用户名");
+                    }
+
+                    if (!form_check_bool(attr["允许管理所有用户的网盘"])) throw new Error("允许管理所有用户的网盘");
+                }
+
+                #_template = {
+                    "停用": false,
+                    "名称": "",
+                    "密码": "",
+                    "储存空间": "5120mb",
+                    "所属组": [],
+                    "允许主动与所有用户通信": true,
+                    "允许主动与这些组通信": [],
+                    "允许主动与这些用户通信": [],
+                    "允许管理所有用户的网盘": false,
+                }
+
+                new_user() {
+
+                    const _template = [{...this.#_template},]
+
+                    let form = [
+                        {type: "title", label: "创建用户："},
+                        {type: "textarea", label: "", value: JSON.stringify(_template, null, 2),},
+                    ];
+
+                    const confirm_callback = (fm,) => {
+                        fm.collect_data();
+
+                        try {
+                            let _template = JSON.parse(form[1].value)
+
+                            if (!form_check_array(_template)) throw new Error("array");
+                            for (const attr of _template) {
+                                this._check_form(attr);
+                            }
+
+                            // fm.remove();
+                            this._new_user(fm, _template);
+
+                        } catch (e) {
+                            MessageMark.report(e, fm.rect)
+                        }
+
+                    }
+
+                    FormMark.get_global_input(form, confirm_callback)
+                }
+
+                _new_user(fm, form) {
+                    // this.loading_mark.show();
+                    fm.loading_mark = new LoadingMark(fm.rect);
+                    fm.loading_mark.show();
+                    this.client.subviews.admin.new_user(form)
+                        .then(result => {
+                            if (this.closed) return;
+                            for (const resultElement of result) {
+                                this.add_item(resultElement);
+                            }
+                            // this.remove_loading_mark();
+                            fm.loading_mark.remove();
+                            fm.remove();
+                        }).catch(error => {
+                        if (this.closed) return;
+                        // this.remove_loading_mark();
+                        fm.loading_mark.remove();
+                        MessageMark.report(error, fm.rect);
+                    });
+                }
+
+                activity_user(clicking_info) {
+
+                }
+
+                edit_user(clicking_info) {
+                    const uid = clicking_info.tree_item.attr.columns[2].text;
+                    this.loading_mark.show();
+                    this.client.subviews.admin.fetch_user_attr(uid)
+                        .then(result => {
+                            if (this.closed) return;
+                            this._edit_user(clicking_info, result);
+                            this.remove_loading_mark();
+                        }).catch(error => {
+                        if (this.closed) return;
+                        this.remove_loading_mark();
+                        MessageMark.report(error);
+                    });
+                }
+
+                _edit_user(clicking_info, attr,) {
+                    const _template = {...this.#_template}
+
+                    _template["停用"] = Boolean(attr.disabled);
+                    _template["名称"] = attr.uid;
+                    _template["密码"] = "不变";
+                    _template["储存空间"] = `${attr.free_space}mb`;
+                    _template["所属组"] = attr.groups;
+                    _template["允许主动与所有用户通信"] = Boolean(attr.contact_any);
+                    _template["允许主动与这些组通信"] = attr.contact_groups;
+                    _template["允许主动与这些用户通信"] = attr.contact_users;
+                    _template["允许管理所有用户的网盘"] = Boolean(attr.manage_drive);
+
+                    let form = [
+                        {type: "title", label: `编辑用户：${attr.uid}`},
+                        {type: "textarea", label: "", value: JSON.stringify(_template, null, 2),},
+                    ];
+
+                    const confirm_callback = (fm,) => {
+                        fm.collect_data();
+
+                        try {
+                            let _template = JSON.parse(form[1].value)
+
+                            if (!form_check_object(_template)) throw new Error("object");
+                            this._check_form(_template, true);
+
+                            // fm.remove();
+                            this.__edit_user(clicking_info, fm, _template, attr.uid);
+
+                        } catch (e) {
+                            MessageMark.report(e, fm.rect)
+                        }
+
+                    }
+
+                    FormMark.get_global_input(form, confirm_callback)
+                }
+
+                __edit_user(clicking_info, fm, form, old_uid) {
+                    fm.loading_mark = new LoadingMark(fm.rect);
+                    fm.loading_mark.show();
+                    this.client.subviews.admin.edit_user(form, old_uid)
+                        .then(result => {
+                            if (this.closed) return;
+                            this.update_item(clicking_info.tree_item, result);
+                            // this.remove_loading_mark();
+                            fm.loading_mark.remove();
+                            fm.remove();
+                        }).catch(error => {
+                        if (this.closed) return;
+                        // this.remove_loading_mark();
+                        fm.loading_mark.remove();
+                        MessageMark.report(error, fm.rect);
+                    });
+                }
+
+                delete_user(clicking_info) {
+                    const uid = clicking_info.tree_item.attr.columns[2].text;
+                    MessageMark.confirm(`删除用户：${uid}`, null, null, () => {
+                        this._delete_user(clicking_info.tree_item, uid);
+                    },)
+                }
+
+                _delete_user(tree_item, uid,) {
+                    this.loading_mark.show();
+                    this.client.subviews.admin.delete_user(uid)
+                        .then(result => {
+                            if (this.closed) return;
+                            this.tree1.remove_item(tree_item)
+                            this.remove_loading_mark();
+                        }).catch(error => {
+                        if (this.closed) return;
+                        this.remove_loading_mark()
+                        MessageMark.report(error);
+                    });
+                }
             },
 
             groups: class extends _ {
@@ -1469,7 +2017,8 @@
 
                     const tree_headers = [
                         {text: "", width: 40,},
-                        {text: "名称", width: -1,},
+                        {text: "名称", width: 120,},
+                        {text: "成员", width: -1,},
                     ];
                     this.tree1 = new TreeWidget(this.container, tree_headers, this.fill_tree_menu.bind(this))
                     this.tree1.show();
@@ -1491,14 +2040,14 @@
                         {type: "section", text: "",},
                         {
                             type: "button",
-                            text: "上线状况",
-                            callback: event => this.open_admin_page(event, true),
+                            text: "上线情况",
+                            callback: event => this.activity_group(clicking_info),
                         },
                         {type: "section", text: "",},
                         {
                             type: "button",
                             text: "删除",
-                            callback: event => this.open_admin_page(event, true),
+                            callback: event => this.delete_group(clicking_info),
                         },
                     )
 
@@ -1510,22 +2059,25 @@
                     return items;
                 }
 
+                add_item(attr) {
+                    let tree_item = {
+                        clickable: false,
+                        columns: [
+                            {text: this.tree1.tree_items.length + 1, selectable: false,},
+                            {text: attr.gid, selectable: true,},
+                            {text: `${attr.users.length}人；${attr.users.join("、")}`, selectable: true,},
+                        ],
+                    };
+                    this.tree1.add_item(tree_item);
+                }
+
                 fetch_list() {
                     this.loading_mark.show();
                     this.client.subviews.admin.fetch_group_list()
                         .then(result => {
                             if (this.closed) return;
-                            let c = 0;
                             for (const resultElement of result) {
-                                c++;
-                                let tree_item = {
-                                    clickable: false,
-                                    columns: [
-                                        {text: c, selectable: false,},
-                                        {text: resultElement.gid, selectable: true,},
-                                    ],
-                                };
-                                this.tree1.add_item(tree_item);
+                                this.add_item(resultElement);
                             }
                             this.remove_loading_mark();
                         }).catch(error => {
@@ -1538,7 +2090,7 @@
                 new_group() {
 
                     const _template = [{
-                        name: "",
+                        "名称": "",
                     },]
 
                     let form = [
@@ -1552,18 +2104,16 @@
                         try {
                             let _template = JSON.parse(form[1].value)
 
-                            if (!form_check_array(_template))
-                                throw new Error("array");
+                            if (!form_check_array(_template)) throw new Error("array");
                             for (const attr of _template) {
-                                if (!form_check_string(attr.name))
-                                    throw new Error("name");
+                                if (!form_check_string(attr["名称"])) throw new Error("名称");
                             }
 
                             fm.remove();
                             this._new_group(_template);
 
                         } catch (e) {
-                            MessageMark.report(e, fm.mark)
+                            MessageMark.report(e, fm.rect)
                         }
 
                     }
@@ -1576,24 +2126,39 @@
                     this.client.subviews.admin.new_group(form)
                         .then(result => {
                             if (this.closed) return;
-                            let c = this.tree1.tree_items.length;
                             for (const resultElement of result) {
-                                c++;
-                                let tree_item = {
-                                    clickable: false,
-                                    columns: [
-                                        {text: c, selectable: false,},
-                                        {text: resultElement.gid, selectable: true,},
-                                    ],
-                                };
-                                this.tree1.add_item(tree_item);
+                                this.add_item(resultElement);
                             }
                             this.remove_loading_mark();
                         }).catch(error => {
                         if (this.closed) return;
                         this.remove_loading_mark()
                         MessageMark.report(error);
+                    });
+                }
 
+                activity_group(clicking_info) {
+
+                }
+
+                delete_group(clicking_info) {
+                    const gid = clicking_info.tree_item.attr.columns[1].text;
+                    MessageMark.confirm(`删除分组：${gid}`, null, null, () => {
+                        this._delete_group(clicking_info.tree_item, gid);
+                    },)
+                }
+
+                _delete_group(tree_item, gid,) {
+                    this.loading_mark.show();
+                    this.client.subviews.admin.delete_group(gid)
+                        .then(result => {
+                            if (this.closed) return;
+                            this.tree1.remove_item(tree_item)
+                            this.remove_loading_mark();
+                        }).catch(error => {
+                        if (this.closed) return;
+                        this.remove_loading_mark()
+                        MessageMark.report(error);
                     });
                 }
             },
@@ -1609,7 +2174,7 @@
 
         }
 
-        return {dashboard_mail, dashboard_drive, backend_panel,};
+        return {dashboard_mail, dashboard_drive, dashboard_chat, backend_panel,};
     })()
 
 
@@ -1628,7 +2193,8 @@
 
             this.header_btn_mail = document.getElementById("header-btn-mail"); // 切换面板
             this.header_btn_drive = document.getElementById("header-btn-drive");
-            this.header_btns = [this.header_btn_mail, this.header_btn_drive,];
+            this.header_btn_chat = document.getElementById("header-btn-chat");
+            this.header_btns = [this.header_btn_mail, this.header_btn_drive, this.header_btn_chat,];
             for (const headerBtn of this.header_btns) {
                 headerBtn.addEventListener("click", (event) => {
                     this.switch_panel_btn(event)
@@ -1668,8 +2234,9 @@
             this.login_panel = document.getElementById("login-panel"); // 面板
             this.dashboard_mail = document.getElementById("dashboard-mail");
             this.dashboard_drive = document.getElementById("dashboard-drive");
+            this.dashboard_chat = document.getElementById("dashboard-chat");
             this.backend_panel = document.getElementById("backend-panel");
-            this.panels = [this.login_panel, this.dashboard_mail, this.dashboard_drive, this.backend_panel,];
+            this.panels = [this.login_panel, this.dashboard_mail, this.dashboard_drive, this.dashboard_chat, this.backend_panel,];
 
             this.login_rect = document.getElementById("login-rect"); // 登录
             this.login_tip_user = document.getElementById("login-tip-user");
@@ -1683,15 +2250,18 @@
 
             this.#setup_divider(this.dashboard_mail) // 面板的左右布局
             this.#setup_divider(this.dashboard_drive)
+            this.#setup_divider(this.dashboard_chat)
             this.#setup_divider(this.backend_panel)
 
             this.#bind_mainactions(this.dashboard_mail, [ // 控制切换右侧画面 按钮
                 {text: "收件箱", pagetype: contentpages.dashboard_mail.inbox,},
                 {text: "已发送", pagetype: contentpages.dashboard_mail.sent,},
+                {text: "垃圾桶", pagetype: contentpages.dashboard_mail.trashcan,},
                 {text: "上线情况", pagetype: contentpages.dashboard_mail.activity,},
             ])
             this.#bind_mainactions(this.dashboard_drive, [
                 {text: "个人空间", pagetype: contentpages.dashboard_drive.myspace,},
+                {text: "垃圾桶", pagetype: contentpages.dashboard_drive.trashcan,},
                 {text: "最近新增", pagetype: contentpages.dashboard_drive.newfiles,},
                 {text: "与我共享", pagetype: contentpages.dashboard_drive.sharewithme,},
                 {text: "总盘", pagetype: contentpages.dashboard_drive.root,},
@@ -1757,7 +2327,7 @@
         * 登录 登出
         * */
         login(event) {
-            this.login_input_account.value = this.login_input_account.value.replace(/\W+/g, "");
+            this.login_input_account.value = this.login_input_account.value.replace(/[\s\r\t\n]+/g, "");
 
             let account = this.login_input_account.value;
             let password = this.login_input_password.value;
@@ -1775,6 +2345,17 @@
                         lm.remove()
                         logged_admin = true;
                         this.switch_panel_to_backend();
+
+                    }).catch(error => {
+                    lm.remove()
+                    MessageMark.report(error);
+                });
+            } else {
+                this.subviews.api.auth(account, password)
+                    .then(result => {
+                        lm.remove()
+                        logged_user = true;
+                        this.restore_selected_panel_id();
 
                     }).catch(error => {
                     lm.remove()
@@ -1875,7 +2456,7 @@
                 event.target.classList.add("selected");
                 this.save_selected_panel_id(event.target);
             } else {
-                this.clear_selected_panel_id()
+                // this.clear_selected_panel_id()
             }
             this.switch_panel(event);
         }
@@ -1887,9 +2468,14 @@
             for (const panel of this.panels)
                 panel.classList.remove("active")
             if (btn === this.header_btn_mail) {
+                if (!logged_user) return this.switch_panel_to_login();
                 this.dashboard_mail.classList.add("active");
             } else if (btn === this.header_btn_drive) {
+                if (!logged_user) return this.switch_panel_to_login();
                 this.dashboard_drive.classList.add("active");
+            } else if (btn === this.header_btn_chat) {
+                if (!logged_user) return this.switch_panel_to_login();
+                this.dashboard_chat.classList.add("active");
             } else {
                 this.login_panel.classList.add("active");
             }
@@ -1915,48 +2501,52 @@
 
     }
 
+
+    function initialize() {
+        // 访问的是admin路径
+        if (backend_panel) {
+            document.title = `${document.title} - 管理`;
+            // checkin.header_btn_backend.classList.remove("hidden");
+            // checkin.header_btn_backend.classList.add("transparent");
+            // checkin.header_btn_backend.classList.add("no-width");
+            // checkin.header_btn_backend.classList.add("no-height");
+            // checkin.header_btn_backend.innerHTML = "";
+            for (const headerBtn of checkin.header_btns) {
+                headerBtn.classList.add("hidden");
+            }
+
+            checkin.header_btn_more_left.classList.add("hidden");
+            // checkin.header_btn_more_right.classList.add("hidden");
+
+            checkin.login_tip_admin.classList.remove("hidden");
+        } else {
+            checkin.header_btn_startpage.classList.add("hidden");
+
+            checkin.login_tip_user.classList.remove("hidden");
+        }
+        checkin.header_btn_startpage.classList.remove("initiation_hidden");
+
+
+        // 切换到默认面板
+        let switched = false;
+        if (backend_panel) {
+            if (logged_admin) {
+                switched = true;
+                checkin.switch_panel_to_backend();
+            }
+        } else {
+            if (logged_user) {
+                switched = true;
+                checkin.restore_selected_panel_id();
+            }
+        }
+        if (!switched)
+            checkin.switch_panel_to_login();
+
+    }
+
     const checkin = new Checkin();
-
-
-    // 访问的是admin路径
-    if (backend_panel) {
-        document.title = `${document.title} - 管理`;
-        // checkin.header_btn_backend.classList.remove("hidden");
-        // checkin.header_btn_backend.classList.add("transparent");
-        // checkin.header_btn_backend.classList.add("no-width");
-        // checkin.header_btn_backend.classList.add("no-height");
-        // checkin.header_btn_backend.innerHTML = "";
-        for (const headerBtn of checkin.header_btns) {
-            headerBtn.classList.add("hidden");
-        }
-
-        checkin.header_btn_more_left.classList.add("hidden");
-        // checkin.header_btn_more_right.classList.add("hidden");
-
-        checkin.login_tip_admin.classList.remove("hidden");
-    } else {
-        checkin.header_btn_startpage.classList.add("hidden");
-
-        checkin.login_tip_user.classList.remove("hidden");
-    }
-    checkin.header_btn_startpage.classList.remove("initiation_hidden");
-
-
-    // 切换到默认面板
-    let switched = false;
-    if (backend_panel) {
-        if (logged_admin) {
-            switched = true;
-            checkin.switch_panel_to_backend();
-        }
-    } else {
-        if (logged_user) {
-            switched = true;
-            checkin.restore_selected_panel_id();
-        }
-    }
-    if (!switched)
-        checkin.switch_panel_to_login();
+    initialize();
 
 
 </script>
