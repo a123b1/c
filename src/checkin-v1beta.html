@@ -163,6 +163,8 @@
             display: flex;
             flex-direction: row;
 
+            height: 0;
+
         }
 
     </style>
@@ -205,6 +207,33 @@
 
     </style>
 
+    <!--滚动条-->
+    <style>
+        .tiny-scrollbar {
+            overflow: auto;
+            /* Firefox */
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 0, 0, .2) transparent;
+        }
+
+        /* Chrome / Safari / Edge */
+        .tiny-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .tiny-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, .2);
+            border-radius: 3px;
+        }
+
+        .tiny-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, .3);
+        }
+
+
+    </style>
+
     <!--通用 左右分栏-->
     <style>
         .aside-left {
@@ -217,6 +246,11 @@
 
             display: flex;
             flex-direction: column;
+
+            padding-top: 16px;
+            padding-bottom: 16px;
+            gap: 14px;
+
         }
 
         .aside-right {
@@ -228,15 +262,16 @@
 
         .aside-right > div {
             flex-grow: 1;
+            display: flex;
         }
 
         .aside-divider {
-            width: 3px;
+            width: 2px;
             cursor: col-resize;
-            background-color: #9b9b9b88;
+            background-color: #9b9b9b66;
             user-select: none;
 
-            margin: 8px 0;
+            margin: 8px 0 0 0;
 
         }
 
@@ -248,7 +283,7 @@
     <!--通用 左栏按钮列表-->
     <style>
         .aside-left > nav {
-            margin: 14px 10px 8px 10px;
+            margin: 0 10px 0 10px;
             background-color: #fff;
             padding: 4px;
             border-radius: 4px;
@@ -297,7 +332,7 @@
     <style>
         #new-mail-btn {
             padding: 10px 6px;
-            margin: 16px 24px 0 24px;
+            margin: 0 24px 0 24px;
             cursor: pointer;
             transition: background-color 0.1s, transform 0.1s;
             user-select: none;
@@ -590,6 +625,7 @@
         details.tree-widget {
             display: flex;
             flex-direction: column;
+            flex-grow: 1;
         }
 
         /* 顶级节点样式 */
@@ -689,7 +725,7 @@
         </div>
     </section>
     <section id="dashboard-mail">
-        <aside class="aside-left">
+        <aside class="aside-left tiny-scrollbar">
             <button id="new-mail-btn">发信</button>
             <nav>
                 <ol class="nav-buttons">
@@ -702,7 +738,7 @@
         </aside>
     </section>
     <section id="dashboard-drive">
-        <aside class="aside-left">
+        <aside class="aside-left tiny-scrollbar">
             <nav>
                 <ol class="nav-buttons">
                 </ol>
@@ -713,7 +749,11 @@
         </aside>
     </section>
     <section id="dashboard-chat">
-        <aside class="aside-left">
+        <aside class="aside-left tiny-scrollbar">
+            <nav>
+                <ol class="nav-buttons">
+                </ol>
+            </nav>
             <nav>
                 <ol class="nav-buttons">
                 </ol>
@@ -724,7 +764,7 @@
         </aside>
     </section>
     <section id="backend-panel">
-        <aside class="aside-left">
+        <aside class="aside-left tiny-scrollbar">
             <nav>
                 <ol class="nav-buttons">
                 </ol>
@@ -748,7 +788,7 @@
     const top_level_path = null;
     const backend_panel = false;
     let logged_admin = false;
-    let logged_user = false;
+    let logged_user = null;
 
     function current_url() {
         return new URL(window.location.href.replace(/#$/, ""));
@@ -1397,12 +1437,21 @@
 
         show() {
             this.details.classList.remove("hidden")
+
+            window.addEventListener('resize', (event) => this.resize_container_tree_items());
+            this.resize_container_tree_items()
         }
 
         remove() {
             this.details.classList.add("hidden")
             this.details.remove();
             this.parent_element.classList.remove("for-tree-widget");
+        }
+
+        resize_container_tree_items() {
+            const summaryHeight = this.summary.offsetHeight;
+            // const outerHeight = this.details.parentElement.clientHeight;
+            this.container_tree_items.style.height = `calc(100% - ${summaryHeight}px)`;
         }
     }
 
@@ -1436,7 +1485,8 @@
                 let body = {account, password_hash: await hash_password(password),}
                 let r = await fetch_post_json(url, body);
                 if (r.status === 200) {
-                    return true;
+                    let d = await r.json();
+                    return d;
                 }
                 throw new Error(await format_error_response(r));
             }
@@ -1712,6 +1762,7 @@
                     ];
                     this.tree1 = new TreeWidget(this.container, tree_headers, this.fill_tree_menu.bind(this))
                     this.tree1.show();
+
 
                     this.fetch_list();
                 }
@@ -2213,6 +2264,7 @@
             this.header_btn_more_left = document.getElementById("header-btn-more-left"); // 左侧 更多
             this.header_btn_more_left.addEventListener("click", (event) => {
             });
+            this.header_btn_more_left.classList.add("hidden");
             this.header_btn_more_right = document.getElementById("header-btn-more-right"); // 右侧
             this.header_btn_more_right.addEventListener("click", (event) => {
                 const rect = event.target.getBoundingClientRect();
@@ -2274,6 +2326,20 @@
                 {text: "服务状态", pagetype: contentpages.backend_panel.status,},
             ])
 
+            this.#bind_mainactions(this.dashboard_chat, [
+                {text: "上线情况", pagetype: contentpages.backend_panel.activity,},
+                {text: "用户列表", pagetype: contentpages.backend_panel.users,},
+                {text: "组列表", pagetype: contentpages.backend_panel.groups,},
+                {text: "储存空间", pagetype: contentpages.backend_panel.disk,},
+                {text: "服务状态", pagetype: contentpages.backend_panel.status,},
+            ])
+            this.#bind_mainactions(this.dashboard_chat, [
+                {text: "上线情况", pagetype: contentpages.backend_panel.activity,},
+                {text: "用户列表", pagetype: contentpages.backend_panel.users,},
+                {text: "组列表", pagetype: contentpages.backend_panel.groups,},
+                {text: "储存空间", pagetype: contentpages.backend_panel.disk,},
+                {text: "服务状态", pagetype: contentpages.backend_panel.status,},
+            ])
 
         }
 
@@ -2309,7 +2375,7 @@
 
         #bind_mainactions(panel, lis,) {
             panel.mainactions = lis;
-            let ol = panel.querySelector(":scope nav > ol.nav-buttons");
+            let ol = panel.querySelector(":scope nav > ol.nav-buttons:first-of-type");
             for (const m of lis) {
                 let html = `<li>${m.text}</li>`;
                 ol.insertAdjacentHTML("beforeend", html);
@@ -2345,7 +2411,6 @@
                         lm.remove()
                         logged_admin = true;
                         this.switch_panel_to_backend();
-
                     }).catch(error => {
                     lm.remove()
                     MessageMark.report(error);
@@ -2354,9 +2419,8 @@
                 this.subviews.api.auth(account, password)
                     .then(result => {
                         lm.remove()
-                        logged_user = true;
+                        logged_user = result;
                         this.restore_selected_panel_id();
-
                     }).catch(error => {
                     lm.remove()
                     MessageMark.report(error);
@@ -2410,21 +2474,6 @@
             return null;
         }
 
-        switch_panel_to_login() {
-            if (backend_panel) {
-                this.login_panel.classList.add("active");
-            } else {
-                this.switch_panel_btn(null);
-            }
-        }
-
-        switch_panel_to_backend() {
-            if (backend_panel) {
-                this.login_panel.classList.remove("active");
-                this.backend_panel.classList.add("active");
-            }
-        }
-
         save_selected_panel_id(header_btn) {
             localStorage.setItem("selected_panel_id", header_btn.id);
         }
@@ -2470,16 +2519,64 @@
             if (btn === this.header_btn_mail) {
                 if (!logged_user) return this.switch_panel_to_login();
                 this.dashboard_mail.classList.add("active");
+                this._switch_panel_to_mail();
             } else if (btn === this.header_btn_drive) {
                 if (!logged_user) return this.switch_panel_to_login();
                 this.dashboard_drive.classList.add("active");
+                this._switch_panel_to_drive();
             } else if (btn === this.header_btn_chat) {
                 if (!logged_user) return this.switch_panel_to_login();
                 this.dashboard_chat.classList.add("active");
+                this._switch_panel_to_chat();
             } else {
                 this.login_panel.classList.add("active");
             }
+
+            if (btn) {
+                this.header_btn_more_right.textContent = `${logged_user.uid}`;
+            } else {
+                this.header_btn_more_right.textContent = `#`;
+            }
         }
+
+        switch_panel_to_login() {
+            if (backend_panel) {
+                this.login_panel.classList.add("active");
+            } else {
+                this.switch_panel_btn(null);
+            }
+        }
+
+        _switch_panel_to_mail() {
+
+        }
+
+        _switch_panel_to_drive() {
+            let _mainaction_root = null;
+            for (const mainaction of this.dashboard_drive.mainactions) {
+                if (mainaction.pagetype === contentpages.dashboard_drive.root) {
+                    _mainaction_root = mainaction;
+                    break;
+                }
+            }
+            if (logged_user.manage_drive) {
+                _mainaction_root.element.classList.remove("hidden")
+            } else {
+                _mainaction_root.element.classList.add("hidden")
+            }
+        }
+
+        _switch_panel_to_chat() {
+
+        }
+
+        switch_panel_to_backend() {
+            if (backend_panel) {
+                this.login_panel.classList.remove("active");
+                this.backend_panel.classList.add("active");
+            }
+        }
+
 
         /*
         * 右侧页面
