@@ -514,11 +514,230 @@
             justify-content: left;
         }
 
+        div#form-mark-input-group > label > input {
+            margin-left: 4px;
+        }
+
         span#form-mark-input-title {
             display: inline-block;
             font-size: 16px;
             font-weight: bold;
             margin: 0 0 2px 0;
+        }
+
+    </style>
+
+    <!--遮罩内容 悬浮球弹出窗口-->
+    <style>
+        div#floatball-mark-dialog {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            justify-content: start;
+
+            flex-grow: 1;
+            height: 100%;
+        }
+
+        span#floatball-mark-top-margin {
+            height: 20%;
+        }
+
+        span#floatball-mark-bottom-margin {
+            height: 25%;
+        }
+
+        div#floatball-mark-rect {
+            background: white;
+            padding: 14px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: left;
+            gap: 6px;
+
+            /*position: absolute;*/
+            /*flex-wrap: wrap;*/
+            /*width: fit-content;*/
+            max-width: calc(90vw - 48px - 16px - 10px); /* 最大宽度不超过视口 - padding - shadow - fit */
+
+            min-width: 300px;
+        }
+
+        div.floatball-mark-tabbar {
+            display: flex;
+            flex-direction: row;
+            border: 0 solid #2088eeaa;
+            border-bottom-width: 2px;
+            padding: 0 4px;
+        }
+
+        div.floatball-mark-tabbar button {
+            display: inline-block;
+            padding: 6px 14px;
+            /*font-size: 14px;*/
+            background: transparent;
+            transition: all 0.1s ease-in-out;
+            border: 0 solid #3498db;
+            border-radius: 0;
+            cursor: pointer;
+
+            text-align: left;
+
+            font-size: 16px;
+            color: #1c1c1c;
+        }
+
+        div.floatball-mark-tabbar button:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        div.floatball-mark-tabbar button:active {
+            background: rgba(0, 0, 0, 0.24);
+        }
+
+        div.floatball-mark-tabbar button.active {
+            font-weight: bold;
+            /*color: #1574D1;*/
+            background: #2088ee33;
+        }
+
+
+        div.floatball-mark-tabcontent {
+            display: flex;
+            overflow: auto;
+            max-height: 60vh;
+        }
+
+        div.floatball-mark-tabcontent-settings {
+            display: flex;
+            flex-direction: column;
+            gap: 4px
+        }
+
+        div.floatball-mark-tabcontent-settings label {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+        }
+
+        div.floatball-mark-tabcontent-backtasks {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            gap: 2px;
+        }
+
+    </style>
+
+    <!--悬浮球弹出窗口 后台任务-->
+    <style>
+        .backtask-rect {
+            display: flex;
+            flex-direction: row;
+            gap: 6px;
+            padding: 6px;
+            width: calc(100% - 12px);
+            border-radius: 2px;
+        }
+
+        .backtask-rect:hover {
+            background: rgba(0, 0, 0, 0.08);
+        }
+
+        .backtask-name {
+            margin: 0;
+            padding: 0;
+        }
+
+        .backtask-status-text {
+            margin: 0;
+            padding: 0;
+            color: #000000aa;
+            font-size: 12px;
+            user-select: none;
+        }
+
+        .backtask-progress-bar {
+            width: 100%;
+            background-color: white;
+            border: 0 solid #ccc;
+            height: 6px;
+            flex-shrink: 0;
+            /*display: none; */
+            display: block;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .backtask-progress {
+            height: 100%;
+            background-color: #2E89E0;
+            width: 30%;
+        }
+
+        .sliding-bar-animation {
+            animation: slidingBar 1200ms infinite;
+            animation-timing-function: cubic-bezier(0.2, 1, 0.8, 1);
+        }
+
+        @keyframes slidingBar {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(333%);
+            }
+        }
+
+        .backtask-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex-grow: 1;
+        }
+
+        .backtask-btns {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .backtask-btns > button {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s ease, background-color 0.1s ease;
+            padding: 6px 6px;
+        }
+
+        .backtask-btns > button:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .backtask-btns > button:active {
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        i.backtask-btnicon {
+            background-repeat: no-repeat;
+            background-size: contain;
+            width: 22px;
+            height: 22px;
+            display: inline-block;
+        }
+
+        .backtask-btn-cancel i.backtask-btnicon {
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23F44336' d='M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z' /></svg>");
+        }
+
+        .backtask-btn-retry i.backtask-btnicon {
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%232196F3' d='M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z'/></svg>");
         }
 
     </style>
@@ -612,15 +831,22 @@
         .menu-mark-action-section-hr {
             flex-grow: 1;
             display: inline-block;
-            height: 1px;
-            background-color: #00000066;
+            min-height: 1px;
+            max-height: 1px;
+            background-color: #00000033;
             border: none;
+            margin: 0;
+            padding: 0;
         }
 
     </style>
 
     <!--树-->
     <style>
+
+        .for-tree-widget {
+            /*display: do nothings;*/
+        }
 
         details.tree-widget {
             display: flex;
@@ -634,7 +860,7 @@
             padding: 6px 12px;
             margin: 0;
             background-color: #CCE5FF;
-            border-radius: 6px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             user-select: none;
@@ -644,6 +870,23 @@
         /*details.tree-widget > summary:hover {*/
         /*    transform: scale(1.05);*/
         /*}*/
+
+        details.tree-widget > summary.as-item {
+            background-color: transparent;
+            transition: all 0.1s ease-in-out;
+        }
+
+        details.tree-widget > summary.as-item:hover {
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+
+        details.tree-widget > summary.as-item.hold {
+            background-color: rgba(0, 123, 255, 0.2);
+        }
+
+        details.tree-widget > summary.as-item.active {
+            background-color: rgba(255, 255, 0, 0.35);
+        }
 
         /* Flex布局模拟多列 */
         div.tree-headers {
@@ -685,7 +928,7 @@
         }
 
         li.tree-item.active {
-            background-color: rgba(255, 242, 0, 0.3);
+            background-color: rgba(255, 255, 0, 0.35);
         }
 
         .column-mark-inactive {
@@ -698,6 +941,319 @@
 
     </style>
 
+    <!--网盘页面-->
+    <style>
+
+        .drive-rect {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            gap: 4px;
+        }
+
+        .drive-path {
+            display: flex;
+            flex-direction: row;
+            justify-content: left;
+            gap: 4px;
+            margin-bottom: 2px;
+            margin-left: 10px;
+        }
+
+        .drive-path-item {
+            display: flex;
+            flex-direction: row;
+            gap: 2px;
+            font-size: 16px;
+            align-items: flex-end;
+        }
+
+        .drive-path-item-slash {
+            color: #14589a;
+            user-select: none;
+        }
+
+        .drive-path-item-btn {
+            display: inline-block;
+            padding: 10px 8px 6px 8px;
+            background: transparent;
+            transition: all 0.1s ease-in-out;
+            border: 0 solid #3498db;
+            border-bottom-width: 1px;
+            border-radius: 3px 3px 6px 6px;
+            cursor: pointer;
+        }
+
+        .drive-path-item-btn:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .drive-path-item-btn:active {
+            background: rgba(0, 0, 0, 0.24);
+        }
+
+        .drive-path-item-btn.active {
+            background-color: rgba(255, 255, 0, 0.35);
+        }
+
+        .drive-actions {
+            display: flex;
+            flex-direction: row;
+            /*background: #CCE5FF;*/
+            background: linear-gradient(to bottom, #CCE5FFcc, transparent);
+            border-radius: 4px;
+            padding: 3px 4px;
+            gap: 4px;
+            margin-bottom: 2px;
+        }
+
+        .drive-action-btn {
+            display: inline-block;
+            padding: 8px 8px;
+            background: transparent;
+            transition: all 0.1s ease-in-out;
+            border: 0 solid black;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        .drive-action-btn:first-of-type {
+            margin-left: 10px;
+        }
+
+        .drive-action-btn:hover {
+            background-color: rgba(0, 123, 255, 0.15);
+        }
+
+        .drive-action-btn:active {
+            background-color: rgba(0, 123, 255, 0.4);
+        }
+
+        .drive-items-wrap {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+
+            overflow: auto;
+        }
+
+        .drive-items-wrap.drag-active {
+            background-color: rgba(255, 255, 0, 0.35);
+        }
+
+        .drive-items {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            /*overflow-y: auto;*/
+            /*flex-grow: 1;*/
+        }
+
+        .drive-item {
+            display: flex;
+            flex-direction: row;
+            gap: 4px;
+            flex-grow: 1;
+            align-items: center;
+        }
+
+        .drive-items details:last-of-type {
+            margin-bottom: 100px;
+        }
+
+        .drive-item-icon-file {
+            margin-left: 4px;
+            background-repeat: no-repeat;
+            background-size: contain;
+            width: 22px;
+            height: 22px;
+            display: inline-block;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23737373' d='M13,9H18.5L13,3.5V9M6,2H14L20,8V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V4C4,2.89 4.89,2 6,2M15,18V16H6V18H15M18,14V12H6V14H18Z'/></svg>")
+        }
+
+        .drive-item-icon-folder {
+            margin-left: 4px;
+            background-repeat: no-repeat;
+            background-size: contain;
+            width: 22px;
+            height: 22px;
+            display: inline-block;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23737373' d='M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z'/></svg>")
+        }
+
+        .drive-item-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex-grow: 1;
+            /*gap: 2px;*/
+        }
+
+        .drive-item-info > a {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex-grow: 1;
+            /*gap: 2px;*/
+
+            text-decoration: none;
+            color: inherit;
+            /*pointer-events: none;*/
+        }
+
+        .drive-item-info-name {
+            margin: 0;
+            padding: 0;
+            user-select: text;
+        }
+
+        .drive-item-info-name.red {
+            color: red;
+        }
+
+        .drive-item-info-others {
+            display: flex;
+            flex-direction: row;
+            justify-content: left;
+            gap: 4px;
+            align-items: end;
+        }
+
+        .drive-item-info-others span {
+            margin: 0;
+            padding: 0;
+            color: #000000aa;
+            font-size: 12px;
+        }
+
+        .drive-item-actions {
+            display: flex;
+            flex-direction: row;
+            justify-content: left;
+        }
+
+        .drive-item-action {
+            display: flex;
+            padding: 8px 8px;
+            background: transparent;
+            transition: all 0.1s ease-in-out;
+            border: 0 solid black;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        .drive-item-action:hover {
+            background-color: rgba(0, 123, 255, 0.15);
+        }
+
+        .drive-item-action:active {
+            background-color: rgba(0, 123, 255, 0.4);
+        }
+
+        .drive-item-action-icon-more {
+            pointer-events: none;
+            background-repeat: no-repeat;
+            background-size: contain;
+            width: 22px;
+            height: 22px;
+            display: inline-block;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%232196F3' d='M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z'/></svg>");
+        }
+
+
+    </style>
+
+    <!--复选框-->
+    <style>
+        .checkbox {
+            display: inline-flex;
+            align-items: center;
+            gap: 0;
+            font-size: 18px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checkbox input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border: 2px solid #00000099;
+            border-radius: 4px;
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+            background-color: transparent;
+            transition: all 0.1s ease;
+        }
+
+        /* 已选中 */
+        .checkbox input[type="checkbox"]:checked {
+        }
+
+        .checkbox input[type="checkbox"]:checked::after {
+            content: "";
+            position: absolute;
+            left: 5px;
+            top: 0;
+            width: 7px;
+            height: 13px;
+            border: solid black;
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg);
+        }
+
+        /* 不确定状态 */
+        .checkbox input[type="checkbox"]:indeterminate {
+        }
+
+        .checkbox input[type="checkbox"]:indeterminate::after {
+            content: "";
+            position: absolute;
+            left: 3px;
+            top: 9px;
+            width: 14px;
+            height: 3px;
+            background: black;
+            border-radius: 2px;
+        }
+    </style>
+
+    <!--悬浮球-->
+    <style>
+        .float-ball {
+            position: fixed;
+            right: 32px;
+            bottom: 32px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background-color: #69b1fa;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            z-index: 9;
+            user-select: none;
+            transition: all 0.1s ease-in-out;
+            font-size: 20px;
+        }
+
+        .float-ball:hover {
+            background-color: #85c1ff;
+        }
+
+        .float-ball:active {
+            background-color: #65a3e3;
+        }
+
+    </style>
+
+
 </head>
 
 <!---->
@@ -705,9 +1261,9 @@
 <body class="">
 <header class="">
     <button id="header-btn-startpage" class="initiation_hidden">返回首页</button>
-    <button id="header-btn-mail" class="">收发</button>
-    <button id="header-btn-drive" class="">网盘</button>
-    <button id="header-btn-chat" class="">聊天</button>
+    <button id="header-btn-chat" class="hidden">收发</button>
+    <button id="header-btn-mail" class="hidden"></button>
+    <button id="header-btn-drive" class="hidden">网盘</button>
     <button id="header-btn-more-left" class="menu-btn">&nbsp;</button>
     <span class="flex-grow"></span>
     <!--    <button id="header-btn-backend" class="">后台面板</button>-->
@@ -786,9 +1342,17 @@
     const checkin_version_number = null;
     const checkin_version_is_beta = null;
     const top_level_path = null;
+    const disallowed_upload = null;
     const backend_panel = false;
     let logged_admin = false;
     let logged_user = null;
+
+
+    const default_key = "C******";
+    const decrypt_error_string = "解密失败，检查密钥后刷新页面。"
+    const decrypt_processing_string = "正在解密。"
+
+    let dragging_item = null;
 
     function current_url() {
         return new URL(window.location.href.replace(/#$/, ""));
@@ -801,12 +1365,20 @@
     }
 
     function join_path(url, ...subs) {
+        url = new URL(url);
         url.pathname = `${url.pathname.replace(/\/+$/, "")}/${subs.map(i => i.toString()).join("/")}`;
         return url;
     }
 
-    async function fetch_get(url, headers) {
-        return await fetch(url, {
+    async function fetch_get(url, params, headers) {
+        const _url = new URL(url);
+        if (params) {
+            for (const key of Object.keys(params)) {
+                if (params[key] === undefined) continue;
+                _url.searchParams.set(key, params[key])
+            }
+        }
+        return await fetch(_url, {
             method: "GET", headers: {
                 ...headers,
             },
@@ -876,6 +1448,70 @@
         return format.replace(/YYYY|MM|DD|HH|mm|ss/g, matched => map[matched]);
     }
 
+    function format_bytes(bytes) {
+        if (bytes === 0) return "0 B";
+        const sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+        const i = Math.floor(Math.log(bytes) / Math.log(1024));
+        let formattedSize = (bytes / Math.pow(1024, i)).toFixed(1);
+        if (formattedSize % 1 === 0) formattedSize = parseInt(formattedSize);
+        return `${formattedSize} ${sizes[i]}`;
+    }
+
+    function format_uploader(uploader) {
+        return uploader === logged_user.uid ? "你" : uploader;
+    }
+
+    function normalizeName(name) {
+        if (!name) return name;
+        name = name.replace(/[/\\:*?"<>\r\n\t\f]|^[\s]+|[\s]+$/g, '');
+        if (/^\.*$/.test(name)) return ""; // 不能全是点
+        return name;
+    }
+
+    function readFileAsync(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result); // arrayBuffer
+            reader.onerror = () => reject(reader.error);
+            reader.readAsArrayBuffer(file);
+        });
+    }
+
+    async function getAllFilesFromDroppedFolder(entry) {
+        const files = [];
+        await traverseEntry(entry, [], files);
+        return files;
+    }
+
+    async function traverseEntry(entry, pathArray = [], files = []) {
+        return new Promise((resolve) => {
+            if (entry.isFile) {
+                entry.file(file => {
+                    file.relativePath = [...pathArray, file.name];
+                    files.push(file);
+                    resolve();
+                });
+            } else if (entry.isDirectory) {
+                const reader = entry.createReader();
+
+                const readAll = () => {
+                    reader.readEntries(async entries => {
+                        if (entries.length === 0) {
+                            resolve(); // done
+                        } else {
+                            for (const e of entries) {
+                                await traverseEntry(e, [...pathArray, entry.name], files);
+                            }
+                            readAll(); // in case more entries exist
+                        }
+                    });
+                };
+
+                readAll();
+            }
+        });
+    }
+
     function form_check_string(value, allow_empty = false) {
         return ((typeof value === "string") && ((!allow_empty && value.length > 0) || allow_empty))
     }
@@ -896,12 +1532,169 @@
         return value !== null && typeof value === 'object' && value.constructor === Object;
     }
 
+
+    /*
+    * 加解密
+    * */
+    class Encryptors {
+        constructor() {
+            this.ors = [];
+            this.is_creating = false;
+        }
+
+        static Encryptor = class {
+            constructor(password) {
+                this.password = password;
+            }
+
+            // console.log(JSON.stringify(Array.from(crypto.getRandomValues(new Uint8Array(16)))));
+            static password_salt = new Uint8Array([123, 148, 39, 173, 6, 29, 41, 39, 216, 104, 177, 152, 227, 38, 73, 104]);
+
+            async init() {
+                this.password_key = await this.deriveKeyFromPassword(this.password, Encryptors.Encryptor.password_salt);
+
+                // const cipherText = await this.encrypt(Encryptors.Encryptor.str2bytes("会话"));
+                // console.log("CipherText:", cipherText);
+                // const decrypted = await this.decrypt(Encryptors.Encryptor.bytesToBase64(cipherText));
+                // console.log("Decrypted:", Encryptors.Encryptor.bytes2str(decrypted));
+            }
+
+            static str2bytes(str) {
+                return new TextEncoder().encode(str);
+            }
+
+            static bytes2str(bytes) {
+                return new TextDecoder().decode(bytes);
+            }
+
+            static bytesToBase64(bytes) {
+                let binary = '';
+                for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+                return btoa(binary);
+            }
+
+            static base64ToBytes(base64) {
+                const binary = atob(base64);
+                const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+                return bytes;
+            }
+
+            async deriveKeyFromPassword(password, salt, keyLength = 16) {
+                const keyMaterial = await crypto.subtle.importKey(
+                    'raw',
+                    Encryptors.Encryptor.str2bytes(password),
+                    {name: 'PBKDF2'},
+                    false,
+                    ['deriveKey']
+                );
+
+                return crypto.subtle.deriveKey(
+                    {
+                        name: 'PBKDF2',
+                        salt,
+                        iterations: 1_000,
+                        hash: 'SHA-256'
+                    },
+                    keyMaterial,
+                    {name: 'AES-GCM', length: keyLength * 8},
+                    false,
+                    ['encrypt', 'decrypt']
+                );
+            }
+
+            async encrypt(plainBytes) {
+                const iv = crypto.getRandomValues(new Uint8Array(12));
+
+                let encryptedBytes = await crypto.subtle.encrypt({name: 'AES-GCM', iv}, this.password_key, plainBytes);
+                encryptedBytes = new Uint8Array(encryptedBytes);
+
+                const c = new Uint8Array(iv.length + encryptedBytes.length);
+                c.set(iv, 0);
+                c.set(new Uint8Array(encryptedBytes), iv.length);
+
+                return c;
+            }
+
+            async decrypt(encryptedBytes) {
+                const iv = encryptedBytes.slice(0, 12);
+
+                const decryptedBytes = await crypto.subtle.decrypt({
+                    name: 'AES-GCM',
+                    iv
+                }, this.password_key, encryptedBytes.slice(12));
+                return new Uint8Array(decryptedBytes);
+            }
+        }
+
+
+        async create(password) {
+            if (!form_check_string(password)) return;
+            const encryptor = new Encryptors.Encryptor(password);
+            await encryptor.init();
+            this.ors.push(encryptor);
+        }
+
+        async clear() {
+            this.ors.length = 0;
+        }
+
+        async recreate_all(passwords = []) {
+            this.is_creating = true;
+            await this.clear();
+            await this.create(passwords[0]);
+            await this.create(default_key);
+            for (const password of passwords.slice(1)) await this.create(password);
+            this.is_creating = false;
+            // console.log(this.ors);
+        }
+
+        async encrypt(plain) {
+            if (form_check_string(plain, true)) plain = Encryptors.Encryptor.str2bytes(plain);
+            const encryptor = this.ors[0];
+            return await encryptor.encrypt(plain);
+        }
+
+        async decrypt(cipherText, bare = false) {
+            for (let i = 0; i < this.ors.length; i++) {
+                const encryptor = this.ors[i];
+                try {
+                    const decrypted = await encryptor.decrypt(bare ? cipherText : Encryptors.Encryptor.base64ToBytes(cipherText));
+                    return decrypted;
+                } catch (e) {
+                    if (i === this.ors.length - 1) throw e;
+                }
+            }
+            throw new Error("没有注册Encryptor对象。")
+        }
+
+        async encrypt2base64(plain) {
+            return Encryptors.Encryptor.bytesToBase64(await this.encrypt(plain));
+        }
+
+        async decrypt2string(cipherText, bare = false) {
+            return Encryptors.Encryptor.bytes2str(await this.decrypt(cipherText, bare));
+        }
+
+    }
+
+    const encryptors = new Encryptors();
+    // encryptors.recreate_all([localStorage.getItem("currentkey"), ...(JSON.parse(localStorage.getItem("historicalkeys")) || [])]);
+    // setTimeout(async () => {
+    //     const cipherBytes = await encryptors.encrypt("会话");
+    //     console.log("cipherBytes", cipherBytes, Encryptors.Encryptor.bytesToBase64(cipherBytes));
+    //     const plainBytes = await encryptors.decrypt(Encryptors.Encryptor.bytesToBase64(cipherBytes));
+    //     console.log("plainBytes", plainBytes, Encryptors.Encryptor.bytes2str(plainBytes));
+    // }, 1000)
+
+
     /*
     * 遮罩
     * */
     class BlurMark {
         constructor(element) {
             this.element = element;
+            this.filled = false;
             this.init();
         }
 
@@ -914,8 +1707,13 @@
         }
 
         show() {
-            this.fill();
+            if (!this.filled)
+                this.fill();
             this.mark.classList.remove("hidden")
+        }
+
+        hide() {
+            this.mark.classList.add("hidden")
         }
 
         remove() {
@@ -925,6 +1723,7 @@
         }
 
         fill() {
+            this.filled = true;
         }
 
         increase_z() {
@@ -1092,6 +1891,8 @@
                 this.#add_input_element_title(row);
             } else if (row.type === "textarea") {
                 this.#add_input_element_textarea(row);
+            } else if (row.type === "linetext") {
+                this.#add_input_element_linetext(row);
             }
         }
 
@@ -1116,9 +1917,26 @@
             row.input_element.style.height = `${256}px`;
         }
 
+        #add_input_element_linetext(row) {
+            let html = `
+<label>${row.label}<input type="text"></label>
+`;
+            this.input_group.insertAdjacentHTML("beforeend", html);
+            row.label_element = this.input_group.querySelector(":scope > label:last-of-type");
+            row.input_element = row.label_element.querySelector(":scope > input");
+
+            row.input_element.value = row.value;
+
+            // row.input_element.style.width = `fit-content`;
+            // row.input_element.style.maxWidth = `300px`;
+            row.input_element.style.width = `30ch`;
+        }
+
         collect_data() {
             for (const row of this.form) {
                 if (row.type === "textarea") {
+                    row.value = row.input_element.value;
+                } else if (row.type === "linetext") {
                     row.value = row.input_element.value;
                 }
             }
@@ -1279,14 +2097,17 @@
             blank: 2,
         }
 
-        constructor(parent_element, headers, fill_menu, can_fold) {
+        constructor(parent_element, headers, fill_menu, can_fold, as_item, can_click) {
             this.parent_element = parent_element;
             this.headers = headers;
             this.fill_menu = fill_menu;
-            this.can_fold = can_fold;
+            this.can_fold = can_fold; // 2=always fold
+            this.as_item = as_item;
+            this.can_click = can_click;
 
             this.tree_headers = [];
             this.tree_items = [];
+            this.header_btns = []
 
             this.init();
             this.init_headers();
@@ -1320,10 +2141,45 @@
                     }
                 });
                 this.summary.addEventListener('click', (e) => {
-                    e.preventDefault();
+                    if (!this.header_btns.includes(e.target)) {
+                        e.preventDefault();
+                    }
+                });
+            } else if (this.can_fold === 2) {
+                this.details.open = false;
+                this.details.addEventListener('toggle', (e) => {
+                    if (!this.details.open) {
+                        this.details.open = false;
+                    }
+                });
+                this.summary.addEventListener('click', (e) => {
+                    if (!this.header_btns.includes(e.target)) {
+                        e.preventDefault();
+                    }
                 });
             } else {
                 this.summary.style.cursor = "pointer";
+            }
+
+            if (this.as_item) {
+                this.summary.classList.add("as-item");
+
+                if (this.can_click) {
+                    this.summary.addEventListener('mousedown', (event) => {
+                        if (!this.header_btns.includes(event.target)) {
+                            this.summary.classList.add('hold')
+                        }
+                    });
+                    this.summary.addEventListener('mouseup', (event) => {
+                        if (!this.header_btns.includes(event.target)) {
+                            this.summary.classList.remove('hold')
+                        }
+                    });
+                    // this.summary.addEventListener('dragend', (event) => {
+                    //     this.summary.classList.remove('hold')
+                    // });
+                }
+
             }
 
             // 菜单
@@ -1381,7 +2237,11 @@
                     tree_header.style.width = `${header.width}px`;
                 }
             }
+        }
 
+        set_raw_header(html) {
+            this.container_tree_headers.insertAdjacentHTML("beforeend", html);
+            this.raw_header = this.container_tree_headers.querySelector(":scope > :first-child");
         }
 
         add_item(...attrs) {
@@ -1456,8 +2316,585 @@
     }
 
 
+    /*
+    * 悬浮球
+    * */
+    class FloatBall {
+        constructor(parent_element) {
+            const html = `<div class="float-ball"></div>`;
+            this.parent_element = parent_element;
+            this.parent_element.insertAdjacentHTML("beforeend", html);
+            this.ball = this.parent_element.querySelector(":scope > div.float-ball");
+            this.ball.addEventListener("click", this.ballClicked.bind(this));
+            this.dialog = new FloatBall.FloatBallDialogMark(document.querySelector("body"));
+            this.setText();
+        }
+
+        setText(s) {
+            if (s) {
+                this.ball.textContent = s.toString();
+            } else {
+                this.ball.textContent = "☁";
+            }
+        }
+
+        show() {
+            this.ball.classList.remove("hidden");
+        }
+
+        hide() {
+            this.ball.classList.add("hidden");
+        }
+
+        ballClicked(event) {
+            if (this.dialog.mark.classList.contains("hidden")) {
+                this.showDialog();
+            } else {
+                this.hideDialog();
+            }
+        }
+
+        showDialog() {
+            this.dialog.show();
+        }
+
+        hideDialog() {
+            this.dialog.hide();
+        }
+
+
+        static taskstatus = {
+            waiting: "正在排队...",
+            processing: "正在{}...",
+            finalizing: "最终阶段...",
+            failed: "{}失败。",
+            finished: "{}完成。",
+        }
+
+        /*
+        * 任务对象
+        * */
+        static tasktypes = (() => {
+            class _ {
+                constructor(task_container) {
+                    this.task_container = task_container;
+                    this.filled = false;
+                    this.backtask_btns = [];
+                    this.status = null;
+                    this.name = null;
+                    this.args = {};
+                    this.error_string = "";
+                }
+
+                init() {
+                    const html = `<div class="backtask-rect">
+
+<div class="backtask-content">
+    <p class="backtask-name"></p>
+    <div class="backtask-progress-bar">
+        <div class="backtask-progress sliding-bar-animation"></div>
+    </div>
+    <p class="backtask-status-text"></p>
+</div>
+
+<div class="backtask-btns">
+    <button class="backtask-btn-cancel"><i class="backtask-btnicon"></i></button>
+    <button class="backtask-btn-retry"><i class="backtask-btnicon"></i></button>
+</div>
+
+</div>`;
+                    this.task_container.insertAdjacentHTML("beforeend", html);
+                    this.rect = this.task_container.querySelector(":scope > div.backtask-rect:last-of-type");
+
+                    this.backtask_name = this.rect.querySelector(":scope .backtask-name");
+                    this.backtask_status_text = this.rect.querySelector(":scope .backtask-status-text");
+                    this.backtask_progress_bar = this.rect.querySelector(":scope div.backtask-progress-bar");
+                    this.backtask_progress = this.rect.querySelector(":scope div.backtask-progress");
+                    this.backtask_progress.classList.remove("sliding-bar-animation");
+
+                    this.backtask_btn_cancel = this.rect.querySelector(":scope .backtask-btn-cancel");
+                    this.backtask_btn_retry = this.rect.querySelector(":scope .backtask-btn-retry");
+                    this.backtask_btns.push(this.backtask_btn_cancel);
+                    this.backtask_btns.push(this.backtask_btn_retry);
+
+                    this.backtask_btn_cancel.addEventListener("click", (event) => {
+                        this.stop();
+                    });
+                    this.backtask_btn_retry.addEventListener("click", (event) => {
+                        floatball.dialog.retryToStartTask(this);
+                    });
+
+                    this.rect.classList.add("hidden")
+                }
+
+                fill() {
+                    this.filled = true;
+                }
+
+                show() {
+                    if (!this.filled)
+                        this.fill();
+                    this.rect.classList.remove("hidden")
+                }
+
+                remove() {
+                    this.rect.classList.add("hidden")
+                    this.rect.remove();
+                }
+
+                set_name(s) {
+                    this.name = s;
+                    this.backtask_name.textContent = s;
+                }
+
+                set_args(i) {
+                    Object.assign(this.args, i);
+                }
+
+                start() {
+                    console.log("后台任务 启动", this);
+                    this.update_status_text(FloatBall.taskstatus.processing);
+                }
+
+                stop() {
+                    console.log("后台任务 停止", this);
+                    // 状态改变在回调函数里
+                    // this.update_status_text(FloatBall.taskstatus.failed);
+                    // floatball.dialog.checkToStartTask();
+                }
+
+                update_progress(i) {
+                    console.log("后台任务 进度变化", `${i}%`);
+                    if (i === -1) {
+                        this.backtask_progress.style.width = `30%`;
+                        this.backtask_progress.classList.add("sliding-bar-animation");
+                    } else if (i === 100) {
+                        this.backtask_progress.classList.remove("sliding-bar-animation");
+                        this.backtask_progress.style.width = `${i}%`;
+                    } else {
+                        this.backtask_progress.classList.remove("sliding-bar-animation");
+                        this.backtask_progress.style.width = `${i}%`;
+                    }
+                }
+
+                update_status_text(ts) {
+                    this.status = ts;
+                    this.backtask_btn_cancel.classList.add("hidden");
+                    this.backtask_btn_retry.classList.add("hidden");
+
+                    if (ts === FloatBall.taskstatus.waiting) {
+                        this.backtask_btn_cancel.classList.remove("hidden");
+                        this.update_progress(0);
+                    } else if (ts === FloatBall.taskstatus.processing) {
+                        this.backtask_btn_cancel.classList.remove("hidden");
+                        this.update_progress(0);
+                    } else if (ts === FloatBall.taskstatus.finalizing) {
+                        this.backtask_btn_cancel.classList.remove("hidden");
+                        this.update_progress(-1);
+                    } else if (ts === FloatBall.taskstatus.finished) {
+                        this.update_progress(100);
+                        this.backtask_progress_bar.classList.add("hidden");
+                    } else if (ts === FloatBall.taskstatus.failed) {
+                        this.backtask_btn_retry.classList.remove("hidden");
+                        this.update_progress(0);
+                    }
+                }
+
+            }
+
+            class Upload extends _ {
+                constructor(task_container) {
+                    super(task_container)
+                    Object.assign(this.args, {
+                        lstartindex: 0,
+                        total: 0,
+                        curr: 0,
+                    })
+                }
+
+                fill() {
+                    super.fill();
+                }
+
+                start() {
+                    super.start();
+                    this.core();
+                }
+
+                stop() {
+                    super.stop();
+                    if (this.status === FloatBall.taskstatus.waiting) {
+                        this.error_string = "被用户取消";
+                        this.update_status_text(FloatBall.taskstatus.failed);
+                        floatball.dialog.checkToStartTask();
+                        return;
+                    }
+                    if (this.xhr) {
+                        console.log(this.xhr, this.xhr.abort,);
+                        this.xhr.abort();
+                        this.xhr.canceled = true;
+                    }
+                }
+
+                update_status_text(ts) {
+                    super.update_status_text(ts);
+                    if (ts === FloatBall.taskstatus.waiting) {
+                        this.backtask_status_text.textContent = ts;
+                    } else if (ts === FloatBall.taskstatus.processing) {
+                        this.backtask_status_text.textContent = ts.replace("{}", "上传");
+                    } else if (ts === FloatBall.taskstatus.finalizing) {
+                        this.backtask_status_text.textContent = ts;
+                    } else if (ts === FloatBall.taskstatus.finished) {
+                        this.backtask_status_text.textContent = ts.replace("{}", "上传");
+                    } else if (ts === FloatBall.taskstatus.failed) {
+                        this.backtask_status_text.textContent = ts.replace("{}", "上传") + this.error_string;
+                    }
+                }
+
+                async core() {
+                    try {
+                        if (!this.result1) {
+                            this.result1 = await checkin.subviews.drive.new_file(this.name, this.args.file, this.args.current_path_item.attr.type === contentpages._drive.path_item_type.root ? undefined : this.args.current_path_item.attr.did);
+                            // console.log(this.result1);
+                        }
+
+                        const callbacks = {
+                            onprogress: (event) => {
+                                if (event.lengthComputable) {
+                                    const percentComplete = Math.round(((event.loaded + this.args.lstartindex) / (event.total + this.args.lstartindex)) * 100);
+                                    this.args.total = event.total
+                                    this.args.curr = event.loaded
+                                    if (percentComplete === 100) {
+                                        this.update_status_text(FloatBall.taskstatus.finalizing);
+                                    } else {
+                                        this.update_progress(percentComplete);
+                                    }
+                                }
+                            },
+
+                            onload: (event) => {
+                                if (this.xhr.status === 200) {
+                                    console.log("后台任务 上传 成功", event);
+                                    this.update_status_text(FloatBall.taskstatus.finished);
+                                } else {
+                                    console.error("后台任务 上传 失败", this.xhr.status, this.xhr.statusText, event);
+                                    this.error_string = format_xhr_error_response(this.xhr);
+                                    this.update_status_text(FloatBall.taskstatus.failed);
+                                }
+                                floatball.dialog.checkToStartTask();
+                            },
+
+                            onerror: (event) => {
+                                console.error("后台任务 上传 请求错误", event);
+                                this.error_string = format_xhr_error_response(this.xhr);
+                                this.update_status_text(FloatBall.taskstatus.failed);
+                                floatball.dialog.checkToStartTask();
+                            },
+
+                            onabort: (event) => {
+                                console.error("后台任务 上传 取消", event);
+                                this.error_string = "被用户取消";
+                                this.update_status_text(FloatBall.taskstatus.failed);
+                                floatball.dialog.checkToStartTask();
+                                this.xhr.canceled = true;
+                            },
+                        }
+                        this.xhr = await checkin.subviews.drive.upload(this.result1.did, this.args.file, callbacks);
+
+                    } catch (error) {
+                        console.error("后台任务 上传 异常", error);
+                        this.error_string = error.toString();
+                        this.update_status_text(FloatBall.taskstatus.failed);
+                        floatball.dialog.checkToStartTask();
+                        // MessageMark.report(error,);
+                    }
+
+                }
+            }
+
+            class Download extends _ {
+                constructor(task_container) {
+                    super(task_container)
+                    Object.assign(this.args, {
+                        controller: null,
+
+                        total: null,
+                        curr: 0,
+                        chunks: [],
+                    })
+                }
+
+                fill() {
+                    super.fill();
+                }
+
+                start() {
+                    super.start();
+                    this.core();
+                }
+
+                stop() {
+                    super.stop();
+                    if (this.status === FloatBall.taskstatus.waiting) {
+                        this.error_string = "被用户取消";
+                        this.update_status_text(FloatBall.taskstatus.failed);
+                        floatball.dialog.checkToStartTask();
+                        return;
+                    }
+                    if (this.args.controller) {
+                        console.log(this.args.controller, this.args.controller.abort,);
+                        this.args.controller.abort();
+                        this.args.controller.canceled = true;
+                    }
+                }
+
+                update_status_text(ts) {
+                    super.update_status_text(ts);
+                    if (ts === FloatBall.taskstatus.waiting) {
+                        this.backtask_status_text.textContent = ts;
+                    } else if (ts === FloatBall.taskstatus.processing) {
+                        this.backtask_status_text.textContent = ts.replace("{}", "下载");
+                    } else if (ts === FloatBall.taskstatus.finalizing) {
+                        this.backtask_status_text.textContent = ts;
+                    } else if (ts === FloatBall.taskstatus.finished) {
+                        this.backtask_status_text.textContent = ts.replace("{}", "下载");
+                    } else if (ts === FloatBall.taskstatus.failed) {
+                        this.backtask_status_text.textContent = ts.replace("{}", "下载") + this.error_string;
+                    }
+                }
+
+                async core() {
+                    try {
+
+                        const callbacks = {
+                            onprogress: () => {
+                                let percentComplete = Math.round((this.args.curr / this.args.total) * 100);
+                                if (percentComplete === 100) {
+                                    this.update_status_text(FloatBall.taskstatus.finalizing);
+                                } else {
+                                    this.update_progress(percentComplete);
+                                }
+                            },
+
+                            onload: () => {
+                                console.log("后台任务 下载 成功",);
+                                this.update_status_text(FloatBall.taskstatus.finished);
+                                floatball.dialog.checkToStartTask();
+                            },
+
+                        }
+                        await checkin.subviews.drive.download(this.args.did, this.args, callbacks);
+
+                    } catch (error) {
+                        console.error("后台任务 下载 异常", error);
+                        this.error_string = error.toString();
+                        this.update_status_text(FloatBall.taskstatus.failed);
+                        floatball.dialog.checkToStartTask();
+                        // MessageMark.report(error,);
+                    }
+
+                }
+            }
+
+            return {Upload, Download};
+        })()
+
+
+        /*
+        * 弹出窗口
+        * */
+        static FloatBallDialogMark = class extends BlurMark {
+            constructor(element) {
+                super(element)
+                this.tab_btns = [];
+                this.tab_contents = [];
+                this.tasks = [];
+            }
+
+            fill() {
+                super.fill();
+                let html = `
+<div id="floatball-mark-dialog">
+    <span id="floatball-mark-top-margin"></span>
+    <div id="floatball-mark-rect">
+        <div class="floatball-mark-tabbar">
+           <button id="floatball-mark-tab-settings">设置</button>
+           <button id="floatball-mark-tab-backtasks">后台任务</button>
+        </div>
+        <div class="floatball-mark-tabcontent">
+
+<!--设置-->
+<div class="floatball-mark-tabcontent-settings">
+<label>当前密钥：<input type="text" id="fbm-settings-currentkey" placeholder="留空使用默认"></label>
+<label>历史密钥：<textarea id="fbm-settings-historicalkeys" style="width:200px;height:160px;" placeholder="每行一个"></textarea></label>
+</div>
+
+<!--后台任务-->
+<div class="floatball-mark-tabcontent-backtasks">
+
+</div>
+
+<!---->
+        </div>
+    </div>
+    <span id="floatball-mark-bottom-margin"></span>
+</div>
+`;
+                this.mark.insertAdjacentHTML("beforeend", html);
+
+                this.rect = this.mark.querySelector(":scope div#floatball-mark-rect");
+                this.rect.style.background = MessageMark.get_background_color.call(this);
+
+                this.dialog = this.mark.querySelector(":scope div#floatball-mark-dialog");
+                this.dialog.addEventListener('click', (event) => {
+                    if (event.target !== this.dialog)
+                        return;
+                    floatball.hideDialog();
+                });
+
+                // tab contents
+                this.tab_content_settings = this.mark.querySelector(".floatball-mark-tabcontent-settings");
+                this.tab_contents.push(this.tab_content_settings)
+
+                this.tab_content_backtasks = this.mark.querySelector(".floatball-mark-tabcontent-backtasks");
+                this.tab_contents.push(this.tab_content_backtasks)
+
+
+                // tab buttons
+                this.tab_btn_settings = this.mark.querySelector("#floatball-mark-tab-settings");
+                this.tab_btn_settings.addEventListener('click', (event) => {
+                    this.switchTab(this.tab_btn_settings);
+                });
+                this.tab_btns.push(this.tab_btn_settings)
+
+                this.tab_btn_backtasks = this.mark.querySelector("#floatball-mark-tab-backtasks");
+                this.tab_btn_backtasks.addEventListener('click', (event) => {
+                    this.switchTab(this.tab_btn_backtasks);
+                });
+                this.tab_btns.push(this.tab_btn_backtasks)
+
+            }
+
+            show() {
+                if (encryptors.is_creating) return;
+
+                this.element.classList.add("for-blur-mark");
+                super.show()
+                if (!this.currentTab()) {
+                    this.switchTab(this.tab_btn_settings)
+                }
+                this.loadSettings()
+            }
+
+            hide() {
+                if (encryptors.is_creating) return;
+
+                super.hide()
+                // this.element.classList.remove("for-blur-mark");
+                this.saveSettings()
+            }
+
+            switchTab(t) {
+                for (const tabBtn of this.tab_btns) {
+                    tabBtn.classList.remove("active");
+                }
+                t.classList.add("active");
+
+                for (const tabContent of this.tab_contents) {
+                    tabContent.classList.add("hidden");
+                }
+
+                if (t === this.tab_btn_settings) {
+                    this.tab_content_settings.classList.remove("hidden")
+                } else if (t === this.tab_btn_backtasks) {
+                    this.tab_content_backtasks.classList.remove("hidden")
+                }
+            }
+
+            currentTab() {
+                for (const tabBtn of this.tab_btns) {
+                    if (tabBtn.classList.contains("active")) {
+                        return tabBtn;
+                    }
+                }
+                return null;
+            }
+
+            loadSettings() {
+                this.tab_content_settings.querySelector(":scope #fbm-settings-currentkey").value = localStorage.getItem("currentkey") || "";
+                this.tab_content_settings.querySelector(":scope #fbm-settings-historicalkeys").value = (JSON.parse(localStorage.getItem("historicalkeys")) || []).join("\n");
+
+            }
+
+            saveSettings() {
+                const currentkey = this.tab_content_settings.querySelector(":scope #fbm-settings-currentkey").value.replace(/^[\s\f]+|[\s\f]+$/g, "");
+                localStorage.setItem("currentkey", currentkey);
+
+                let historicalkeys = this.tab_content_settings.querySelector(":scope #fbm-settings-historicalkeys").value.split(/[\r\n]+/g).map((i) => {
+                    return i.replace(/^[\s\f]+|[\s\f]+$/g, "");
+                });
+                historicalkeys = historicalkeys.reduce((acc, cur) => {
+                    if (!acc.includes(cur) && cur.length > 0) acc.push(cur);
+                    return acc;
+                }, []);
+                localStorage.setItem("historicalkeys", JSON.stringify(historicalkeys));
+
+                encryptors.recreate_all([currentkey, ...historicalkeys]);
+            }
+
+            addTask(t) {
+                t.init();
+                t.show();
+                t.update_status_text(FloatBall.taskstatus.waiting);
+                this.tasks.push(t);
+            }
+
+            checkToStartTask() {
+                const ttmap = {};
+                for (const task of this.tasks) {
+                    if (!ttmap.hasOwnProperty(task.constructor.name)) ttmap[task.constructor.name] = [];
+                    ttmap[task.constructor.name].push(task);
+                }
+                for (const ttmapKey in ttmap) {
+                    const tlist = ttmap[ttmapKey];
+                    let processing = false;
+                    for (const tlistElement of tlist) {
+                        if (tlistElement.status === FloatBall.taskstatus.processing || tlistElement.status === FloatBall.taskstatus.finalizing) processing = true;
+                    }
+                    if (!processing) {
+                        for (const tlistElement of tlist) {
+                            if (tlistElement.status === FloatBall.taskstatus.waiting) {
+                                tlistElement.start();
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            retryToStartTask(t) {
+                if (t.status === FloatBall.taskstatus.failed) {
+                    console.log("后台任务 重试", t);
+                    t.update_status_text(FloatBall.taskstatus.waiting);
+                    this.checkToStartTask();
+                }
+            }
+        }
+
+    }
+
+    const floatball = new FloatBall(document.querySelector("main"));
+    floatball.showDialog();
+    floatball.hideDialog();
+    floatball.hide();
+
+
     async function format_error_response(resp) {
         return `${resp.status} ${await resp.text()}`;
+    }
+
+    function format_xhr_error_response(xhr) {
+        return `${xhr.status} ${xhr.responseText}`;
     }
 
     /*
@@ -1596,7 +3033,6 @@
                 return d;
             }
 
-
             async edit_user(form, old_uid) {
                 let url = join_path(this.api_url(), "user", old_uid);
                 let body = await this._form2json(form, true);
@@ -1634,6 +3070,223 @@
         class Drive extends _ {
             constructor(client) {
                 super(client, ["drive", "api",]);
+            }
+
+            static item_type = {
+                file: 1, folder: 2,
+            };
+
+            async fetch_list(site, did,) {
+                let url = join_path(this.api_url(), "list");
+                let params = {site, did,}
+                let r = await fetch_get(url, params);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async new_folder(name, parent_did = undefined) {
+                let url = join_path(this.api_url(), "new",);
+                let body = {
+                    "type": Drive.item_type.folder,
+                    "name": await encryptors.encrypt2base64(name),
+                    "name_encrypted": true,
+                    "parent_did": parent_did,
+                };
+                let r = await fetch_post_json(url, body);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async new_file(name, file, parent_did = undefined) {
+                let url = join_path(this.api_url(), "new",);
+                let body = {
+                    "type": Drive.item_type.file,
+                    "name": await encryptors.encrypt2base64(name),
+                    "name_encrypted": true,
+                    "parent_did": parent_did,
+                    "size": file.size,
+                };
+                let r = await fetch_post_json(url, body);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async upload(did, file, callbacks) {
+                let url = join_path(this.api_url(), "upload",);
+
+                url.searchParams.set("did", did);
+
+                const xhr = new XMLHttpRequest();
+                xhr.open("PUT", url, true);
+                xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+                xhr.upload.onprogress = callbacks.onprogress;
+                xhr.onload = callbacks.onload;
+                xhr.onerror = callbacks.onerror;
+                xhr.onabort = callbacks.onabort;
+
+                // if (ti.udti_attr.session) {
+                //     console.log(`bytes ${ti.udti_attr.lstartindex}-${ti.udti_attr.file.size - 1}/${ti.udti_attr.file.size}`)
+                //     xhr.setRequestHeader("Content-Range", `bytes ${ti.udti_attr.lstartindex}-${ti.udti_attr.file.size - 1}/${ti.udti_attr.file.size}`);
+                // }
+
+                // if (ti.udti_attr.session) {
+                //     xhr.send(ti.udti_attr.file.slice(ti.udti_attr.lstartindex));
+                // } else {
+                // xhr.send(file);
+                // }
+
+
+                const uint8 = new Uint8Array(await readFileAsync(file));
+                if (xhr.canceled) return callbacks.onabort();
+                const encrypted = await encryptors.encrypt(uint8);
+                if (xhr.canceled) return callbacks.onabort();
+                xhr.send(encrypted);
+
+                return xhr;
+            }
+
+            async download(did, feedbackargs, callbacks) {
+                let url = join_path(this.api_url(), "item", did, "down");
+
+                let response;
+                let controller = new AbortController();
+                feedbackargs.controller = controller;
+                try {
+                    response = await fetch(url, {
+                        method: "GET",
+                        headers: {"Range": `bytes=${feedbackargs.curr}-`},
+                        signal: controller.signal
+                    });
+                } catch (e) {
+                    throw e;
+                }
+
+                if (!response.ok && response.status !== 206) {
+                    throw new Error(await format_error_response(response));
+                }
+
+                let reader = response.body.getReader();
+                let contentLength = Number(response.headers.get("Content-Length")) || 0;
+                console.log(`预计下载`, format_bytes(contentLength));
+                if (feedbackargs.total === null) feedbackargs.total = contentLength;
+
+                while (true) {
+                    let done, value;
+                    try {
+                        const _ = await reader.read();
+                        value = _.value;
+                        done = _.done;
+                    } catch (e) {
+                        throw e;
+                    }
+                    if (done) break;
+                    feedbackargs.chunks.push(value);
+                    feedbackargs.curr += value.length;
+                    callbacks.onprogress();
+                }
+                console.log(`已读完`, format_bytes(feedbackargs.curr), format_bytes(contentLength), format_bytes(feedbackargs.total), feedbackargs.curr === feedbackargs.total, feedbackargs.curr === contentLength);
+                let totalArray = new Uint8Array(feedbackargs.curr);
+                let offset = 0;
+                for (let chunk of feedbackargs.chunks) {
+                    totalArray.set(chunk, offset);
+                    offset += chunk.length;
+                }
+
+                totalArray = await encryptors.decrypt(totalArray, true);
+
+                let blob = new Blob([totalArray]);
+                let a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = feedbackargs.name.split("/").at(-1);
+                a.click();
+                URL.revokeObjectURL(a.href);
+                feedbackargs.chunks.length = 0;
+                feedbackargs.curr = 0;
+
+                callbacks.onload();
+
+            }
+
+            async rename(did, name,) {
+                let url = join_path(this.api_url(), "item", did,);
+                let body = {
+                    "action": "rename",
+                    "name": await encryptors.encrypt2base64(name),
+                    "name_encrypted": true,
+                };
+                let r = await fetch_put_json(url, body);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async move(did, parent_did, site) {
+                let url = join_path(this.api_url(), "item", did,);
+                let body = {
+                    "action": "move",
+                    "parent_did": parent_did,
+                    "site": site,
+                };
+                let r = await fetch_put_json(url, body);
+                if (r.status === 200) {
+                    // let d = await r.json();
+                    // return d;
+                    return true;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async trash(did,) {
+                let url = join_path(this.api_url(), "item", did,);
+                let body = {
+                    "action": "trash",
+                };
+                let r = await fetch_put_json(url, body);
+                if (r.status === 200) {
+                    // let d = await r.json();
+                    // return d;
+                    return true;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async restore(did,) {
+                let url = join_path(this.api_url(), "item", did,);
+                let body = {
+                    "action": "restore",
+                };
+                let r = await fetch_put_json(url, body);
+                if (r.status === 200) {
+                    // let d = await r.json();
+                    // return d;
+                    return true;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async delete(did,) {
+                let url = join_path(this.api_url(), "item", did,);
+                let body = {
+                    "action": "delete",
+                };
+                let r = await fetch_put_json(url, body);
+                if (r.status === 200) {
+                    // let d = await r.json();
+                    // return d;
+                    return true;
+                }
+                throw new Error(await format_error_response(r));
             }
         }
 
@@ -1677,6 +3330,850 @@
             }
         }
 
+        class _drive extends _ {
+            constructor(client, panel, li) {
+                super(client, panel, li);
+                this.drive_path_items = [];
+                this.drive_items = [];
+            }
+
+            close_page() {
+                super.close_page();
+            }
+
+            open_page() {
+                super.open_page();
+
+                let html = `
+<div class="drive-rect">
+<div class="drive-path"></div>
+<div class="drive-actions">
+<label class="checkbox"><input type="checkbox"></label>
+<button class="drive-action-btn" id="dab-upload">上传文件<input type="file" class="hidden"></button>
+<button class="drive-action-btn" id="dab-newfolder">新建文件夹</button>
+</div>
+<div class="drive-items-wrap"><div class="drive-items"></div></div>
+</div>
+`;
+                this.container.insertAdjacentHTML("beforeend", html);
+                this.drive_rect = this.container.querySelector(":scope div.drive-rect");
+                this.drive_path = this.drive_rect.querySelector(":scope div.drive-path");
+                this.drive_actions = this.drive_rect.querySelector(":scope div.drive-actions");
+                this.element_drive_items_wrap = this.drive_rect.querySelector(":scope div.drive-items-wrap");
+                this.element_drive_items = this.drive_rect.querySelector(":scope div.drive-items");
+
+                // 多选框
+                this.selecting_checkbox = this.drive_actions.querySelector(":scope > label.checkbox:first-of-type");
+                this.selecting_checkbox_input = this.selecting_checkbox.querySelector(":scope > input");
+                const cb = this.selecting_checkbox_input;
+                this.selecting_checkbox.state = 0; // 0 未选中, 1 已选中, 2 不确定
+                this.selecting_checkbox.addEventListener("click", (event) => {
+                    this.selecting_checkbox.state = (this.selecting_checkbox.state + 1) % 2;
+                    cb.checked = this.selecting_checkbox.state === 1;
+                    cb.indeterminate = this.selecting_checkbox.state === 2;
+
+                    if (cb.checked) {
+                        for (const driveItem of this.drive_items) {
+                            driveItem.raw_header.selecting_checkbox.state = 1;
+                            driveItem.raw_header.selecting_checkbox_input.checked = true;
+                            driveItem.raw_header.selecting_checkbox_input.indeterminate = false;
+                        }
+                    } else if (cb.indeterminate) {
+                        for (const driveItem of this.drive_items) {
+                            driveItem.raw_header.selecting_checkbox.state = 2;
+                            driveItem.raw_header.selecting_checkbox_input.checked = false;
+                            driveItem.raw_header.selecting_checkbox_input.indeterminate = true;
+                        }
+                    } else {
+                        for (const driveItem of this.drive_items) {
+                            driveItem.raw_header.selecting_checkbox.state = 0;
+                            driveItem.raw_header.selecting_checkbox_input.checked = false;
+                            driveItem.raw_header.selecting_checkbox_input.indeterminate = false;
+                        }
+                    }
+                });
+                cb.checked = false;
+                cb.indeterminate = false;
+
+                // 按钮 上传文件
+                this.drive_action_btn_upload = this.drive_actions.querySelector(":scope button#dab-upload");
+                this.drive_action_btn_upload__input = this.drive_action_btn_upload.querySelector(":scope > input");
+                this.drive_action_btn_upload.addEventListener("click", (event) => {
+                    this.drive_action_btn_upload__input.click();
+                });
+                this.drive_action_btn_upload__input.addEventListener('change', (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        let name = normalizeName(file.name);
+                        if (!name) return;
+                        for (let disallowedUploadElement of disallowed_upload) {
+                            if (name.endsWith(disallowedUploadElement)) {
+                                MessageMark.report(`不允许上传：${disallowedUploadElement}`);
+                                return;
+                            }
+                        }
+                        for (let itemElement of this.drive_items) {
+                            if (name === this.get_item_display_name(itemElement)) {
+                                MessageMark.report(`名称重复“${name}”。`);
+                                return;
+                            }
+                        }
+                        const task = this.add_upload_task(file);
+                        this.look_upload_tasks(task);
+                    }
+                });
+
+                // 按钮 新文件夹
+                this.drive_action_btn_newfolder = this.drive_actions.querySelector(":scope button#dab-newfolder");
+                this.drive_action_btn_newfolder.addEventListener("click", (event) => {
+                    this.new_folder();
+                });
+
+                // 拖拽上传
+                this.element_drive_items_wrap.addEventListener('dragenter', (event) => {
+                    if (dragging_item) return;
+                    if (this.current_path_item().attr.type === _drive.path_item_type.root && this.constructor.name !== "myspace") return;
+                    event.preventDefault();
+                    this.element_drive_items_wrap.classList.add("drag-active");
+                });
+                this.element_drive_items_wrap.addEventListener('dragover', (event) => {
+                    if (dragging_item) return;
+                    if (this.current_path_item().attr.type === _drive.path_item_type.root && this.constructor.name !== "myspace") return;
+                    event.preventDefault();
+                    event.dataTransfer.dropEffect = 'copy';
+                    this.element_drive_items_wrap.classList.add("drag-active");
+                });
+                this.element_drive_items_wrap.addEventListener('dragleave', () => {
+                    if (dragging_item) return;
+                    if (this.current_path_item().attr.type === _drive.path_item_type.root && this.constructor.name !== "myspace") return;
+                    this.element_drive_items_wrap.classList.remove("drag-active");
+                });
+                this.element_drive_items_wrap.addEventListener('drop', async (event) => {
+                    if (dragging_item) return;
+                    if (this.current_path_item().attr.type === _drive.path_item_type.root && this.constructor.name !== "myspace") return;
+                    event.preventDefault();
+                    this.element_drive_items_wrap.classList.remove("drag-active");
+                    const dataTransferItems = event.dataTransfer.items;
+                    const validFiles = [];
+                    const validFolders = [];
+                    for (let i = 0; i < dataTransferItems.length; i++) {
+                        const item = dataTransferItems[i];
+                        const entry = item.webkitGetAsEntry && item.webkitGetAsEntry();
+                        // console.log(item, entry);
+                        if (item.kind === 'file') {
+                            if (entry && entry.isDirectory) {
+                                // validFolders.push(entry);
+                            } else {
+                                const file = item.getAsFile();
+                                // console.log(file,);
+                                if (file) {
+                                    validFiles.push(file);
+                                }
+                            }
+                        }
+                    }
+                    if (validFolders.length > 0) {
+                        for (const entry of validFolders) {
+                            const files = await getAllFilesFromDroppedFolder(entry);
+                            for (const file of files) {
+                                // console.log(file.relativePath, file);
+                                file.relativePath.pop()
+                                validFiles.push(file);
+                            }
+                        }
+                        // return;
+                    }
+                    let files = [];
+                    if (validFiles.length > 0) {
+                        for (const file of validFiles) {
+                            let can = true;
+
+                            let name = normalizeName(file.name);
+                            if (!name) can = false;
+
+                            if (!can) {
+                                // continue;
+                                return;
+                            }
+
+                            for (let disallowedUploadElement of disallowed_upload) {
+                                if (name.endsWith(disallowedUploadElement)) {
+                                    MessageMark.report(`不允许上传：${disallowedUploadElement}`);
+                                    can = false;
+                                    break;
+                                }
+                            }
+
+                            if (!can) {
+                                // continue;
+                                return;
+                            }
+
+                            // if (root_attr.max_upload_size > 0 && file.size >= root_attr.max_upload_size * 1024 * 1024) {
+                            //     alert(`单文件大小限制为${root_attr.max_upload_size}MB。`);
+                            //     can = false;
+                            //     // continue;
+                            //     return;
+                            // }
+
+                            if (file.relativePath && file.relativePath.length > 0) {
+                            } else {
+                                for (let itemElement of this.drive_items) {
+                                    if (name === this.get_item_display_name(itemElement)) {
+                                        MessageMark.report(`名称重复“${name}”。`);
+                                        can = false;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (!can) {
+                                // continue;
+                                return;
+                            }
+
+                            files.push(file)
+                        }
+                    }
+                    if (files.length > 0) {
+                        MessageMark.confirm(`${files.length}个文件，开始上传？`, null, null, () => {
+                            let first_task = null;
+                            for (const file of files) {
+                                // console.log(file, file.relativePath, file.formated_name)
+                                const task = this.add_upload_task(file);
+                                if (!first_task) first_task = task;
+                            }
+                            this.look_upload_tasks(first_task);
+                        }, MessageMark.colors.blue)
+                    }
+                });
+
+
+                this.add_top_level_path_item()
+
+                this.refresh();
+            }
+
+            static path_item_type = {
+                root: 0, folder: 1,
+            }
+
+            add_top_level_path_item() {
+                const name = this.li.bindmap.text;
+                const attr = {
+                    type: _drive.path_item_type.root,
+                };
+                this.add_path_item(name, attr);
+            }
+
+            add_path_item(name, attr) {
+                let html = `
+<div class="drive-path-item">
+<span class="drive-path-item-slash">/</span>
+<button class="drive-path-item-btn">${name}</button>
+</div>
+`;
+                this.drive_path.insertAdjacentHTML("beforeend", html);
+                const path_item = this.drive_path.querySelector(":scope div.drive-path-item:last-of-type");
+                path_item.attr = attr;
+
+                const path_item_btn = path_item.querySelector(":scope .drive-path-item-btn");
+                path_item_btn.addEventListener("click", (event) => {
+                    this.remove_back_path_items(path_item);
+                    this.switch_action_btns(path_item);
+                    this.fetch_list(path_item);
+                });
+
+                path_item_btn.addEventListener('drop', (event) => {
+                    if (!dragging_item) return;
+                    if (path_item === this.drive_path_items[this.drive_path_items.length - 1]) return;
+                    if (path_item.attr.type === _drive.path_item_type.root && this.constructor.name !== "myspace") return;
+                    const station_element = event.target.closest(".drive-path-item-btn");
+                    if (!station_element) return;
+                    path_item_btn.classList.remove("active");
+                    // const d = JSON.parse(event.dataTransfer.getData("application/json"));
+                    if (path_item.attr.type === _drive.path_item_type.root) {
+                        this.move(dragging_item, undefined, path_item);
+                    } else {
+                        this.move(dragging_item, path_item);
+                    }
+                });
+                path_item_btn.addEventListener('dragover', (event) => {
+                    if (!dragging_item) return;
+                    if (path_item === this.drive_path_items[this.drive_path_items.length - 1]) return;
+                    if (path_item.attr.type === _drive.path_item_type.root && this.constructor.name !== "myspace") return;
+                    const station_element = event.target.closest(".drive-path-item-btn");
+                    if (!station_element) return;
+                    event.preventDefault();
+                    path_item_btn.classList.add("active");
+                });
+                path_item_btn.addEventListener('dragenter', (event) => {
+                    if (!dragging_item) return;
+                    if (path_item === this.drive_path_items[this.drive_path_items.length - 1]) return;
+                    if (path_item.attr.type === _drive.path_item_type.root && this.constructor.name !== "myspace") return;
+                    const station_element = event.target.closest(".drive-path-item-btn");
+                    if (!station_element) return;
+                    event.preventDefault();
+                    path_item_btn.classList.add("active");
+                });
+                path_item_btn.addEventListener('dragleave', (event) => {
+                    if (!dragging_item) return;
+                    if (path_item === this.drive_path_items[this.drive_path_items.length - 1]) return;
+                    if (path_item.attr.type === _drive.path_item_type.root && this.constructor.name !== "myspace") return;
+                    const station_element = event.target.closest(".drive-path-item-btn");
+                    if (!station_element) return;
+                    event.preventDefault();
+                    path_item_btn.classList.remove("active");
+                });
+
+                this.drive_path_items.push(path_item);
+            }
+
+            fetch_list(path_item) {
+                this.loading_mark.show();
+                this.remove_all_items()
+
+                this.selecting_checkbox.state = 0;
+                this.selecting_checkbox_input.checked = false;
+                this.selecting_checkbox_input.indeterminate = false;
+
+                this.client.subviews.drive.fetch_list(this.constructor.name, path_item.attr.type === _drive.path_item_type.root ? undefined : path_item.attr.did,)
+                    .then(result => {
+                        if (this.closed) return;
+                        for (const resultElement of result) {
+                            this.add_item(resultElement);
+                        }
+                        this.remove_loading_mark();
+                    }).catch(error => {
+                    if (this.closed) return;
+                    this.remove_loading_mark()
+                    MessageMark.report(error);
+                });
+            }
+
+            add_item(attr) {
+                const tree_headers = [];
+
+                let can_click = attr.type === subviews.Drive.item_type.folder;
+                if (this.constructor.name === "trashcan") can_click = false;
+
+                const item = new TreeWidget(this.element_drive_items, tree_headers, null, 2, true, can_click)
+                item.attr = attr;
+                const html = `<div class="drive-item">
+<label class="checkbox"><input type="checkbox"></label>
+<i class="drive-item-icon"></i>
+<div class="drive-item-info">
+<!--    <a href="" target="_self" onclick="event.preventDefault();" draggable="false">-->
+        <p class="drive-item-info-name"></p>
+        <div class="drive-item-info-others"></div>
+<!--    </a>-->
+</div>
+<div class="drive-item-actions">
+    <button class="drive-item-action drive-item-action-more"><i class="drive-item-action-icon-more"></i></button>
+</div>
+</div>`;
+                item.set_raw_header(html);
+                item.show();
+
+                // // a标签
+                // item.e_atag = item.raw_header.querySelector(":scope div.drive-item-info > a");
+
+                const e_icon = item.raw_header.querySelector(":scope i.drive-item-icon");
+                if (attr.type === subviews.Drive.item_type.file) {
+                    e_icon.classList.add("drive-item-icon-file")
+                } else if (attr.type === subviews.Drive.item_type.folder) {
+                    e_icon.classList.add("drive-item-icon-folder")
+                }
+
+
+                // 拖拽
+                if (this.current_path_item().attr.type === _drive.path_item_type.root && this.constructor.name !== "myspace") {
+                } else {
+                    item.summary.draggable = "true";
+                }
+                if (attr.type === subviews.Drive.item_type.folder) {
+                    item.summary.addEventListener('drop', (event) => {
+                        if (!dragging_item) return;
+                        const station_element = event.target.closest("summary");
+                        if (!station_element || item === dragging_item) return;
+                        item.summary.classList.remove("active");
+                        // const d = JSON.parse(event.dataTransfer.getData("application/json"));
+                        this.move(dragging_item, item);
+                    });
+                    item.summary.addEventListener('dragover', (event) => {
+                        if (!dragging_item) return;
+                        const station_element = event.target.closest("summary");
+                        if (!station_element || item === dragging_item) return;
+                        event.preventDefault();
+                        item.summary.classList.add("active");
+                    });
+                    item.summary.addEventListener('dragenter', (event) => {
+                        if (!dragging_item) return;
+                        const station_element = event.target.closest("summary");
+                        if (!station_element || item === dragging_item) return;
+                        event.preventDefault();
+                        item.summary.classList.add("active");
+                    });
+                    item.summary.addEventListener('dragleave', (event) => {
+                        if (!dragging_item) return;
+                        if (event.target.nodeName === "#text") return;
+                        const station_element = event.target.closest("summary");
+                        if (!station_element || item === dragging_item) return;
+                        event.preventDefault();
+                        item.summary.classList.remove("active");
+                    });
+                }
+                item.summary.addEventListener('dragstart', (event) => {
+                    if (event.target.tagName !== "SUMMARY") {
+                        return;
+                    }
+                    dragging_item = item;
+                    // event.dataTransfer.setData("application/json", JSON.stringify());
+                    event.dataTransfer.effectAllowed = 'move';
+                });
+                item.summary.addEventListener('dragend', (event) => {
+                    dragging_item = null;
+                    item.summary.classList.remove('hold')
+                })
+
+
+                // 展示数据
+                this.update_item(item);
+                const e_info_others = item.raw_header.querySelector(":scope div.drive-item-info-others");
+                {
+                    const html = `<span>${format_timestamp_utc8(attr.uploaded_time)}</span>`;
+                    e_info_others.insertAdjacentHTML("beforeend", html,);
+                }
+                if (attr.type === subviews.Drive.item_type.file) {
+                    const html = `<span>由${format_uploader(attr.uploader)}上传</span>`;
+                    e_info_others.insertAdjacentHTML("beforeend", html,);
+                } else if (attr.type === subviews.Drive.item_type.folder) {
+                    const html = `<span>由${format_uploader(attr.uploader)}创建</span>`;
+                    e_info_others.insertAdjacentHTML("beforeend", html,);
+                }
+                if (attr.type === subviews.Drive.item_type.file) {
+                    const html = `<span>${format_bytes(attr.size)}</span>`;
+                    e_info_others.insertAdjacentHTML("beforeend", html,);
+                }
+
+
+                // 复选框
+                item.raw_header.selecting_checkbox = item.raw_header.querySelector(":scope > label.checkbox:first-of-type");
+                item.raw_header.selecting_checkbox_input = item.raw_header.selecting_checkbox.querySelector(":scope > input");
+
+                const cb = item.raw_header.selecting_checkbox_input;
+                item.raw_header.selecting_checkbox.state = 0;
+                item.raw_header.selecting_checkbox.addEventListener("click", (event) => {
+                    item.raw_header.selecting_checkbox.state = (item.raw_header.selecting_checkbox.state + 1) % 2;
+                    cb.checked = item.raw_header.selecting_checkbox.state === 1;
+                    cb.indeterminate = item.raw_header.selecting_checkbox.state === 2;
+                    this._update_selecting_checkbox_state();
+                });
+                cb.checked = false;
+                cb.indeterminate = false;
+
+                item.header_btns.push(item.raw_header.selecting_checkbox, item.raw_header.selecting_checkbox_input)
+
+
+                // 点击
+                if (item.can_click) {
+                    item.summary.addEventListener('click', (e) => {
+                        if (item.header_btns.includes(e.target)) return;
+                        this.into_folder(item);
+                    });
+                }
+
+
+                // 按钮
+                item.raw_header.action_more = item.raw_header.querySelector(":scope button.drive-item-action-more");
+                item.raw_header.action_more.addEventListener("click", (event) => {
+                    const rect = event.target.getBoundingClientRect();
+                    const items = [];
+                    items.push(
+                        {type: "button", text: "下载", callback: event => this.download(event, item),},
+                        {type: "section", text: "",},
+                        {type: "button", text: "重命名", callback: event => this.rename(event, item),},
+                        {type: "button", text: "共享设置", callback: event => this.sharesettings(event, item),},
+                        {type: "section", text: "",},
+                        {type: "button", text: "移到垃圾桶", callback: event => this.movetotrash(event, item),},
+                        {type: "button", text: "永久删除", callback: event => this.delete(event, item),},
+                    );
+                    if (this.current_path_item().attr.type === _drive.path_item_type.root && this.constructor.name === "root") {
+                        items[2].disabled = true;
+                        items[3].disabled = true;
+                        items[5].disabled = true;
+                        items[6].disabled = true;
+                    }
+                    if (this.constructor.name === "trashcan") {
+                        items[5].text = "移出垃圾桶";
+                        items[5].callback = event => this.restore(event, item);
+                    }
+
+                    if (item.attr.type === subviews.Drive.item_type.folder) {
+                        items[0].text = "下载文件夹";
+                    }
+
+                    item.summary.classList.add("active");
+                    MenuMark.exec({x: rect.left, y: rect.top + rect.height,}, items, () => {
+                        item.summary.classList.remove("active");
+                    });
+                });
+                item.header_btns.push(item.raw_header.action_more);
+
+
+                this.drive_items.push(item);
+
+                return item;
+
+            }
+
+            update_item(item,) {
+                const e_info_name = item.raw_header.querySelector(":scope p.drive-item-info-name");
+                if (item.attr.name_encrypted) {
+                    e_info_name.textContent = decrypt_processing_string;
+                    // this.update_item_atag(item);
+                    encryptors.decrypt2string(item.attr.name).then(result => {
+                        e_info_name.textContent = result;
+                        item.attr.plain_name = result;
+                        // this.update_item_atag(item);
+                    }).catch(error => {
+                        e_info_name.classList.add("red");
+                        e_info_name.textContent = decrypt_error_string;
+                        item.attr.plain_name = decrypt_error_string;
+                        // this.update_item_atag(item);
+                    });
+                } else {
+                    e_info_name.textContent = item.attr.name;
+                }
+            }
+
+            update_item_atag(item,) {
+                // 因下载后还要解密，用a标签不行
+                if (item.attr.type === subviews.Drive.item_type.folder) return;
+                const url = join_path(this.client.subviews.drive.api_url(), "item", item.attr.did, "down", encodeURIComponent(this.get_item_display_name(item)));
+                item.e_atag.href = url.href;
+            }
+
+            get_item_display_name(item) {
+                return item.attr.plain_name ? item.attr.plain_name : item.attr.name;
+            }
+
+            remove_all_items() {
+                for (const driveItem of this.drive_items) {
+                    driveItem.remove();
+                }
+                this.drive_items.length = 0;
+            }
+
+            remove_item(item) {
+                item.remove();
+                this.drive_items.splice(this.drive_items.indexOf(item), 1);
+            }
+
+            _update_selecting_checkbox_state() {
+                let checked_count = 0;
+                for (const driveItem of this.drive_items) {
+                    if (driveItem.raw_header.selecting_checkbox.state === 1) {
+                        checked_count++;
+                    }
+                }
+                if (checked_count === 0) {
+                    this.selecting_checkbox.state = 0;
+                    this.selecting_checkbox_input.checked = false;
+                    this.selecting_checkbox_input.indeterminate = false;
+                } else if (checked_count === this.drive_items.length) {
+                    this.selecting_checkbox.state = 1;
+                    this.selecting_checkbox_input.checked = true;
+                    this.selecting_checkbox_input.indeterminate = false;
+                } else {
+                    this.selecting_checkbox.state = 2;
+                    this.selecting_checkbox_input.checked = false;
+                    this.selecting_checkbox_input.indeterminate = true;
+                }
+            }
+
+            current_path_item() {
+                return this.drive_path_items[this.drive_path_items.length - 1];
+            }
+
+            into_folder(item) {
+                const name = this.get_item_display_name(item);
+                const attr = {
+                    type: _drive.path_item_type.folder,
+                    did: item.attr.did,
+
+                    name: item.attr.name,
+                    plain_name: item.attr.plain_name,
+                };
+                this.add_path_item(name, attr);
+                this.refresh();
+            }
+
+            remove_back_path_items(item) {
+                for (let i = this.drive_path_items.length - 1; i > -1; i--) {
+                    if (item !== this.drive_path_items[i]) {
+                        this.drive_path_items[i].remove();
+                        this.drive_path_items.splice(i, 1);
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            new_folder() {
+                let form = [
+                    {type: "title", label: "新建文件夹："},
+                    {type: "linetext", label: "名称", value: "",},
+                ];
+
+                const confirm_callback = (fm,) => {
+                    fm.collect_data();
+
+                    try {
+                        let name = normalizeName(form[1].value);
+                        if (!form_check_string(name)) throw new Error("名称无效。");
+                        // fm.remove();
+                        this._new_folder(fm, name);
+
+                    } catch (e) {
+                        MessageMark.report(e, fm.rect)
+                    }
+
+                }
+
+                FormMark.get_global_input(form, confirm_callback)
+            }
+
+            _new_folder(fm, name) {
+                const path_item = this.current_path_item();
+                // this.loading_mark.show();
+                fm.loading_mark = new LoadingMark(fm.rect);
+                fm.loading_mark.show();
+                this.client.subviews.drive.new_folder(name, path_item.attr.type === _drive.path_item_type.root ? undefined : path_item.attr.did)
+                    .then(result => {
+                        if (this.closed) return;
+                        const item = this.add_item(result);
+                        item.summary.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+                        // this.remove_loading_mark();
+                        fm.loading_mark.remove();
+                        fm.remove();
+                    }).catch(error => {
+                    if (this.closed) return;
+                    // this.remove_loading_mark();
+                    fm.loading_mark.remove();
+                    MessageMark.report(error, fm.rect);
+                });
+            }
+
+            refresh() {
+                const path_item = this.current_path_item();
+                this.switch_action_btns(path_item);
+                this.fetch_list(path_item);
+            }
+
+            switch_action_btns(path_item) {
+                if (path_item.attr.type === _drive.path_item_type.root && this.constructor.name !== "myspace") {
+                    for (const string of ["hidden",]) {
+                        this.drive_action_btn_upload.classList.add(string);
+                        this.drive_action_btn_newfolder.classList.add(string);
+                    }
+                } else {
+                    for (const string of ["hidden",]) {
+                        this.drive_action_btn_upload.classList.remove(string);
+                        this.drive_action_btn_newfolder.classList.remove(string);
+                    }
+                }
+            }
+
+            add_upload_task(file) {
+                const t = new FloatBall.tasktypes.Upload(floatball.dialog.tab_content_backtasks);
+                floatball.dialog.addTask(t);
+                t.set_name(normalizeName(file.name));
+                t.set_args({
+                    file,
+                    current_path_item: this.current_path_item(),
+                });
+                floatball.dialog.checkToStartTask();
+                return t;
+            }
+
+            look_upload_tasks(t) {
+                floatball.showDialog();
+                floatball.dialog.switchTab(floatball.dialog.tab_btn_backtasks);
+                if (t) t.rect.scrollIntoView({behavior: 'smooth', block: 'center'});
+            }
+
+            download(event, item) {
+                if (item.attr.type === subviews.Drive.item_type.folder) {
+
+                } else {
+                    const t = new FloatBall.tasktypes.Download(floatball.dialog.tab_content_backtasks);
+                    floatball.dialog.addTask(t);
+                    t.set_name(normalizeName(this.get_item_display_name(item)));
+                    t.set_args({
+                        type: this.constructor,
+                        did: item.attr.did,
+                        name: this.get_item_display_name(item),
+                    });
+                    floatball.dialog.checkToStartTask();
+
+                    floatball.showDialog();
+                    floatball.dialog.switchTab(floatball.dialog.tab_btn_backtasks);
+                    t.rect.scrollIntoView({behavior: 'smooth', block: 'center'});
+                }
+            }
+
+            rename(event, item) {
+                const origin_name = this.get_item_display_name(item);
+                let form = [
+                    {type: "title", label: "重命名："},
+                    {type: "linetext", label: "名称", value: origin_name,},
+                ];
+
+                const confirm_callback = (fm,) => {
+                    fm.collect_data();
+
+                    try {
+                        let name = normalizeName(form[1].value);
+                        if (!form_check_string(name)) throw new Error("名称无效。");
+
+                        if (name === origin_name) {
+                            fm.remove();
+                            return;
+                        }
+
+                        // fm.remove();
+                        this._rename(event, item, fm, name);
+
+                    } catch (e) {
+                        MessageMark.report(e, fm.rect)
+                    }
+
+                }
+
+                FormMark.get_global_input(form, confirm_callback)
+            }
+
+            _rename(event, item, fm, name) {
+                fm.loading_mark = new LoadingMark(fm.rect);
+                fm.loading_mark.show();
+                this.client.subviews.drive.rename(item.attr.did, name,)
+                    .then(result => {
+                        if (this.closed) return;
+                        item.attr.name = result.name;
+                        this.update_item(item);
+                        fm.loading_mark.remove();
+                        fm.remove();
+                    }).catch(error => {
+                    if (this.closed) return;
+                    fm.loading_mark.remove();
+                    MessageMark.report(error, fm.rect);
+                });
+            }
+
+            move(dragging_item, item, root_path_item) {
+                let name1 = this.get_item_display_name(dragging_item);
+                let name2;
+                if (root_path_item) {
+                    for (const mainaction of this.panel.mainactions) {
+                        if (mainaction.pagetype.name === this.constructor.name) {
+                            name2 = mainaction.text;
+                            break;
+                        }
+                    }
+                } else {
+                    name2 = this.get_item_display_name(item);
+                }
+
+                MessageMark.confirm(`移动“${name1}”到“${name2}”？`, null, null, () => {
+                    this._move(dragging_item, item, root_path_item);
+                },)
+            }
+
+            _move(dragging_item, item, root_path_item) {
+                this.loading_mark.show();
+                this.client.subviews.drive.move(dragging_item.attr.did,
+                    root_path_item ? undefined : item.attr.did,
+                    root_path_item ? this.constructor.name : undefined)
+                    .then(result => {
+                        if (this.closed) return;
+                        this.remove_item(dragging_item);
+                        this.remove_loading_mark();
+                    }).catch(error => {
+                    if (this.closed) return;
+                    this.remove_loading_mark()
+                    MessageMark.report(error);
+                });
+            }
+
+            sharesettings(event, item) {
+
+            }
+
+            movetotrash(event, item) {
+                let name = this.get_item_display_name(item);
+                MessageMark.confirm(`移到垃圾桶“${name}”？`, null, null, () => {
+                    this._movetotrash(event, item);
+                },)
+            }
+
+            _movetotrash(event, item) {
+                this.loading_mark.show();
+                this.client.subviews.drive.trash(item.attr.did)
+                    .then(result => {
+                        if (this.closed) return;
+                        this.remove_item(item);
+                        this.remove_loading_mark();
+                    }).catch(error => {
+                    if (this.closed) return;
+                    this.remove_loading_mark()
+                    MessageMark.report(error);
+                });
+            }
+
+            restore(event, item) {
+                let name = this.get_item_display_name(item);
+                MessageMark.confirm(`移出垃圾桶“${name}”？`, null, null, () => {
+                    this._restore(event, item);
+                },)
+            }
+
+            _restore(event, item) {
+                this.loading_mark.show();
+                this.client.subviews.drive.restore(item.attr.did)
+                    .then(result => {
+                        if (this.closed) return;
+                        this.remove_item(item);
+                        this.remove_loading_mark();
+                    }).catch(error => {
+                    if (this.closed) return;
+                    this.remove_loading_mark()
+                    MessageMark.report(error);
+                });
+            }
+
+            delete(event, item) {
+                let name = this.get_item_display_name(item);
+                MessageMark.confirm(`永久删除“${name}”？`, null, null, () => {
+                    this._delete(event, item);
+                },)
+            }
+
+            _delete(event, item) {
+                this.loading_mark.show();
+                this.client.subviews.drive.delete(item.attr.did)
+                    .then(result => {
+                        if (this.closed) return;
+                        this.remove_item(item);
+                        this.remove_loading_mark();
+                    }).catch(error => {
+                    if (this.closed) return;
+                    this.remove_loading_mark()
+                    MessageMark.report(error);
+                });
+            }
+        }
+
         /*
         * 收发
         * */
@@ -1702,24 +4199,75 @@
         * 网盘
         * */
         let dashboard_drive = {
-            myspace(event) {
 
+            myspace: class extends _drive {
+                constructor(client, panel, li) {
+                    super(client, panel, li);
+                }
+
+                close_page() {
+                    super.close_page();
+                }
+
+                open_page() {
+                    super.open_page();
+                }
             },
 
-            trashcan(event) {
+            trashcan: class extends _drive {
+                constructor(client, panel, li) {
+                    super(client, panel, li);
+                }
 
+                close_page() {
+                    super.close_page();
+                }
+
+                open_page() {
+                    super.open_page();
+                }
             },
 
-            newfiles(event) {
+            newfiles: class extends _drive {
+                constructor(client, panel, li) {
+                    super(client, panel, li);
+                }
 
+                close_page() {
+                    super.close_page();
+                }
+
+                open_page() {
+                    super.open_page();
+                }
             },
 
-            sharewithme(event) {
+            sharewithme: class extends _drive {
+                constructor(client, panel, li) {
+                    super(client, panel, li);
+                }
 
+                close_page() {
+                    super.close_page();
+                }
+
+                open_page() {
+                    super.open_page();
+                }
             },
 
-            root(event) {
+            root: class extends _drive {
+                constructor(client, panel, li) {
+                    super(client, panel, li);
+                }
 
+                close_page() {
+                    super.close_page();
+                }
+
+                open_page() {
+                    super.open_page();
+                }
             },
         }
 
@@ -2225,7 +4773,7 @@
 
         }
 
-        return {dashboard_mail, dashboard_drive, dashboard_chat, backend_panel,};
+        return {_drive, dashboard_mail, dashboard_drive, dashboard_chat, backend_panel,};
     })()
 
 
@@ -2243,6 +4791,7 @@
             };
 
             this.header_btn_mail = document.getElementById("header-btn-mail"); // 切换面板
+            this.header_btn_mail.classList.add("hidden");
             this.header_btn_drive = document.getElementById("header-btn-drive");
             this.header_btn_chat = document.getElementById("header-btn-chat");
             this.header_btns = [this.header_btn_mail, this.header_btn_drive, this.header_btn_chat,];
@@ -2420,6 +4969,13 @@
                     .then(result => {
                         lm.remove()
                         logged_user = result;
+
+                        // this.header_btn_mail.classList.remove("hidden");
+                        this.header_btn_drive.classList.remove("hidden");
+                        this.header_btn_chat.classList.remove("hidden");
+
+                        floatball.show();
+
                         this.restore_selected_panel_id();
                     }).catch(error => {
                     lm.remove()
@@ -2492,7 +5048,7 @@
                     return;
                 }
             }
-            this.header_btn_mail.click();
+            this.header_btn_chat.click();
         }
 
         switch_panel_btn(event) {
@@ -2574,6 +5130,7 @@
             if (backend_panel) {
                 this.login_panel.classList.remove("active");
                 this.backend_panel.classList.add("active");
+                this.header_btn_more_right.textContent = `服务管理员`;
             }
         }
 
@@ -2634,6 +5191,13 @@
         } else {
             if (logged_user) {
                 switched = true;
+
+                // checkin.header_btn_mail.classList.remove("hidden");
+                checkin.header_btn_drive.classList.remove("hidden");
+                checkin.header_btn_chat.classList.remove("hidden");
+
+                floatball.show();
+
                 checkin.restore_selected_panel_id();
             }
         }
