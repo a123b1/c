@@ -22,19 +22,19 @@
         }
 
         .no-width {
-            width: 0;
-            padding-left: 0;
-            padding-right: 0;
-            margin-left: 0;
-            margin-right: 0;
+            width: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
         }
 
         .no-height {
-            height: 0;
-            padding-top: 0;
-            padding-bottom: 0;
-            margin-top: 0;
-            margin-bottom: 0;
+            height: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
         }
 
         html {
@@ -249,7 +249,7 @@
 
             padding-top: 16px;
             padding-bottom: 16px;
-            gap: 14px;
+            gap: 10px;
 
         }
 
@@ -287,7 +287,7 @@
             background-color: #fff;
             padding: 4px;
             border-radius: 4px;
-            box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
         }
 
         /* ol 去掉默认序号和 padding */
@@ -338,7 +338,7 @@
             user-select: none;
             border: 0 solid #3498db;
             border-radius: 4px;
-            box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
             font-size: 16px;
             background: white;
         }
@@ -348,6 +348,30 @@
         }
 
         #new-mail-btn:active {
+            background-color: rgba(0, 123, 255, 0.2);
+        }
+    </style>
+
+    <!--发布主题按钮-->
+    <style>
+        #new-discussion-btn {
+            padding: 10px 6px;
+            margin: 0 24px 0 24px;
+            cursor: pointer;
+            transition: background-color 0.1s, transform 0.1s;
+            user-select: none;
+            border: 0 solid #3498db;
+            border-radius: 4px;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+            font-size: 16px;
+            background: white;
+        }
+
+        #new-discussion-btn:hover {
+            background-color: rgba(24, 128, 255, 0.15);
+        }
+
+        #new-discussion-btn:active {
             background-color: rgba(0, 123, 255, 0.4);
         }
     </style>
@@ -512,10 +536,61 @@
             display: flex;
             flex-direction: column;
             justify-content: left;
+            gap: 4px;
+
+            overflow-y: auto;
+            max-height: 60vh;
         }
 
-        div#form-mark-input-group > label > input {
+        div#form-mark-input-group > label {
+            display: flex;
+            flex-direction: row;
+            justify-content: left;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+        }
+
+        div#form-mark-input-group > label > *:first-child {
             margin-left: 4px;
+        }
+
+        div.form-mark-input-group {
+            display: flex;
+            flex-direction: column;
+            justify-content: left;
+            gap: 4px;
+
+            border: #1c1c1c20 1px solid;
+            border-radius: 4px;
+            background: #1c1c1c05;
+            padding: 6px;
+            margin-bottom: 2px;
+        }
+
+        div.form-mark-input-group > label {
+            display: flex;
+            flex-direction: row;
+            justify-content: left;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+        }
+
+        div.form-mark-input-group > label > *:first-child {
+            margin-left: 4px;
+        }
+
+        div.form-mark-input-group > label.form-mark-input-group-title {
+            display: inline-block;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 0 0 2px 0;
+
+        }
+
+        div.form-mark-input-custom {
+            display: flex;
+            flex-direction: column;
+            justify-content: left;
         }
 
         span#form-mark-input-title {
@@ -523,6 +598,15 @@
             font-size: 16px;
             font-weight: bold;
             margin: 0 0 2px 0;
+        }
+
+        span.form-mark-input-multiselectbutton-value {
+            margin: 0;
+            padding: 0;
+            color: #000000aa;
+            font-size: 12px;
+            user-select: none;
+            margin-left: 4px;
         }
 
     </style>
@@ -603,7 +687,6 @@
             /*color: #1574D1;*/
             background: #2088ee33;
         }
-
 
         div.floatball-mark-tabcontent {
             display: flex;
@@ -1000,7 +1083,7 @@
             display: flex;
             flex-direction: row;
             /*background: #CCE5FF;*/
-            background: linear-gradient(to bottom, #CCE5FFcc, transparent);
+            background: linear-gradient(to bottom, #CCE5FF88, transparent);
             border-radius: 4px;
             padding: 3px 4px;
             gap: 4px;
@@ -1018,7 +1101,11 @@
         }
 
         .drive-action-btn:first-of-type {
-            margin-left: 10px;
+            margin-left: 4px !important;
+        }
+
+        .drive-action-btn.hidden-btn {
+            display: none !important;
         }
 
         .drive-action-btn:hover {
@@ -1039,6 +1126,11 @@
 
         .drive-items-wrap.drag-active {
             background-color: rgba(255, 255, 0, 0.35);
+        }
+
+        .drive-items-wrap > p {
+            margin: 0;
+            align-self: center;
         }
 
         .drive-items {
@@ -1253,6 +1345,40 @@
 
     </style>
 
+    <!--输入表单 自定义元素-->
+    <style>
+        /* nothings */
+    </style>
+
+    <!--输入表单 自定义元素 共享设置-->
+    <style>
+        .fmic-item-sharesettings {
+            display: flex;
+            flex-direction: row;
+            justify-content: left;
+            margin-bottom: 6px;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+            gap: 4px;
+            margin-right: 24px;
+        }
+
+        .fmic-item-sharesettings > label {
+            white-space: nowrap;
+        }
+
+        .fmic-item-sharesettings > label > * {
+            margin-left: 4px;
+        }
+
+        .fmic-item-sharesettings > label > *:first-child {
+            margin-left: 4px;
+        }
+
+        .fmic-item-sharesettings select {
+        }
+    </style>
+
 
 </head>
 
@@ -1261,15 +1387,17 @@
 <body class="">
 <header class="">
     <button id="header-btn-startpage" class="initiation_hidden">返回首页</button>
-    <button id="header-btn-chat" class="hidden">收发</button>
-    <button id="header-btn-mail" class="hidden"></button>
+    <button id="header-btn-mail" class="hidden">收发</button>
     <button id="header-btn-drive" class="hidden">网盘</button>
+    <button id="header-btn-chat" class="hidden">聊天</button>
+    <button id="header-btn-forum" class="hidden">讨论</button>
     <button id="header-btn-more-left" class="menu-btn">&nbsp;</button>
     <span class="flex-grow"></span>
     <!--    <button id="header-btn-backend" class="">后台面板</button>-->
     <button id="header-btn-more-right" class="menu-btn">#</button>
 </header>
 <main>
+
     <section id="login-panel" class="">
         <span id="login-top-margin"></span>
         <div id="login-rect">
@@ -1280,6 +1408,7 @@
             <button id="login-btn">登录</button>
         </div>
     </section>
+
     <section id="dashboard-mail">
         <aside class="aside-left tiny-scrollbar">
             <button id="new-mail-btn">发信</button>
@@ -1293,6 +1422,7 @@
         <aside class="aside-right">
         </aside>
     </section>
+
     <section id="dashboard-drive">
         <aside class="aside-left tiny-scrollbar">
             <nav>
@@ -1304,6 +1434,7 @@
         <aside class="aside-right">
         </aside>
     </section>
+
     <section id="dashboard-chat">
         <aside class="aside-left tiny-scrollbar">
             <nav>
@@ -1319,6 +1450,20 @@
         <aside class="aside-right">
         </aside>
     </section>
+
+    <section id="dashboard-forum">
+        <aside class="aside-left tiny-scrollbar">
+            <button id="new-discussion-btn">发布主题</button>
+            <nav>
+                <ol class="nav-buttons">
+                </ol>
+            </nav>
+        </aside>
+        <div class="aside-divider"></div>
+        <aside class="aside-right">
+        </aside>
+    </section>
+
     <section id="backend-panel">
         <aside class="aside-left tiny-scrollbar">
             <nav>
@@ -1330,6 +1475,7 @@
         <aside class="aside-right">
         </aside>
     </section>
+
 </main>
 <footer>
 </footer>
@@ -1338,7 +1484,7 @@
 <!---->
 
 <script>
-    const checkin_version = null;
+    const checkin_version = null; // 被服务端替换
     const checkin_version_number = null;
     const checkin_version_is_beta = null;
     const top_level_path = null;
@@ -1434,9 +1580,13 @@
         return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
+    const seconds_of_one_hour = 60 * 60;
+    const seconds_of_eight_hours = 8 * seconds_of_one_hour;
+    const seconds_of_one_day = 24 * seconds_of_one_hour;
+
     function format_timestamp_utc8(timestamp, format = 'YYYY-MM-DD HH:mm') {
         if (!timestamp) return "未知";
-        const date = new Date((timestamp + (8 * 60 * 60)) * 1000);
+        const date = new Date((timestamp + seconds_of_eight_hours) * 1000);
         const map = {
             'YYYY': date.getUTCFullYear(),
             'MM': String(date.getUTCMonth() + 1).padStart(2, '0'),
@@ -1449,7 +1599,7 @@
     }
 
     function format_bytes(bytes) {
-        if (bytes === 0) return "0 B";
+        if (!bytes) return "0 B";
         const sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
         const i = Math.floor(Math.log(bytes) / Math.log(1024));
         let formattedSize = (bytes / Math.pow(1024, i)).toFixed(1);
@@ -1459,6 +1609,13 @@
 
     function format_uploader(uploader) {
         return uploader === logged_user.uid ? "你" : uploader;
+    }
+
+    function format_shared(attr) {
+        // 判断由谁共享的，应该向上找到非noset的吧？
+        // if (attr.uploader !== logged_user.uid) return attr.shared ? `由${attr.uploader}共享` : "";
+
+        return attr.shared ? "已共享" : "";
     }
 
     function normalizeName(name) {
@@ -1516,6 +1673,12 @@
         return ((typeof value === "string") && ((!allow_empty && value.length > 0) || allow_empty))
     }
 
+    function form_check_string_int(value) {
+        if (!(typeof value === "string")) return false;
+        if (!/^\d+$/.test(value)) return false;
+        return true;
+    }
+
     function form_check_bool(value,) {
         return ((typeof value === "boolean"))
     }
@@ -1532,6 +1695,10 @@
         return value !== null && typeof value === 'object' && value.constructor === Object;
     }
 
+    function form_check_known(value, range) {
+        if (range instanceof Array) return range.includes(value);
+        return range.hasOwnProperty(value);
+    }
 
     /*
     * 加解密
@@ -1552,11 +1719,6 @@
 
             async init() {
                 this.password_key = await this.deriveKeyFromPassword(this.password, Encryptors.Encryptor.password_salt);
-
-                // const cipherText = await this.encrypt(Encryptors.Encryptor.str2bytes("会话"));
-                // console.log("CipherText:", cipherText);
-                // const decrypted = await this.decrypt(Encryptors.Encryptor.bytesToBase64(cipherText));
-                // console.log("Decrypted:", Encryptors.Encryptor.bytes2str(decrypted));
             }
 
             static str2bytes(str) {
@@ -1627,7 +1789,6 @@
             }
         }
 
-
         async create(password) {
             if (!form_check_string(password)) return;
             const encryptor = new Encryptors.Encryptor(password);
@@ -1679,13 +1840,6 @@
     }
 
     const encryptors = new Encryptors();
-    // encryptors.recreate_all([localStorage.getItem("currentkey"), ...(JSON.parse(localStorage.getItem("historicalkeys")) || [])]);
-    // setTimeout(async () => {
-    //     const cipherBytes = await encryptors.encrypt("会话");
-    //     console.log("cipherBytes", cipherBytes, Encryptors.Encryptor.bytesToBase64(cipherBytes));
-    //     const plainBytes = await encryptors.decrypt(Encryptors.Encryptor.bytesToBase64(cipherBytes));
-    //     console.log("plainBytes", plainBytes, Encryptors.Encryptor.bytes2str(plainBytes));
-    // }, 1000)
 
 
     /*
@@ -1728,6 +1882,10 @@
 
         increase_z() {
             this.mark.style.zIndex = (parseInt(window.getComputedStyle(this.mark).zIndex) + 1).toString();
+        }
+
+        is_visible() {
+            return !this.mark.classList.contains("hidden");
         }
     }
 
@@ -1865,7 +2023,7 @@
             // 输入区域
             this.input_group = this.mark.querySelector(":scope div#form-mark-input-group");
             for (const formElement of this.form) {
-                this.#add_input_element(formElement)
+                this.#add_input_element(formElement, this.input_group)
             }
 
             // 按钮
@@ -1886,30 +2044,42 @@
             }
         }
 
-        #add_input_element(row) {
+        #add_input_element(row, input_group) {
             if (row.type === "title") {
-                this.#add_input_element_title(row);
+                this.#add_input_element_title(row, input_group);
             } else if (row.type === "textarea") {
-                this.#add_input_element_textarea(row);
+                this.#add_input_element_textarea(row, input_group);
             } else if (row.type === "linetext") {
-                this.#add_input_element_linetext(row);
+                this.#add_input_element_linetext(row, input_group);
+            } else if (row.type === "combobox") {
+                this.#add_input_element_combobox(row, input_group);
+            } else if (row.type === "groupbox") {
+                this.#add_input_element_groupbox(row, input_group);
+            } else if (row.type === "multiselectbutton") {
+                this.#add_input_element_multiselectbutton(row, input_group);
+            } else if (row.type === "date") {
+                this.#add_input_element_date(row, input_group);
+            } else if (row.type === "button") {
+                this.#add_input_element_button(row, input_group);
+            } else if (row.type === "custom") {
+                this.#add_input_element_custom(row, input_group);
             }
         }
 
-        #add_input_element_title(row) {
+        #add_input_element_title(row, input_group) {
             let html = `
 <label><span id="form-mark-input-title">${row.label}</span></label>
 `;
-            this.input_group.insertAdjacentHTML("beforeend", html);
-            row.label_element = this.input_group.querySelector(":scope > label:last-of-type");
+            input_group.insertAdjacentHTML("beforeend", html);
+            row.label_element = input_group.querySelector(":scope > label:last-of-type");
         }
 
-        #add_input_element_textarea(row) {
+        #add_input_element_textarea(row, input_group) {
             let html = `
 <label >${row.label}<textarea wrap="soft"></textarea></label>
 `;
-            this.input_group.insertAdjacentHTML("beforeend", html);
-            row.label_element = this.input_group.querySelector(":scope > label:last-of-type");
+            input_group.insertAdjacentHTML("beforeend", html);
+            row.label_element = input_group.querySelector(":scope > label:last-of-type");
             row.input_element = row.label_element.querySelector(":scope > textarea");
 
             row.input_element.value = row.value;
@@ -1917,34 +2087,130 @@
             row.input_element.style.height = `${256}px`;
         }
 
-        #add_input_element_linetext(row) {
+        #add_input_element_linetext(row, input_group) {
             let html = `
 <label>${row.label}<input type="text"></label>
 `;
-            this.input_group.insertAdjacentHTML("beforeend", html);
-            row.label_element = this.input_group.querySelector(":scope > label:last-of-type");
+            input_group.insertAdjacentHTML("beforeend", html);
+            row.label_element = input_group.querySelector(":scope > label:last-of-type");
             row.input_element = row.label_element.querySelector(":scope > input");
 
             row.input_element.value = row.value;
+            row.input_element.placeholder = row.placeholder || "";
 
             // row.input_element.style.width = `fit-content`;
             // row.input_element.style.maxWidth = `300px`;
             row.input_element.style.width = `30ch`;
         }
 
-        collect_data() {
-            for (const row of this.form) {
+        #add_input_element_combobox(row, input_group) {
+            let html = `
+<label>${row.label}<select></select></label>
+`;
+            input_group.insertAdjacentHTML("beforeend", html);
+            row.label_element = input_group.querySelector(":scope > label:last-of-type");
+            row.input_element = row.label_element.querySelector(":scope > select");
+
+            for (const optionsKey in row.options) {
+                let html = `
+<option value="${optionsKey}">${row.options[optionsKey]}</option>
+`;
+                row.input_element.insertAdjacentHTML("beforeend", html);
+                const option = row.input_element.querySelector(":scope > option:last-of-type");
+            }
+
+            row.input_element.value = row.value;
+        }
+
+        #add_input_element_groupbox(row, input_group) {
+            let html = `
+<div class="form-mark-input-group"><label class="form-mark-input-group-title">${row.label}</label></div>
+`;
+            input_group.insertAdjacentHTML("beforeend", html);
+            row.input_group = input_group.querySelector(":scope > .form-mark-input-group:last-of-type");
+
+            for (const formElement of row.form) {
+                this.#add_input_element(formElement, row.input_group)
+            }
+        }
+
+        #add_input_element_multiselectbutton(row, input_group) {
+            let html = `
+<label>${row.label}<button>${row.label_button}</button><span class="form-mark-input-multiselectbutton-value">${row.display}</span></label>
+`;
+            input_group.insertAdjacentHTML("beforeend", html);
+            row.label_element = input_group.querySelector(":scope > label:last-of-type");
+            row.input_element = row.label_element.querySelector(":scope > button");
+            row.input_element.addEventListener("click", (event) => {
+                row.callback(event, this, row);
+            });
+
+            row.display_element = row.label_element.querySelector(":scope .form-mark-input-multiselectbutton-value");
+        }
+
+        #add_input_element_date(row, input_group) {
+            let html = `
+<label>${row.label}<input type="date"></label>
+`;
+            input_group.insertAdjacentHTML("beforeend", html);
+            row.label_element = input_group.querySelector(":scope > label:last-of-type");
+            row.input_element = row.label_element.querySelector(":scope > input");
+
+            row.input_element.value = format_timestamp_utc8(row.value ? row.value : (Date.now() / 1000) + (30 * seconds_of_one_day), "YYYY-MM-DD");
+        }
+
+        #add_input_element_button(row, input_group) {
+            let html = `
+<label>${row.label}<button>${row.label_button}</button></label>
+`;
+            input_group.insertAdjacentHTML("beforeend", html);
+            row.label_element = input_group.querySelector(":scope > label:last-of-type");
+            row.input_element = row.label_element.querySelector(":scope > button");
+            row.input_element.addEventListener("click", (event) => {
+                row.callback(event, this, row);
+            });
+        }
+
+        #add_input_element_custom(row, input_group) {
+            let html = `
+<!--<label>${row.label}-->
+<div class="form-mark-input-custom"></div>
+<!--</label>-->
+`;
+            input_group.insertAdjacentHTML("beforeend", html);
+            // row.label_element = input_group.querySelector(":scope > label:last-of-type");
+            row.input_element = input_group.querySelector(":scope > div:last-of-type");
+            row.add_element(this, row);
+        }
+
+        collect_data(form = undefined) {
+            if (!form) form = this.form;
+            for (const row of form) {
                 if (row.type === "textarea") {
                     row.value = row.input_element.value;
                 } else if (row.type === "linetext") {
                     row.value = row.input_element.value;
+                } else if (row.type === "combobox") {
+                    row.value = row.input_element.value;
+                } else if (row.type === "groupbox") {
+                    this.collect_data(row.form);
+                } else if (row.type === "date") {
+                    let selected = row.input_element.value;
+                    if (form_check_string(selected)) {
+                        selected = new Date(selected);
+                        row.value = Math.floor(selected.getTime() / 1000) + seconds_of_eight_hours;
+                    } else {
+                        row.value = 0;
+                    }
+                } else if (row.type === "custom") {
+                    row.collect_data(this, row);
                 }
             }
 
         }
 
-        static get_global_input(form, confirm_callback) {
-            const fm = new FormMark(document.body, form, confirm_callback);
+        static get_global_input(form, confirm_callback, parent_element) {
+            const fm = new FormMark(parent_element ? parent_element : document.body, form, confirm_callback);
             fm.show();
             return fm;
         }
@@ -2376,8 +2642,13 @@
         * */
         static tasktypes = (() => {
             class _ {
-                constructor(task_container) {
+                constructor(task_container, callbacks) {
                     this.task_container = task_container;
+                    this.callbacks = {
+                        onfinished: null,
+                        onfailed: null,
+                    };
+                    if (callbacks) Object.assign(this.callbacks, callbacks);
                     this.filled = false;
                     this.backtask_btns = [];
                     this.status = null;
@@ -2474,7 +2745,11 @@
                     } else {
                         this.backtask_progress.classList.remove("sliding-bar-animation");
                         this.backtask_progress.style.width = `${i}%`;
+                        if (this.status === FloatBall.taskstatus.processing) this.update_progress_text(i);
                     }
+                }
+
+                update_progress_text(i) {
                 }
 
                 update_status_text(ts) {
@@ -2494,17 +2769,19 @@
                     } else if (ts === FloatBall.taskstatus.finished) {
                         this.update_progress(100);
                         this.backtask_progress_bar.classList.add("hidden");
+                        if (this.callbacks.onfinished) this.callbacks.onfinished();
                     } else if (ts === FloatBall.taskstatus.failed) {
                         this.backtask_btn_retry.classList.remove("hidden");
                         this.update_progress(0);
+                        if (this.callbacks.onfailed) this.callbacks.onfailed();
                     }
                 }
 
             }
 
             class Upload extends _ {
-                constructor(task_container) {
-                    super(task_container)
+                constructor(task_container, callbacks) {
+                    super(task_container, callbacks)
                     Object.assign(this.args, {
                         lstartindex: 0,
                         total: 0,
@@ -2534,6 +2811,11 @@
                         this.xhr.abort();
                         this.xhr.canceled = true;
                     }
+                }
+
+                update_progress_text(i) {
+                    super.update_progress_text(i);
+                    this.backtask_status_text.textContent = this.status.replace("{}", "上传") + `${i}%, ${format_bytes(this.args.curr)} / ${format_bytes(this.args.total)}`;
                 }
 
                 update_status_text(ts) {
@@ -2599,7 +2881,7 @@
                                 this.xhr.canceled = true;
                             },
                         }
-                        this.xhr = await checkin.subviews.drive.upload(this.result1.did, this.args.file, callbacks);
+                        this.xhr = await checkin.subviews.drive.upload(this.result1.did, this.args, callbacks);
 
                     } catch (error) {
                         console.error("后台任务 上传 异常", error);
@@ -2613,8 +2895,8 @@
             }
 
             class Download extends _ {
-                constructor(task_container) {
-                    super(task_container)
+                constructor(task_container, callbacks) {
+                    super(task_container, callbacks)
                     Object.assign(this.args, {
                         controller: null,
 
@@ -2646,6 +2928,11 @@
                         this.args.controller.abort();
                         this.args.controller.canceled = true;
                     }
+                }
+
+                update_progress_text(i) {
+                    super.update_progress_text(i);
+                    this.backtask_status_text.textContent = this.status.replace("{}", "下载") + `${i}%, ${format_bytes(this.args.curr)} / ${format_bytes(this.args.total)}`;
                 }
 
                 update_status_text(ts) {
@@ -2719,7 +3006,9 @@
     <div id="floatball-mark-rect">
         <div class="floatball-mark-tabbar">
            <button id="floatball-mark-tab-settings">设置</button>
-           <button id="floatball-mark-tab-backtasks">后台任务</button>
+<!--           <button id="floatball-mark-tab-backtasks">后台任务</button>-->
+           <button id="floatball-mark-tab-backtasks__upload">上传</button>
+           <button id="floatball-mark-tab-backtasks__download">下载</button>
         </div>
         <div class="floatball-mark-tabcontent">
 
@@ -2731,7 +3020,6 @@
 
 <!--后台任务-->
 <div class="floatball-mark-tabcontent-backtasks">
-
 </div>
 
 <!---->
@@ -2759,7 +3047,6 @@
                 this.tab_content_backtasks = this.mark.querySelector(".floatball-mark-tabcontent-backtasks");
                 this.tab_contents.push(this.tab_content_backtasks)
 
-
                 // tab buttons
                 this.tab_btn_settings = this.mark.querySelector("#floatball-mark-tab-settings");
                 this.tab_btn_settings.addEventListener('click', (event) => {
@@ -2767,11 +3054,23 @@
                 });
                 this.tab_btns.push(this.tab_btn_settings)
 
-                this.tab_btn_backtasks = this.mark.querySelector("#floatball-mark-tab-backtasks");
-                this.tab_btn_backtasks.addEventListener('click', (event) => {
-                    this.switchTab(this.tab_btn_backtasks);
+                // this.tab_btn_backtasks = this.mark.querySelector("#floatball-mark-tab-backtasks");
+                // this.tab_btn_backtasks.addEventListener('click', (event) => {
+                //     this.switchTab(this.tab_btn_backtasks);
+                // });
+                // this.tab_btns.push(this.tab_btn_backtasks)
+
+                this.tab_btn_backtasks__upload = this.mark.querySelector("#floatball-mark-tab-backtasks__upload");
+                this.tab_btn_backtasks__upload.addEventListener('click', (event) => {
+                    this.switchTab(this.tab_btn_backtasks__upload);
                 });
-                this.tab_btns.push(this.tab_btn_backtasks)
+                this.tab_btns.push(this.tab_btn_backtasks__upload)
+
+                this.tab_btn_backtasks__download = this.mark.querySelector("#floatball-mark-tab-backtasks__download");
+                this.tab_btn_backtasks__download.addEventListener('click', (event) => {
+                    this.switchTab(this.tab_btn_backtasks__download);
+                });
+                this.tab_btns.push(this.tab_btn_backtasks__download)
 
             }
 
@@ -2780,9 +3079,20 @@
 
                 this.element.classList.add("for-blur-mark");
                 super.show()
+
+                const _ = this.unfinishedTasks();
+                if (_[FloatBall.tasktypes.Upload.name].length > 0) {
+                    this.switchTab(this.tab_btn_backtasks__upload)
+                    _[FloatBall.tasktypes.Upload.name][0].rect.scrollIntoView({behavior: 'smooth', block: 'center'});
+                } else if (_[FloatBall.tasktypes.Download.name].length > 0) {
+                    this.switchTab(this.tab_btn_backtasks__download)
+                    _[FloatBall.tasktypes.Download.name][0].rect.scrollIntoView({behavior: 'smooth', block: 'center'});
+                }
+
                 if (!this.currentTab()) {
                     this.switchTab(this.tab_btn_settings)
                 }
+
                 this.loadSettings()
             }
 
@@ -2806,8 +3116,14 @@
 
                 if (t === this.tab_btn_settings) {
                     this.tab_content_settings.classList.remove("hidden")
-                } else if (t === this.tab_btn_backtasks) {
+                    // } else if (t === this.tab_btn_backtasks) {
+                    //     this.tab_content_backtasks.classList.remove("hidden")
+                } else if (t === this.tab_btn_backtasks__upload) {
                     this.tab_content_backtasks.classList.remove("hidden")
+                    this.checkToHideTask();
+                } else if (t === this.tab_btn_backtasks__download) {
+                    this.tab_content_backtasks.classList.remove("hidden")
+                    this.checkToHideTask();
                 }
             }
 
@@ -2850,10 +3166,16 @@
             }
 
             checkToStartTask() {
-                const ttmap = {};
+                const ttmap = {
+                    [FloatBall.tasktypes.Upload.name]: [],
+                    [FloatBall.tasktypes.Download.name]: [],
+                };
                 for (const task of this.tasks) {
-                    if (!ttmap.hasOwnProperty(task.constructor.name)) ttmap[task.constructor.name] = [];
-                    ttmap[task.constructor.name].push(task);
+                    if (task.constructor.name.startsWith(FloatBall.tasktypes.Upload.name)) {
+                        ttmap[FloatBall.tasktypes.Upload.name].push(task);
+                    } else if (task.constructor.name.startsWith(FloatBall.tasktypes.Download.name)) {
+                        ttmap[FloatBall.tasktypes.Download.name].push(task);
+                    }
                 }
                 for (const ttmapKey in ttmap) {
                     const tlist = ttmap[ttmapKey];
@@ -2870,6 +3192,7 @@
                         }
                     }
                 }
+                floatball.updateText();
             }
 
             retryToStartTask(t) {
@@ -2879,6 +3202,78 @@
                     this.checkToStartTask();
                 }
             }
+
+            checkToHideTask() {
+                const current_tab = this.currentTab();
+                if (current_tab === this.tab_btn_backtasks__upload) {
+                    for (const task of this.tasks) {
+                        if (task.constructor.name.startsWith(FloatBall.tasktypes.Upload.name)) {
+                            task.rect.classList.remove("hidden");
+                        } else {
+                            task.rect.classList.add("hidden");
+                        }
+                    }
+                } else if (current_tab === this.tab_btn_backtasks__download) {
+                    for (const task of this.tasks) {
+                        if (task.constructor.name.startsWith(FloatBall.tasktypes.Download.name)) {
+                            task.rect.classList.remove("hidden");
+                        } else {
+                            task.rect.classList.add("hidden");
+                        }
+                    }
+                }
+            }
+
+            checkToHide(task) {
+                const current_tab = this.currentTab();
+                if (current_tab === this.tab_btn_backtasks__upload) {
+                    if (!task.constructor.name.startsWith(FloatBall.tasktypes.Upload.name)) {
+                        task.rect.classList.add("hidden");
+                    }
+                } else if (current_tab === this.tab_btn_backtasks__download) {
+                    if (!task.constructor.name.startsWith(FloatBall.tasktypes.Download.name)) {
+                        task.rect.classList.add("hidden");
+                    }
+                } else {
+                    task.rect.classList.add("hidden");
+                }
+            }
+
+            unfinishedTasks() {
+                const result = {};
+                const ttmap = {
+                    [FloatBall.tasktypes.Upload.name]: [],
+                    [FloatBall.tasktypes.Download.name]: [],
+                };
+                for (const ttmapKey in ttmap) result[ttmapKey] = [];
+
+                for (const task of this.tasks) {
+                    if (task.constructor.name.startsWith(FloatBall.tasktypes.Upload.name)) {
+                        ttmap[FloatBall.tasktypes.Upload.name].push(task);
+                    } else if (task.constructor.name.startsWith(FloatBall.tasktypes.Download.name)) {
+                        ttmap[FloatBall.tasktypes.Download.name].push(task);
+                    }
+                }
+                for (const ttmapKey in ttmap) {
+                    const tlist = ttmap[ttmapKey];
+                    for (const tlistElement of tlist) {
+                        if (tlistElement.status !== FloatBall.taskstatus.finished) result[ttmapKey].push(tlistElement);
+                    }
+                }
+                return result;
+            }
+
+        }
+
+        updateText() {
+            const _ = this.dialog.unfinishedTasks();
+            const unfinished_task_count = _[FloatBall.tasktypes.Upload.name].length + _[FloatBall.tasktypes.Download.name].length;
+            if (unfinished_task_count > 0) {
+                this.setText(unfinished_task_count);
+                return;
+            }
+
+            this.setText();
         }
 
     }
@@ -2890,11 +3285,11 @@
 
 
     async function format_error_response(resp) {
-        return `${resp.status} ${await resp.text()}`;
+        return `${resp.status} ${resp.url} ${await resp.text()}`;
     }
 
     function format_xhr_error_response(xhr) {
-        return `${xhr.status} ${xhr.responseText}`;
+        return `${xhr.status} ${xhr._url} ${xhr.responseText}`;
     }
 
     /*
@@ -3058,6 +3453,79 @@
         class Me extends _ {
             constructor(client) {
                 super(client, ["me", "api",]);
+                this.caches = {
+                    contacts_any: null,
+                    contacts_users: null,
+                    contacts_groups: null,
+
+                    contacted_users: null,
+                    contacted_groups: null,
+                }
+            }
+
+            async fetch_contacts_any() {
+                if (this.caches.contacts_any !== null) return this.caches.contacts_any;
+                let url = join_path(this.api_url(), "contacts");
+                let params = {type: "any",}
+                let r = await fetch_get(url, params);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    this.caches.contacts_any = d;
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async fetch_contacts_users() {
+                if (this.caches.contacts_users !== null) return this.caches.contacts_users;
+                let url = join_path(this.api_url(), "contacts");
+                let params = {type: "users",}
+                let r = await fetch_get(url, params);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    this.caches.contacts_users = d;
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async fetch_contacts_groups() {
+                if (this.caches.contacts_groups !== null) return this.caches.contacts_groups;
+                let url = join_path(this.api_url(), "contacts");
+                let params = {type: "groups",}
+                let r = await fetch_get(url, params);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    this.caches.contacts_groups = d;
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async fetch_contacted_users() {
+                if (this.caches.contacted_users !== null) return this.caches.contacted_users;
+                let url = join_path(this.api_url(), "contacted");
+                let params = {type: "users",}
+                let r = await fetch_get(url, params);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    this.caches.contacted_users = d;
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async fetch_contacted_groups() {
+                if (this.caches.contacted_groups !== null) return this.caches.contacted_groups;
+                let url = join_path(this.api_url(), "contacted");
+                let params = {type: "groups",}
+                let r = await fetch_get(url, params);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    this.caches.contacted_groups = d;
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
             }
         }
 
@@ -3070,11 +3538,16 @@
         class Drive extends _ {
             constructor(client) {
                 super(client, ["drive", "api",]);
+
+                Drive.share_type_strings[Drive.share_type.noset] = "随父级";
+                Drive.share_type_strings[Drive.share_type.noshare] = "不共享";
+                Drive.share_type_strings[Drive.share_type.readonly] = "可下载";
+                Drive.share_type_strings[Drive.share_type.readwrite] = "可下载可修改";
             }
 
-            static item_type = {
-                file: 1, folder: 2,
-            };
+            static item_type = "drive"; // 被服务端替换
+            static share_type = "drive";
+            static share_type_strings = {};
 
             async fetch_list(site, did,) {
                 let url = join_path(this.api_url(), "list");
@@ -3120,14 +3593,15 @@
                 throw new Error(await format_error_response(r));
             }
 
-            async upload(did, file, callbacks) {
+            async upload(did, feedbackargs, callbacks) {
                 let url = join_path(this.api_url(), "upload",);
 
                 url.searchParams.set("did", did);
 
                 const xhr = new XMLHttpRequest();
+                xhr._url = url;
                 xhr.open("PUT", url, true);
-                xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+                xhr.setRequestHeader("Content-Type", feedbackargs.file.type || "application/octet-stream");
                 xhr.upload.onprogress = callbacks.onprogress;
                 xhr.onload = callbacks.onload;
                 xhr.onerror = callbacks.onerror;
@@ -3145,9 +3619,10 @@
                 // }
 
 
-                const uint8 = new Uint8Array(await readFileAsync(file));
+                const uint8 = new Uint8Array(await readFileAsync(feedbackargs.file));
                 if (xhr.canceled) return callbacks.onabort();
                 const encrypted = await encryptors.encrypt(uint8);
+                feedbackargs.total = encrypted.length;
                 if (xhr.canceled) return callbacks.onabort();
                 xhr.send(encrypted);
 
@@ -3277,10 +3752,7 @@
 
             async delete(did,) {
                 let url = join_path(this.api_url(), "item", did,);
-                let body = {
-                    "action": "delete",
-                };
-                let r = await fetch_put_json(url, body);
+                let r = await fetch_delete(url,);
                 if (r.status === 200) {
                     // let d = await r.json();
                     // return d;
@@ -3288,6 +3760,28 @@
                 }
                 throw new Error(await format_error_response(r));
             }
+
+            async share_get(did) {
+                let url = join_path(this.api_url(), "item", did, "share");
+                let r = await fetch_get(url,);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async share_set(did, form) {
+                let url = join_path(this.api_url(), "item", did, "share");
+                let body = {...form};
+                let r = await fetch_put_json(url, body);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
         }
 
         return {Api, Admin, Me, Mail, Drive};
@@ -3348,11 +3842,18 @@
 <div class="drive-rect">
 <div class="drive-path"></div>
 <div class="drive-actions">
-<label class="checkbox"><input type="checkbox"></label>
-<button class="drive-action-btn" id="dab-upload">上传文件<input type="file" class="hidden"></button>
-<button class="drive-action-btn" id="dab-newfolder">新建文件夹</button>
+    <label class="checkbox"><input type="checkbox"></label>
+    <button class="drive-action-btn no-width">　</button>
+    <button class="drive-action-btn" id="dab-upload">上传文件<input type="file" class="hidden"></button>
+    <button class="drive-action-btn" id="dab-newfolder">新建文件夹</button>
+    <button class="drive-action-btn hidden-btn" id="dab-batch-trash">移到垃圾桶</button>
+    <button class="drive-action-btn hidden-btn" id="dab-batch-restore">移出垃圾桶</button>
+    <button class="drive-action-btn hidden-btn" id="dab-batch-delete">永久删除</button>
 </div>
-<div class="drive-items-wrap"><div class="drive-items"></div></div>
+<div class="drive-items-wrap">
+    <p class="hidden">此处没有文件。</p>
+    <div class="drive-items"></div>
+</div>
 </div>
 `;
                 this.container.insertAdjacentHTML("beforeend", html);
@@ -3360,6 +3861,7 @@
                 this.drive_path = this.drive_rect.querySelector(":scope div.drive-path");
                 this.drive_actions = this.drive_rect.querySelector(":scope div.drive-actions");
                 this.element_drive_items_wrap = this.drive_rect.querySelector(":scope div.drive-items-wrap");
+                this.element_drive_items_nothings_tip = this.drive_rect.querySelector(":scope div.drive-items-wrap > p");
                 this.element_drive_items = this.drive_rect.querySelector(":scope div.drive-items");
 
                 // 多选框
@@ -3391,6 +3893,7 @@
                             driveItem.raw_header.selecting_checkbox_input.indeterminate = false;
                         }
                     }
+                    this.switch_action_btns__batch();
                 });
                 cb.checked = false;
                 cb.indeterminate = false;
@@ -3427,6 +3930,20 @@
                 this.drive_action_btn_newfolder = this.drive_actions.querySelector(":scope button#dab-newfolder");
                 this.drive_action_btn_newfolder.addEventListener("click", (event) => {
                     this.new_folder();
+                });
+
+                // 按钮 批量操作
+                this.drive_action_btn_batch_trash = this.drive_actions.querySelector(":scope button#dab-batch-trash");
+                this.drive_action_btn_batch_trash.addEventListener("click", (event) => {
+                    this.movetotrash_batch();
+                });
+                this.drive_action_btn_batch_restore = this.drive_actions.querySelector(":scope button#dab-batch-restore");
+                this.drive_action_btn_batch_restore.addEventListener("click", (event) => {
+                    this.restore_batch();
+                });
+                this.drive_action_btn_batch_delete = this.drive_actions.querySelector(":scope button#dab-batch-delete");
+                this.drive_action_btn_batch_delete.addEventListener("click", (event) => {
+                    this.delete_batch();
                 });
 
                 // 拖拽上传
@@ -3580,8 +4097,9 @@
                 const path_item_btn = path_item.querySelector(":scope .drive-path-item-btn");
                 path_item_btn.addEventListener("click", (event) => {
                     this.remove_back_path_items(path_item);
-                    this.switch_action_btns(path_item);
-                    this.fetch_list(path_item);
+                    // this.switch_action_btns__root(path_item);
+                    // this.fetch_list(path_item);
+                    this.refresh();
                 });
 
                 path_item_btn.addEventListener('drop', (event) => {
@@ -3633,6 +4151,8 @@
                 this.loading_mark.show();
                 this.remove_all_items()
 
+                this.element_drive_items_nothings_tip.classList.add("hidden");
+
                 this.selecting_checkbox.state = 0;
                 this.selecting_checkbox_input.checked = false;
                 this.selecting_checkbox_input.indeterminate = false;
@@ -3640,9 +4160,8 @@
                 this.client.subviews.drive.fetch_list(this.constructor.name, path_item.attr.type === _drive.path_item_type.root ? undefined : path_item.attr.did,)
                     .then(result => {
                         if (this.closed) return;
-                        for (const resultElement of result) {
-                            this.add_item(resultElement);
-                        }
+                        if (result.length === 0) this.element_drive_items_nothings_tip.classList.remove("hidden");
+                        for (const resultElement of result) this.add_item(resultElement);
                         this.remove_loading_mark();
                     }).catch(error => {
                     if (this.closed) return;
@@ -3655,7 +4174,7 @@
                 const tree_headers = [];
 
                 let can_click = attr.type === subviews.Drive.item_type.folder;
-                if (this.constructor.name === "trashcan") can_click = false;
+                if (this.constructor.name === contentpages.dashboard_drive.trashcan.name) can_click = false;
 
                 const item = new TreeWidget(this.element_drive_items, tree_headers, null, 2, true, can_click)
                 item.attr = attr;
@@ -3755,7 +4274,11 @@
                     const html = `<span>${format_bytes(attr.size)}</span>`;
                     e_info_others.insertAdjacentHTML("beforeend", html,);
                 }
-
+                {
+                    const html = `<span class="drive-item-info-others-share">${format_shared(attr)}</span>`;
+                    e_info_others.insertAdjacentHTML("beforeend", html,);
+                    item.e_info_others_share = e_info_others.querySelector(":scope > span:last-of-type");
+                }
 
                 // 复选框
                 item.raw_header.selecting_checkbox = item.raw_header.querySelector(":scope > label.checkbox:first-of-type");
@@ -3804,7 +4327,7 @@
                         items[5].disabled = true;
                         items[6].disabled = true;
                     }
-                    if (this.constructor.name === "trashcan") {
+                    if (this.constructor.name === contentpages.dashboard_drive.trashcan.name) {
                         items[5].text = "移出垃圾桶";
                         items[5].callback = event => this.restore(event, item);
                     }
@@ -3845,6 +4368,8 @@
                 } else {
                     e_info_name.textContent = item.attr.name;
                 }
+
+                if (item.e_info_others_share) item.e_info_others_share.textContent = format_shared(item.attr);
             }
 
             update_item_atag(item,) {
@@ -3863,20 +4388,27 @@
                     driveItem.remove();
                 }
                 this.drive_items.length = 0;
+                this._update_selecting_checkbox_state();
             }
 
             remove_item(item) {
                 item.remove();
                 this.drive_items.splice(this.drive_items.indexOf(item), 1);
+                this._update_selecting_checkbox_state();
+            }
+
+            get_selected_items() {
+                const items = [];
+                for (const driveItem of this.drive_items) {
+                    if (driveItem.raw_header.selecting_checkbox.state === 1) {
+                        items.push(driveItem);
+                    }
+                }
+                return items;
             }
 
             _update_selecting_checkbox_state() {
-                let checked_count = 0;
-                for (const driveItem of this.drive_items) {
-                    if (driveItem.raw_header.selecting_checkbox.state === 1) {
-                        checked_count++;
-                    }
-                }
+                let checked_count = this.get_selected_items().length;
                 if (checked_count === 0) {
                     this.selecting_checkbox.state = 0;
                     this.selecting_checkbox_input.checked = false;
@@ -3890,6 +4422,7 @@
                     this.selecting_checkbox_input.checked = false;
                     this.selecting_checkbox_input.indeterminate = true;
                 }
+                this.switch_action_btns__batch();
             }
 
             current_path_item() {
@@ -3952,6 +4485,7 @@
                 this.client.subviews.drive.new_folder(name, path_item.attr.type === _drive.path_item_type.root ? undefined : path_item.attr.did)
                     .then(result => {
                         if (this.closed) return;
+                        this.element_drive_items_nothings_tip.classList.add("hidden");
                         const item = this.add_item(result);
                         item.summary.scrollIntoView({behavior: 'smooth', block: 'nearest'});
                         // this.remove_loading_mark();
@@ -3966,12 +4500,13 @@
             }
 
             refresh() {
+                if (this.loading_mark.is_visible()) return;
                 const path_item = this.current_path_item();
-                this.switch_action_btns(path_item);
+                this.switch_action_btns__root(path_item);
                 this.fetch_list(path_item);
             }
 
-            switch_action_btns(path_item) {
+            switch_action_btns__root(path_item) {
                 if (path_item.attr.type === _drive.path_item_type.root && this.constructor.name !== "myspace") {
                     for (const string of ["hidden",]) {
                         this.drive_action_btn_upload.classList.add(string);
@@ -3985,8 +4520,45 @@
                 }
             }
 
+            switch_action_btns__batch() {
+                const path_item = this.current_path_item();
+                const selected_items = this.get_selected_items();
+                if (selected_items.length > 0) {
+                    this.drive_action_btn_upload.classList.add("hidden-btn");
+                    this.drive_action_btn_newfolder.classList.add("hidden-btn");
+
+                    if (this.constructor.name === contentpages.dashboard_drive.trashcan.name) {
+                        this.drive_action_btn_batch_trash.classList.add("hidden-btn");
+                        this.drive_action_btn_batch_restore.classList.remove("hidden-btn");
+                    } else {
+                        this.drive_action_btn_batch_trash.classList.remove("hidden-btn");
+                        this.drive_action_btn_batch_restore.classList.add("hidden-btn");
+                    }
+                    this.drive_action_btn_batch_delete.classList.remove("hidden-btn");
+
+
+                    if (path_item.attr.type === _drive.path_item_type.root && this.constructor.name === contentpages.dashboard_drive.root.name) {
+                        this.drive_action_btn_batch_trash.classList.add("hidden-btn");
+                        this.drive_action_btn_batch_restore.classList.add("hidden-btn");
+                        this.drive_action_btn_batch_delete.classList.add("hidden-btn");
+                    }
+
+                } else {
+                    this.drive_action_btn_upload.classList.remove("hidden-btn");
+                    this.drive_action_btn_newfolder.classList.remove("hidden-btn");
+
+                    this.drive_action_btn_batch_trash.classList.add("hidden-btn");
+                    this.drive_action_btn_batch_restore.classList.add("hidden-btn");
+                    this.drive_action_btn_batch_delete.classList.add("hidden-btn");
+                }
+            }
+
             add_upload_task(file) {
-                const t = new FloatBall.tasktypes.Upload(floatball.dialog.tab_content_backtasks);
+                const t = new FloatBall.tasktypes.Upload(floatball.dialog.tab_content_backtasks, {
+                    onfinished: () => {
+                        if (t.args.current_path_item === this.current_path_item()) this.refresh();
+                    },
+                });
                 floatball.dialog.addTask(t);
                 t.set_name(normalizeName(file.name));
                 t.set_args({
@@ -3994,12 +4566,13 @@
                     current_path_item: this.current_path_item(),
                 });
                 floatball.dialog.checkToStartTask();
+                floatball.dialog.checkToHide(t);
                 return t;
             }
 
             look_upload_tasks(t) {
                 floatball.showDialog();
-                floatball.dialog.switchTab(floatball.dialog.tab_btn_backtasks);
+                floatball.dialog.switchTab(floatball.dialog.tab_btn_backtasks__upload);
                 if (t) t.rect.scrollIntoView({behavior: 'smooth', block: 'center'});
             }
 
@@ -4011,15 +4584,17 @@
                     floatball.dialog.addTask(t);
                     t.set_name(normalizeName(this.get_item_display_name(item)));
                     t.set_args({
-                        type: this.constructor,
+                        type: this.constructor, // 没用上，记着干嘛
                         did: item.attr.did,
                         name: this.get_item_display_name(item),
                     });
                     floatball.dialog.checkToStartTask();
+                    floatball.dialog.checkToHide(t);
 
                     floatball.showDialog();
-                    floatball.dialog.switchTab(floatball.dialog.tab_btn_backtasks);
+                    floatball.dialog.switchTab(floatball.dialog.tab_btn_backtasks__download);
                     t.rect.scrollIntoView({behavior: 'smooth', block: 'center'});
+
                 }
             }
 
@@ -4075,7 +4650,7 @@
                 let name1 = this.get_item_display_name(dragging_item);
                 let name2;
                 if (root_path_item) {
-                    for (const mainaction of this.panel.mainactions) {
+                    for (const mainaction of this.panel.mainactions[0]) {
                         if (mainaction.pagetype.name === this.constructor.name) {
                             name2 = mainaction.text;
                             break;
@@ -4107,7 +4682,260 @@
             }
 
             sharesettings(event, item) {
+                this.loading_mark.show();
+                this.client.subviews.drive.share_get(item.attr.did)
+                    .then(result => {
+                        if (this.closed) return;
+                        this._sharesettings(event, item, result);
+                        this.remove_loading_mark();
+                    }).catch(error => {
+                    if (this.closed) return;
+                    this.remove_loading_mark()
+                    MessageMark.report(error);
+                });
+            }
 
+            _sharesettings(event, item, result1) {
+
+                const share__group_user = (args, event, fm, row) => {
+                    const callback2 = (result) => {
+                        let form2 = [
+                            {type: "title", label: args.label},
+                            {
+                                type: "custom", label: "",
+                                add_element: (fm, row_custom) => {
+                                    row_custom.subs = [];
+                                    for (const resultElement of result) {
+                                        let html = `<div class="fmic-item fmic-item-sharesettings"><label><input type="checkbox">${resultElement[args.xxid]}</label><select></select></div>`;
+                                        row_custom.input_element.insertAdjacentHTML("beforeend", html);
+                                        const column = row_custom.input_element.querySelector(":scope > .fmic-item:last-of-type");
+                                        column.options = {
+                                            [subviews.Drive.share_type.readonly]: subviews.Drive.share_type_strings[subviews.Drive.share_type.readonly],
+                                            [subviews.Drive.share_type.readwrite]: subviews.Drive.share_type_strings[subviews.Drive.share_type.readwrite],
+                                        };
+                                        const checkbox = column.querySelector(":scope input");
+                                        const select = column.querySelector(":scope select");
+
+                                        row_custom.subs.push({
+                                            attr: resultElement,
+                                            column,
+                                            checkbox,
+                                            select,
+                                        })
+
+                                        checkbox.addEventListener("change", (event) => {
+                                            select.disabled = !checkbox.checked;
+                                        });
+
+                                        for (const optionsKey in column.options) {
+                                            let html = `<option value="${optionsKey}">${column.options[optionsKey]}</option>`;
+                                            select.insertAdjacentHTML("beforeend", html);
+                                            const option = select.querySelector(":scope > option:last-of-type");
+                                        }
+                                        const current_selecting = form_check_array(row.value, true) ? row.value : row.origin;
+                                        let attr;
+                                        for (const i of current_selecting) {
+                                            if (i[args.xxid] === resultElement[args.xxid]) {
+                                                attr = i;
+                                                break;
+                                            }
+                                        }
+                                        if (attr) {
+                                            select.value = attr.share_type;
+                                            checkbox.checked = true;
+                                            select.disabled = false;
+                                        } else {
+                                            checkbox.checked = false;
+                                            select.disabled = true;
+                                        }
+                                    }
+                                },
+                                collect_data: (fm, row_custom) => {
+                                    const map = [];
+                                    for (const sub of row_custom.subs) {
+                                        if (!sub.checkbox.checked) continue;
+                                        let share_type = sub.select.value;
+                                        if (!form_check_string_int(share_type)) throw new Error("共享类型");
+                                        share_type = parseInt(share_type, 10);
+                                        if (!form_check_known(share_type, sub.column.options)) throw new Error("共享类型");
+                                        map.push({[args.xxid]: sub.attr[args.xxid], share_type});
+                                    }
+                                    row_custom.value = map;
+                                },
+                            },
+                        ];
+
+                        const confirm_callback = (fm,) => {
+                            fm.collect_data();
+
+                            try {
+                                // let x = normalizeName(form[1].value);
+                                // if (!form_check_string(x)) throw new Error("");
+                                row.value = form2[1].value;
+                                fm.remove();
+                                args.confirm_callback();
+                            } catch (e) {
+                                MessageMark.report(e, fm.rect)
+                            }
+
+                        }
+                        FormMark.get_global_input(form2, confirm_callback, fm.mark)
+                    }
+
+                    fm.loading_mark = new LoadingMark(fm.rect);
+                    fm.loading_mark.show();
+                    this.client.subviews.me[args.func1]()
+                        .then(result => {
+                            if (this.closed) return;
+                            callback2(result);
+                            fm.loading_mark.remove();
+                        }).catch(error => {
+                        if (this.closed) return;
+                        fm.loading_mark.remove();
+                        MessageMark.report(error, fm.rect);
+                    });
+
+                }
+
+                let form = [
+                    {type: "title", label: "共享设置："},
+                    {
+                        type: "groupbox", label: "共享给：", form: [
+                            {
+                                type: "combobox",
+                                label: "所有用户",
+                                options: subviews.Drive.share_type_strings,
+                                value: result1.any.toString(),
+                            },
+                            {
+                                type: "multiselectbutton",
+                                label: "特定组",
+                                label_button: "管理",
+                                display: `${result1.groups.length}个；${result1.groups.map(i => i.gid).join("、")}`,
+                                origin: result1.groups,
+                                callback: (event, fm, row) => {
+                                    share__group_user({
+                                        label: "共享给特定组：",
+                                        xxid: "gid",
+                                        func1: "fetch_contacts_groups",
+                                        confirm_callback: () => {
+                                            if (form_check_array(row.value, true)) row.display_element.textContent = `${row.value.length}个；${row.value.map(i => i.gid).join("、")}`;
+                                        },
+                                    }, event, fm, row);
+                                },
+                            },
+                            {
+                                type: "multiselectbutton",
+                                label: "特定用户",
+                                label_button: "管理",
+                                display: `${result1.users.length}人；${result1.users.map(i => i.uid).join("、")}`,
+                                origin: result1.users,
+                                callback: (event, fm, row) => {
+                                    share__group_user({
+                                        label: "共享给特定用户：",
+                                        xxid: "uid",
+                                        func1: "fetch_contacts_users",
+                                        confirm_callback: () => {
+                                            if (form_check_array(row.value, true)) row.display_element.textContent = `${row.value.length}人；${row.value.map(i => i.uid).join("、")}`;
+                                        },
+                                    }, event, fm, row);
+                                },
+                            },
+                        ]
+                    },
+                    {
+                        type: "groupbox", label: "公共链接（对于非注册用户）：", form: [
+                            {
+                                type: "combobox",
+                                label: "所有访客",
+                                options: subviews.Drive.share_type_strings,
+                                value: result1.public.toString(),
+                            },
+                            {
+                                type: "date",
+                                label: "链接有效期至",
+                                value: result1.public_expiration,
+                            },
+                            {
+                                type: "linetext",
+                                label: "访问密码",
+                                value: result1.public_pass,
+                                placeholder: "无",
+                            },
+                            {
+                                type: "button",
+                                label: "",
+                                label_button: "复制链接",
+                                callback: (event, fm, row) => {
+                                    const url = join_path(root_url(), "drive", "shared", item.attr.type === subviews.Drive.item_type.folder ? "folder" : "file", item.attr.did);
+                                    navigator.clipboard.writeText(url.href);
+                                },
+                            },
+                        ]
+                    },
+                ];
+
+                const confirm_callback = (fm,) => {
+                    fm.collect_data();
+
+                    try {
+                        let share_any_type = form[1].form[0].value;
+                        if (!form_check_string_int(share_any_type)) throw new Error("所有用户");
+                        share_any_type = parseInt(share_any_type, 10);
+                        if (!form_check_known(share_any_type, subviews.Drive.share_type_strings)) throw new Error("所有用户");
+
+                        let share_groups = form[1].form[1].value;
+                        if (share_groups === undefined) share_groups = form[1].form[1].origin;
+                        let share_users = form[1].form[2].value;
+                        if (share_users === undefined) share_users = form[1].form[2].origin;
+
+                        let share_public_type = form[2].form[0].value;
+                        if (!form_check_string_int(share_public_type)) throw new Error("所有访客");
+                        share_public_type = parseInt(share_public_type, 10);
+                        if (!form_check_known(share_public_type, subviews.Drive.share_type_strings)) throw new Error("所有访客");
+
+                        let public_expiration = form[2].form[1].value;
+                        if (!form_check_int(public_expiration)) throw new Error("链接有效期至");
+
+                        let public_pass = form[2].form[2].value;
+                        if (!form_check_string(public_pass, true)) throw new Error("访问密码");
+
+
+                        const put_form = {
+                            any: share_any_type,
+                            groups: share_groups,
+                            users: share_users,
+                            public: share_public_type,
+                            public_expiration: public_expiration,
+                            public_pass: public_pass,
+                        }
+
+                        this.__sharesettings(event, item, fm, put_form);
+
+                    } catch (e) {
+                        MessageMark.report(e, fm.rect)
+                    }
+
+                }
+
+                FormMark.get_global_input(form, confirm_callback)
+            }
+
+            __sharesettings(event, item, fm, form) {
+                fm.loading_mark = new LoadingMark(fm.rect);
+                fm.loading_mark.show();
+                this.client.subviews.drive.share_set(item.attr.did, form)
+                    .then(result => {
+                        if (this.closed) return;
+                        item.attr.shared = result.shared;
+                        this.update_item(item);
+                        fm.loading_mark.remove();
+                        fm.remove();
+                    }).catch(error => {
+                    if (this.closed) return;
+                    fm.loading_mark.remove();
+                    MessageMark.report(error, fm.rect);
+                });
             }
 
             movetotrash(event, item) {
@@ -4125,6 +4953,31 @@
                         this.remove_item(item);
                         this.remove_loading_mark();
                     }).catch(error => {
+                    if (this.closed) return;
+                    this.remove_loading_mark()
+                    MessageMark.report(error);
+                });
+            }
+
+            movetotrash_batch() {
+                const selected_items = this.get_selected_items();
+                if (selected_items.length === 0) return;
+                MessageMark.confirm(`移到垃圾桶“${selected_items.length}”项？`, null, null, () => {
+                    this._movetotrash_batch(selected_items);
+                },)
+            }
+
+            _movetotrash_batch(items) {
+                this.loading_mark.show();
+
+                const promises = [];
+                for (const item of items) promises.push(this.client.subviews.drive.trash(item.attr.did))
+                const p = Promise.all(promises)
+                p.then((result) => {
+                    if (this.closed) return;
+                    for (const item of items) this.remove_item(item);
+                    this.remove_loading_mark();
+                }).catch((error) => {
                     if (this.closed) return;
                     this.remove_loading_mark()
                     MessageMark.report(error);
@@ -4152,6 +5005,31 @@
                 });
             }
 
+            restore_batch() {
+                const selected_items = this.get_selected_items();
+                if (selected_items.length === 0) return;
+                MessageMark.confirm(`移出垃圾桶“${selected_items.length}”项？`, null, null, () => {
+                    this._restore_batch(selected_items);
+                },)
+            }
+
+            _restore_batch(items) {
+                this.loading_mark.show();
+
+                const promises = [];
+                for (const item of items) promises.push(this.client.subviews.drive.restore(item.attr.did))
+                const p = Promise.all(promises)
+                p.then((result) => {
+                    if (this.closed) return;
+                    for (const item of items) this.remove_item(item);
+                    this.remove_loading_mark();
+                }).catch((error) => {
+                    if (this.closed) return;
+                    this.remove_loading_mark()
+                    MessageMark.report(error);
+                });
+            }
+
             delete(event, item) {
                 let name = this.get_item_display_name(item);
                 MessageMark.confirm(`永久删除“${name}”？`, null, null, () => {
@@ -4167,6 +5045,31 @@
                         this.remove_item(item);
                         this.remove_loading_mark();
                     }).catch(error => {
+                    if (this.closed) return;
+                    this.remove_loading_mark()
+                    MessageMark.report(error);
+                });
+            }
+
+            delete_batch() {
+                const selected_items = this.get_selected_items();
+                if (selected_items.length === 0) return;
+                MessageMark.confirm(`永久删除“${selected_items.length}”项？`, null, null, () => {
+                    this._delete_batch(selected_items);
+                },)
+            }
+
+            _delete_batch(items) {
+                this.loading_mark.show();
+
+                const promises = [];
+                for (const item of items) promises.push(this.client.subviews.drive.delete(item.attr.did))
+                const p = Promise.all(promises)
+                p.then((result) => {
+                    if (this.closed) return;
+                    for (const item of items) this.remove_item(item);
+                    this.remove_loading_mark();
+                }).catch((error) => {
                     if (this.closed) return;
                     this.remove_loading_mark()
                     MessageMark.report(error);
@@ -4275,6 +5178,19 @@
          * 聊天
          * */
         let dashboard_chat = {
+            group(event) {
+
+            },
+
+            user(event) {
+
+            },
+        }
+
+        /*
+        * 论坛
+        * */
+        let dashboard_forum = {
             myspace(event) {
 
             },
@@ -4773,7 +5689,7 @@
 
         }
 
-        return {_drive, dashboard_mail, dashboard_drive, dashboard_chat, backend_panel,};
+        return {_drive, dashboard_mail, dashboard_drive, dashboard_chat, dashboard_forum, backend_panel,};
     })()
 
 
@@ -4794,7 +5710,8 @@
             this.header_btn_mail.classList.add("hidden");
             this.header_btn_drive = document.getElementById("header-btn-drive");
             this.header_btn_chat = document.getElementById("header-btn-chat");
-            this.header_btns = [this.header_btn_mail, this.header_btn_drive, this.header_btn_chat,];
+            this.header_btn_forum = document.getElementById("header-btn-forum");
+            this.header_btns = [this.header_btn_mail, this.header_btn_drive, this.header_btn_chat, this.header_btn_forum,];
             for (const headerBtn of this.header_btns) {
                 headerBtn.addEventListener("click", (event) => {
                     this.switch_panel_btn(event)
@@ -4836,8 +5753,9 @@
             this.dashboard_mail = document.getElementById("dashboard-mail");
             this.dashboard_drive = document.getElementById("dashboard-drive");
             this.dashboard_chat = document.getElementById("dashboard-chat");
+            this.dashboard_forum = document.getElementById("dashboard-forum");
             this.backend_panel = document.getElementById("backend-panel");
-            this.panels = [this.login_panel, this.dashboard_mail, this.dashboard_drive, this.dashboard_chat, this.backend_panel,];
+            this.panels = [this.login_panel, this.dashboard_mail, this.dashboard_drive, this.dashboard_chat, this.dashboard_forum, this.backend_panel,];
 
             this.login_rect = document.getElementById("login-rect"); // 登录
             this.login_tip_user = document.getElementById("login-tip-user");
@@ -4852,22 +5770,23 @@
             this.#setup_divider(this.dashboard_mail) // 面板的左右布局
             this.#setup_divider(this.dashboard_drive)
             this.#setup_divider(this.dashboard_chat)
+            this.#setup_divider(this.dashboard_forum)
             this.#setup_divider(this.backend_panel)
 
-            this.#bind_mainactions(this.dashboard_mail, [ // 控制切换右侧画面 按钮
+            this.#bind_mainactions(this.dashboard_mail, 0, [ // 控制切换右侧画面 按钮
                 {text: "收件箱", pagetype: contentpages.dashboard_mail.inbox,},
                 {text: "已发送", pagetype: contentpages.dashboard_mail.sent,},
                 {text: "垃圾桶", pagetype: contentpages.dashboard_mail.trashcan,},
                 {text: "上线情况", pagetype: contentpages.dashboard_mail.activity,},
             ])
-            this.#bind_mainactions(this.dashboard_drive, [
+            this.#bind_mainactions(this.dashboard_drive, 0, [
                 {text: "个人空间", pagetype: contentpages.dashboard_drive.myspace,},
                 {text: "垃圾桶", pagetype: contentpages.dashboard_drive.trashcan,},
                 {text: "最近新增", pagetype: contentpages.dashboard_drive.newfiles,},
                 {text: "与我共享", pagetype: contentpages.dashboard_drive.sharewithme,},
                 {text: "总盘", pagetype: contentpages.dashboard_drive.root,},
             ])
-            this.#bind_mainactions(this.backend_panel, [
+            this.#bind_mainactions(this.backend_panel, 0, [
                 {text: "上线情况", pagetype: contentpages.backend_panel.activity,},
                 {text: "用户列表", pagetype: contentpages.backend_panel.users,},
                 {text: "组列表", pagetype: contentpages.backend_panel.groups,},
@@ -4875,19 +5794,17 @@
                 {text: "服务状态", pagetype: contentpages.backend_panel.status,},
             ])
 
-            this.#bind_mainactions(this.dashboard_chat, [
-                {text: "上线情况", pagetype: contentpages.backend_panel.activity,},
-                {text: "用户列表", pagetype: contentpages.backend_panel.users,},
-                {text: "组列表", pagetype: contentpages.backend_panel.groups,},
-                {text: "储存空间", pagetype: contentpages.backend_panel.disk,},
-                {text: "服务状态", pagetype: contentpages.backend_panel.status,},
+            this.#bind_mainactions(this.dashboard_chat, 0, [
+                {text: "组", pagetype: contentpages.dashboard_chat.group,},
             ])
-            this.#bind_mainactions(this.dashboard_chat, [
-                {text: "上线情况", pagetype: contentpages.backend_panel.activity,},
-                {text: "用户列表", pagetype: contentpages.backend_panel.users,},
-                {text: "组列表", pagetype: contentpages.backend_panel.groups,},
-                {text: "储存空间", pagetype: contentpages.backend_panel.disk,},
-                {text: "服务状态", pagetype: contentpages.backend_panel.status,},
+            this.#bind_mainactions(this.dashboard_chat, 1, [
+                {text: "用户", pagetype: contentpages.dashboard_chat.user,},
+            ])
+
+            this.#bind_mainactions(this.dashboard_forum, 0, [
+                {text: "全部主题", pagetype: contentpages.dashboard_forum.myspace,},
+                {text: "私有主题", pagetype: contentpages.dashboard_forum.myspace,},
+                {text: "我的关注", pagetype: contentpages.dashboard_forum.myspace,},
             ])
 
         }
@@ -4922,9 +5839,10 @@
             });
         }
 
-        #bind_mainactions(panel, lis,) {
-            panel.mainactions = lis;
-            let ol = panel.querySelector(":scope nav > ol.nav-buttons:first-of-type");
+        #bind_mainactions(panel, ol_index, lis,) {
+            if (!panel.hasOwnProperty("mainactions")) panel.mainactions = {};
+            panel.mainactions[ol_index] = lis;
+            let ol = panel.querySelector(`:scope nav:nth-of-type(${ol_index + 1}) > ol.nav-buttons:first-of-type`);
             for (const m of lis) {
                 let html = `<li>${m.text}</li>`;
                 ol.insertAdjacentHTML("beforeend", html);
@@ -4973,6 +5891,7 @@
                         // this.header_btn_mail.classList.remove("hidden");
                         this.header_btn_drive.classList.remove("hidden");
                         this.header_btn_chat.classList.remove("hidden");
+                        // this.header_btn_forum.classList.remove("hidden");
 
                         floatball.show();
 
@@ -5084,6 +6003,10 @@
                 if (!logged_user) return this.switch_panel_to_login();
                 this.dashboard_chat.classList.add("active");
                 this._switch_panel_to_chat();
+            } else if (btn === this.header_btn_forum) {
+                if (!logged_user) return this.switch_panel_to_login();
+                this.dashboard_forum.classList.add("active");
+                this._switch_panel_to_forum();
             } else {
                 this.login_panel.classList.add("active");
             }
@@ -5109,7 +6032,7 @@
 
         _switch_panel_to_drive() {
             let _mainaction_root = null;
-            for (const mainaction of this.dashboard_drive.mainactions) {
+            for (const mainaction of this.dashboard_drive.mainactions[0]) {
                 if (mainaction.pagetype === contentpages.dashboard_drive.root) {
                     _mainaction_root = mainaction;
                     break;
@@ -5123,6 +6046,10 @@
         }
 
         _switch_panel_to_chat() {
+
+        }
+
+        _switch_panel_to_forum() {
 
         }
 
@@ -5195,6 +6122,7 @@
                 // checkin.header_btn_mail.classList.remove("hidden");
                 checkin.header_btn_drive.classList.remove("hidden");
                 checkin.header_btn_chat.classList.remove("hidden");
+                // checkin.header_btn_forum.classList.remove("hidden");
 
                 floatball.show();
 
