@@ -1528,7 +1528,7 @@
         <div id="login-rect">
             <span id="login-tip-user" class="hidden"></span>
             <span id="login-tip-admin" class="hidden">服务管理员</span>
-            <label>账号：<input type="text" id="login-input-account"></label>
+            <label id="login-input-account-label">账号：<input type="text" id="login-input-account"></label>
             <label>密码：<input type="text" id="login-input-password"></label>
             <button id="login-btn">登录</button>
         </div>
@@ -3545,9 +3545,9 @@
                 super(client, ["admin", "api",]);
             }
 
-            async auth(account, password) {
+            async auth(password) {
                 let url = join_path(this.api_url(), "auth");
-                let body = {account, password,}
+                let body = {password,}
                 let r = await net_fetcher.nf_post_json(url, body);
                 if (r.status === 200) {
                     // let d = await r.json();
@@ -6337,6 +6337,7 @@
             this.login_tip_user = document.getElementById("login-tip-user");
             this.login_tip_admin = document.getElementById("login-tip-admin");
             this.login_input_account = document.getElementById("login-input-account");
+            this.login_input_account_label = document.getElementById("login-input-account-label");
             this.login_input_password = document.getElementById("login-input-password");
             this.login_btn = document.getElementById("login-btn");
             this.login_btn.addEventListener("click", (event) => {
@@ -6448,7 +6449,7 @@
             let account = this.login_input_account.value;
             let password = this.login_input_password.value;
 
-            if (account.length === 0 || password.length === 0) {
+            if ((!backend_panel && account.length === 0) || password.length === 0) {
                 return;
             }
 
@@ -6456,7 +6457,7 @@
             lm.show();
 
             if (backend_panel) {
-                this.subviews.admin.auth(account, password)
+                this.subviews.admin.auth(password)
                     .then(result => {
                         lm.remove()
                         logged_admin = true;
@@ -6729,6 +6730,7 @@
             // checkin.header_btn_more_right.classList.add("hidden");
 
             checkin.login_tip_admin.classList.remove("hidden");
+            checkin.login_input_account_label.classList.add("hidden");
         } else {
             checkin.header_btn_tostartpage.classList.add("hidden");
 
