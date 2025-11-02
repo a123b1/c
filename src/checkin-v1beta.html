@@ -207,6 +207,59 @@
 
     </style>
 
+    <!--应用列表 面板-->
+    <style>
+        section#apps-panel {
+            display: flex;
+            flex-direction: column;
+
+            justify-content: start;
+        }
+
+        div#apps-rect {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 16px;
+            flex-grow: 1;
+        }
+
+        span#apps-top-margin {
+            height: 0;
+        }
+
+        div.apps-item {
+            background: #2088ee33;
+            display: flex;
+            padding: 4px 20px;
+            font-size: 16px;
+            color: #14589a;
+            transition: all 0.1s ease-in-out;
+            border: 0 solid #3498db;
+            border-radius: 0;
+            cursor: pointer;
+            min-width: 140px;
+            flex-direction: column;
+        }
+
+        div.apps-item:hover {
+            background: #2088ee44;
+        }
+
+        div.apps-item:active {
+            background: rgba(22, 100, 176, 0.4);
+        }
+
+        p.apps-item-name {
+            align-self: center;
+            font-size: 16px;
+            user-select: none;
+        }
+
+    </style>
+
     <!--滚动条-->
     <style>
         .tiny-scrollbar {
@@ -1019,7 +1072,7 @@
         }
 
         .column-mark-highlight {
-            background: yellow;
+            background: #FFFF0088;
         }
 
     </style>
@@ -1256,6 +1309,34 @@
 
     </style>
 
+    <!--管理页面 上线情况-->
+    <style>
+        .activity-rect {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            gap: 4px;
+        }
+
+        .activity-filter {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+        }
+
+        .activity-filter > label > *:first-child {
+            margin-left: 4px;
+        }
+
+        .activity-users {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            gap: 4px;
+        }
+
+    </style>
+
     <!--复选框-->
     <style>
         .checkbox {
@@ -1319,8 +1400,8 @@
             position: fixed;
             right: 32px;
             bottom: 32px;
-            width: 64px;
-            height: 64px;
+            width: 58px;
+            height: 58px;
             border-radius: 50%;
             background-color: #69b1fa;
             color: white;
@@ -1333,6 +1414,7 @@
             user-select: none;
             transition: all 0.1s ease-in-out;
             font-size: 20px;
+            border: transparent 6px solid;
         }
 
         .float-ball:hover {
@@ -1341,6 +1423,10 @@
 
         .float-ball:active {
             background-color: #65a3e3;
+        }
+
+        .float-ball.drag-active {
+            border: rgba(255, 255, 0, 0.6) 6px solid;
         }
 
     </style>
@@ -1380,17 +1466,56 @@
     </style>
 
 
+    <!--聊天页面 联系人-->
+    <style>
+
+        /* li 默认样式，无背景 */
+        div.chat-contact {
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: background-color 0.1s, transform 0.1s;
+            user-select: none;
+        }
+
+        /* 鼠标悬浮效果 */
+        div.chat-contact:hover {
+            background-color: rgba(0, 123, 255, 0.15); /* 浅蓝色悬浮 */
+        }
+
+        /* 鼠标按下效果 */
+        div.chat-contact:active {
+            background-color: rgba(0, 123, 255, 0.4); /* 深一些 */
+        }
+
+        /* 选中状态 */
+        div.chat-contact.active {
+            background-color: rgba(0, 123, 255, 0.2);
+            font-weight: bold;
+            border: #2088ee 0 solid;
+            border-radius: 2px;
+            border-left-width: 4px;
+        }
+
+    </style>
+
+
 </head>
 
 <!---->
 
 <body class="">
 <header class="">
-    <button id="header-btn-startpage" class="initiation_hidden">返回首页</button>
+    <button id="header-btn-tostartpage" class="initiation_hidden">返回首页</button>
+
+    <button id="header-btn-startpage" class="hidden">首页</button>
+
     <button id="header-btn-mail" class="hidden">收发</button>
     <button id="header-btn-drive" class="hidden">网盘</button>
     <button id="header-btn-chat" class="hidden">聊天</button>
     <button id="header-btn-forum" class="hidden">讨论</button>
+
     <button id="header-btn-more-left" class="menu-btn">&nbsp;</button>
     <span class="flex-grow"></span>
     <!--    <button id="header-btn-backend" class="">后台面板</button>-->
@@ -1406,6 +1531,21 @@
             <label>账号：<input type="text" id="login-input-account"></label>
             <label>密码：<input type="text" id="login-input-password"></label>
             <button id="login-btn">登录</button>
+        </div>
+    </section>
+
+    <section id="apps-panel" class="">
+        <span id="apps-top-margin"></span>
+        <div id="apps-rect">
+            <div class="apps-item" id="apps-item-drive">
+                <p class="apps-item-name">网盘</p>
+            </div>
+            <div class="apps-item" id="apps-item-chat">
+                <p class="apps-item-name">聊天</p>
+            </div>
+            <div class="apps-item hidden" id="apps-item-forum">
+                <p class="apps-item-name">讨论</p>
+            </div>
         </div>
     </section>
 
@@ -1484,7 +1624,7 @@
 <!---->
 
 <script>
-    const checkin_version = null; // 被服务端替换
+    const checkin_version = null; // 被服务端文本替换
     const checkin_version_number = null;
     const checkin_version_is_beta = null;
     const top_level_path = null;
@@ -1514,49 +1654,6 @@
         url = new URL(url);
         url.pathname = `${url.pathname.replace(/\/+$/, "")}/${subs.map(i => i.toString()).join("/")}`;
         return url;
-    }
-
-    async function fetch_get(url, params, headers) {
-        const _url = new URL(url);
-        if (params) {
-            for (const key of Object.keys(params)) {
-                if (params[key] === undefined) continue;
-                _url.searchParams.set(key, params[key])
-            }
-        }
-        return await fetch(_url, {
-            method: "GET", headers: {
-                ...headers,
-            },
-        });
-    }
-
-    async function fetch_delete(url, headers) {
-        return await fetch(url, {
-            method: "DELETE", headers: {
-                ...headers,
-            },
-        });
-    }
-
-    async function fetch_post_json(url, json, headers) {
-        return await fetch(url, {
-            method: "POST", headers: {
-                ...headers,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(json),
-        });
-    }
-
-    async function fetch_put_json(url, json, headers) {
-        return await fetch(url, {
-            method: "PUT", headers: {
-                ...headers,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(json),
-        });
     }
 
     function random_choice(arr) {
@@ -1598,9 +1695,22 @@
         return format.replace(/YYYY|MM|DD|HH|mm|ss/g, matched => map[matched]);
     }
 
-    function format_bytes(bytes) {
+    function format_timestamp_utc(timestamp, format = 'YYYY-MM-DDTHH:mm:ssZ') {
+        if (!timestamp) return "未知";
+        const date = new Date((timestamp) * 1000);
+        const map = {
+            'YYYY': date.getUTCFullYear(),
+            'MM': String(date.getUTCMonth() + 1).padStart(2, '0'),
+            'DD': String(date.getUTCDate()).padStart(2, '0'),
+            'HH': String(date.getUTCHours()).padStart(2, '0'),
+            'mm': String(date.getUTCMinutes()).padStart(2, '0'),
+            'ss': String(date.getUTCSeconds()).padStart(2, '0')
+        };
+        return format.replace(/YYYY|MM|DD|HH|mm|ss/g, matched => map[matched]);
+    }
+
+    function format_bytes(bytes, sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]) {
         if (!bytes) return "0 B";
-        const sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
         const i = Math.floor(Math.log(bytes) / Math.log(1024));
         let formattedSize = (bytes / Math.pow(1024, i)).toFixed(1);
         if (formattedSize % 1 === 0) formattedSize = parseInt(formattedSize);
@@ -1669,36 +1779,106 @@
         });
     }
 
-    function form_check_string(value, allow_empty = false) {
-        return ((typeof value === "string") && ((!allow_empty && value.length > 0) || allow_empty))
+
+    /*
+    * 请求模板
+    * */
+    const net_fetcher = {
+        nf_get: async (url, params, headers) => {
+            const _url = new URL(url);
+            if (params) {
+                for (const key of Object.keys(params)) {
+                    if (params[key] === undefined) continue;
+                    _url.searchParams.set(key, params[key])
+                }
+            }
+            return await fetch(_url, {
+                method: "GET", headers: {
+                    ...headers,
+                },
+            });
+        },
+
+        nf_delete: async (url, headers) => {
+            return await fetch(url, {
+                method: "DELETE", headers: {
+                    ...headers,
+                },
+            });
+        },
+
+        nf_post_json: async (url, json, headers) => {
+            return await fetch(url, {
+                method: "POST", headers: {
+                    ...headers,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(json),
+            });
+        },
+
+        nf_put_json: async (url, json, headers) => {
+            return await fetch(url, {
+                method: "PUT", headers: {
+                    ...headers,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(json),
+            });
+        },
+
     }
 
-    function form_check_string_int(value) {
-        if (!(typeof value === "string")) return false;
-        if (!/^\d+$/.test(value)) return false;
-        return true;
+
+    /*
+    * 类型检查
+    * */
+    const form_field_checker = {
+        ffc_string: (value, allow_empty = false) => {
+            return ((typeof value === "string") && ((!allow_empty && value.length > 0) || allow_empty))
+        },
+
+        ffc_string_int: (value) => {
+            if (!(typeof value === "string")) return false;
+            if (!/^\d+$/.test(value)) return false;
+            return true;
+        },
+
+        ffc_string_date: (value) => {
+            if (!(typeof value === "string")) return false;
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+            return true;
+        },
+
+        ffc_string_datetime_utc: (value) => {
+            if (!(typeof value === "string")) return false;
+            if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(value)) return false;
+            return true;
+        },
+
+        ffc_bool: (value,) => {
+            return ((typeof value === "boolean"))
+        },
+
+        ffc_int: (value, allow_great_than = -1) => {
+            return ((typeof value === "number") && (value > allow_great_than))
+        },
+
+        ffc_array: (value, allow_empty = false) => {
+            return (value instanceof Array) && ((!allow_empty && value.length > 0) || allow_empty)
+        },
+
+        ffc_object: (value,) => {
+            return value !== null && typeof value === 'object' && value.constructor === Object;
+        },
+
+        ffc_known: (value, range) => {
+            if (range instanceof Array) return range.includes(value);
+            return range.hasOwnProperty(value);
+        },
+
     }
 
-    function form_check_bool(value,) {
-        return ((typeof value === "boolean"))
-    }
-
-    function form_check_int(value, allow_great_than = -1) {
-        return ((typeof value === "number") && (value > allow_great_than))
-    }
-
-    function form_check_array(value, allow_empty = false) {
-        return (value instanceof Array) && ((!allow_empty && value.length > 0) || allow_empty)
-    }
-
-    function form_check_object(value,) {
-        return value !== null && typeof value === 'object' && value.constructor === Object;
-    }
-
-    function form_check_known(value, range) {
-        if (range instanceof Array) return range.includes(value);
-        return range.hasOwnProperty(value);
-    }
 
     /*
     * 加解密
@@ -1790,7 +1970,7 @@
         }
 
         async create(password) {
-            if (!form_check_string(password)) return;
+            if (!form_field_checker.ffc_string(password)) return;
             const encryptor = new Encryptors.Encryptor(password);
             await encryptor.init();
             this.ors.push(encryptor);
@@ -1811,7 +1991,7 @@
         }
 
         async encrypt(plain) {
-            if (form_check_string(plain, true)) plain = Encryptors.Encryptor.str2bytes(plain);
+            if (form_field_checker.ffc_string(plain, true)) plain = Encryptors.Encryptor.str2bytes(plain);
             const encryptor = this.ors[0];
             return await encryptor.encrypt(plain);
         }
@@ -2196,9 +2376,9 @@
                     this.collect_data(row.form);
                 } else if (row.type === "date") {
                     let selected = row.input_element.value;
-                    if (form_check_string(selected)) {
+                    if (form_field_checker.ffc_string_date(selected)) {
                         selected = new Date(selected);
-                        row.value = Math.floor(selected.getTime() / 1000) + seconds_of_eight_hours;
+                        row.value = Math.floor(selected.getTime() / 1000) - seconds_of_eight_hours;
                     } else {
                         row.value = 0;
                     }
@@ -2553,12 +2733,22 @@
                 if (column.inactive) {
                     item_column.classList.add("column-mark-inactive")
                 }
+                if (column.highlight) {
+                    item_column.classList.add("column-mark-highlight")
+                }
             }
         }
 
         remove_item(tree_item) {
             tree_item.remove();
             this.tree_items.splice(this.tree_items.indexOf(tree_item), 1)
+        }
+
+        remove_all_items() {
+            for (const treeItem of this.tree_items) {
+                treeItem.remove();
+            }
+            this.tree_items.length = 0;
         }
 
         show() {
@@ -2594,6 +2784,32 @@
             this.ball.addEventListener("click", this.ballClicked.bind(this));
             this.dialog = new FloatBall.FloatBallDialogMark(document.querySelector("body"));
             this.setText();
+
+            // 拖放
+            this.ball.addEventListener('dragenter', (event) => {
+                if (!dragging_item) return;
+                event.preventDefault();
+                this.ball.classList.add("drag-active");
+            });
+            this.ball.addEventListener('dragover', (event) => {
+                if (!dragging_item) return;
+                event.preventDefault();
+                this.ball.classList.add("drag-active");
+            });
+            this.ball.addEventListener('dragleave', () => {
+                if (!dragging_item) return;
+                this.ball.classList.remove("drag-active");
+            });
+            this.ball.addEventListener('drop', async (event) => {
+                if (!dragging_item) return;
+                event.preventDefault();
+                this.ball.classList.remove("drag-active");
+
+                if (dragging_item.constructor?.name === TreeWidget.name && dragging_item.attr?.did) { // 网盘item
+                    checkin.current_content_page.download(null, dragging_item);
+                }
+
+            });
         }
 
         setText(s) {
@@ -3315,7 +3531,7 @@
             async auth(account, password) {
                 let url = join_path(this.api_url(), "auth");
                 let body = {account, password_hash: await hash_password(password),}
-                let r = await fetch_post_json(url, body);
+                let r = await net_fetcher.nf_post_json(url, body);
                 if (r.status === 200) {
                     let d = await r.json();
                     return d;
@@ -3332,7 +3548,7 @@
             async auth(account, password) {
                 let url = join_path(this.api_url(), "auth");
                 let body = {account, password,}
-                let r = await fetch_post_json(url, body);
+                let r = await net_fetcher.nf_post_json(url, body);
                 if (r.status === 200) {
                     // let d = await r.json();
                     // this.session_key = d.session_key; // 改为设置cookies吧
@@ -3343,7 +3559,7 @@
 
             async fetch_group_list() {
                 let url = join_path(this.api_url(), "group", "list");
-                let r = await fetch_get(url,);
+                let r = await net_fetcher.nf_get(url,);
                 if (r.status === 200) {
                     let d = await r.json();
                     return d;
@@ -3359,7 +3575,7 @@
                         gid: formElement["名称"],
                     })
                 }
-                let r = await fetch_post_json(url, body);
+                let r = await net_fetcher.nf_post_json(url, body);
                 if (r.status === 200) {
                     let d = await r.json();
                     return d;
@@ -3369,7 +3585,7 @@
 
             async delete_group(gid) {
                 let url = join_path(this.api_url(), "group", gid);
-                let r = await fetch_delete(url,);
+                let r = await net_fetcher.nf_delete(url,);
                 if (r.status === 200) {
                     return
                 }
@@ -3378,7 +3594,7 @@
 
             async fetch_user_list() {
                 let url = join_path(this.api_url(), "user", "list");
-                let r = await fetch_get(url,);
+                let r = await net_fetcher.nf_get(url,);
                 if (r.status === 200) {
                     let d = await r.json();
                     return d;
@@ -3392,7 +3608,7 @@
                 for (const formElement of form) {
                     body.push(await this._form2json(formElement))
                 }
-                let r = await fetch_post_json(url, body);
+                let r = await net_fetcher.nf_post_json(url, body);
                 if (r.status === 200) {
                     let d = await r.json();
                     return d;
@@ -3402,7 +3618,7 @@
 
             async fetch_user_attr(uid) {
                 let url = join_path(this.api_url(), "user", uid);
-                let r = await fetch_get(url,);
+                let r = await net_fetcher.nf_get(url,);
                 if (r.status === 200) {
                     let d = await r.json();
                     return d;
@@ -3431,7 +3647,7 @@
             async edit_user(form, old_uid) {
                 let url = join_path(this.api_url(), "user", old_uid);
                 let body = await this._form2json(form, true);
-                let r = await fetch_put_json(url, body);
+                let r = await net_fetcher.nf_put_json(url, body);
                 if (r.status === 200) {
                     let d = await r.json();
                     return d;
@@ -3441,12 +3657,39 @@
 
             async delete_user(uid) {
                 let url = join_path(this.api_url(), "user", uid);
-                let r = await fetch_delete(url,);
+                let r = await net_fetcher.nf_delete(url,);
                 if (r.status === 200) {
                     return
                 }
                 throw new Error(await format_error_response(r));
             }
+
+            async fetch_disk_usage() {
+                let url = join_path(this.api_url(), "service", "disk");
+                let r = await net_fetcher.nf_get(url,);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async fetch_activity(gid, date_utc) {
+                let url;
+                if (gid === null) {
+                    url = join_path(this.api_url(), "activity");
+                } else {
+                    url = join_path(this.api_url(), "group", gid, "activity");
+                }
+                let params = {date: date_utc,};
+                let r = await net_fetcher.nf_get(url, params);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
 
         }
 
@@ -3467,7 +3710,7 @@
                 if (this.caches.contacts_any !== null) return this.caches.contacts_any;
                 let url = join_path(this.api_url(), "contacts");
                 let params = {type: "any",}
-                let r = await fetch_get(url, params);
+                let r = await net_fetcher.nf_get(url, params);
                 if (r.status === 200) {
                     let d = await r.json();
                     this.caches.contacts_any = d;
@@ -3480,7 +3723,7 @@
                 if (this.caches.contacts_users !== null) return this.caches.contacts_users;
                 let url = join_path(this.api_url(), "contacts");
                 let params = {type: "users",}
-                let r = await fetch_get(url, params);
+                let r = await net_fetcher.nf_get(url, params);
                 if (r.status === 200) {
                     let d = await r.json();
                     this.caches.contacts_users = d;
@@ -3493,7 +3736,7 @@
                 if (this.caches.contacts_groups !== null) return this.caches.contacts_groups;
                 let url = join_path(this.api_url(), "contacts");
                 let params = {type: "groups",}
-                let r = await fetch_get(url, params);
+                let r = await net_fetcher.nf_get(url, params);
                 if (r.status === 200) {
                     let d = await r.json();
                     this.caches.contacts_groups = d;
@@ -3506,7 +3749,7 @@
                 if (this.caches.contacted_users !== null) return this.caches.contacted_users;
                 let url = join_path(this.api_url(), "contacted");
                 let params = {type: "users",}
-                let r = await fetch_get(url, params);
+                let r = await net_fetcher.nf_get(url, params);
                 if (r.status === 200) {
                     let d = await r.json();
                     this.caches.contacted_users = d;
@@ -3519,7 +3762,7 @@
                 if (this.caches.contacted_groups !== null) return this.caches.contacted_groups;
                 let url = join_path(this.api_url(), "contacted");
                 let params = {type: "groups",}
-                let r = await fetch_get(url, params);
+                let r = await net_fetcher.nf_get(url, params);
                 if (r.status === 200) {
                     let d = await r.json();
                     this.caches.contacted_groups = d;
@@ -3545,14 +3788,14 @@
                 Drive.share_type_strings[Drive.share_type.readwrite] = "可下载可修改";
             }
 
-            static item_type = "drive"; // 被服务端替换
+            static item_type = "drive"; // 被服务端文本替换
             static share_type = "drive";
             static share_type_strings = {};
 
             async fetch_list(site, did,) {
                 let url = join_path(this.api_url(), "list");
                 let params = {site, did,}
-                let r = await fetch_get(url, params);
+                let r = await net_fetcher.nf_get(url, params);
                 if (r.status === 200) {
                     let d = await r.json();
                     return d;
@@ -3568,7 +3811,7 @@
                     "name_encrypted": true,
                     "parent_did": parent_did,
                 };
-                let r = await fetch_post_json(url, body);
+                let r = await net_fetcher.nf_post_json(url, body);
                 if (r.status === 200) {
                     let d = await r.json();
                     return d;
@@ -3585,7 +3828,7 @@
                     "parent_did": parent_did,
                     "size": file.size,
                 };
-                let r = await fetch_post_json(url, body);
+                let r = await net_fetcher.nf_post_json(url, body);
                 if (r.status === 200) {
                     let d = await r.json();
                     return d;
@@ -3698,7 +3941,7 @@
                     "name": await encryptors.encrypt2base64(name),
                     "name_encrypted": true,
                 };
-                let r = await fetch_put_json(url, body);
+                let r = await net_fetcher.nf_put_json(url, body);
                 if (r.status === 200) {
                     let d = await r.json();
                     return d;
@@ -3713,7 +3956,7 @@
                     "parent_did": parent_did,
                     "site": site,
                 };
-                let r = await fetch_put_json(url, body);
+                let r = await net_fetcher.nf_put_json(url, body);
                 if (r.status === 200) {
                     // let d = await r.json();
                     // return d;
@@ -3727,7 +3970,7 @@
                 let body = {
                     "action": "trash",
                 };
-                let r = await fetch_put_json(url, body);
+                let r = await net_fetcher.nf_put_json(url, body);
                 if (r.status === 200) {
                     // let d = await r.json();
                     // return d;
@@ -3741,7 +3984,7 @@
                 let body = {
                     "action": "restore",
                 };
-                let r = await fetch_put_json(url, body);
+                let r = await net_fetcher.nf_put_json(url, body);
                 if (r.status === 200) {
                     // let d = await r.json();
                     // return d;
@@ -3752,7 +3995,7 @@
 
             async delete(did,) {
                 let url = join_path(this.api_url(), "item", did,);
-                let r = await fetch_delete(url,);
+                let r = await net_fetcher.nf_delete(url,);
                 if (r.status === 200) {
                     // let d = await r.json();
                     // return d;
@@ -3763,7 +4006,7 @@
 
             async share_get(did) {
                 let url = join_path(this.api_url(), "item", did, "share");
-                let r = await fetch_get(url,);
+                let r = await net_fetcher.nf_get(url,);
                 if (r.status === 200) {
                     let d = await r.json();
                     return d;
@@ -3774,7 +4017,7 @@
             async share_set(did, form) {
                 let url = join_path(this.api_url(), "item", did, "share");
                 let body = {...form};
-                let r = await fetch_put_json(url, body);
+                let r = await net_fetcher.nf_put_json(url, body);
                 if (r.status === 200) {
                     let d = await r.json();
                     return d;
@@ -3784,7 +4027,25 @@
 
         }
 
-        return {Api, Admin, Me, Mail, Drive};
+        class Chat extends _ {
+            constructor(client) {
+                super(client, ["chat", "api",]);
+            }
+
+            static receiver_type = "chat"; // 被服务端文本替换
+
+            async fetch_contacts() {
+                let url = join_path(this.api_url(), "contacts");
+                let r = await net_fetcher.nf_get(url,);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+        }
+
+        return {Api, Admin, Me, Mail, Drive, Chat};
     })()
 
 
@@ -4464,7 +4725,7 @@
 
                     try {
                         let name = normalizeName(form[1].value);
-                        if (!form_check_string(name)) throw new Error("名称无效。");
+                        if (!form_field_checker.ffc_string(name)) throw new Error("名称无效。");
                         // fm.remove();
                         this._new_folder(fm, name);
 
@@ -4486,8 +4747,10 @@
                     .then(result => {
                         if (this.closed) return;
                         this.element_drive_items_nothings_tip.classList.add("hidden");
-                        const item = this.add_item(result);
-                        item.summary.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+                        if (!this.loading_mark.is_visible()) {
+                            const item = this.add_item(result);
+                            item.summary.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+                        }
                         // this.remove_loading_mark();
                         fm.loading_mark.remove();
                         fm.remove();
@@ -4610,7 +4873,7 @@
 
                     try {
                         let name = normalizeName(form[1].value);
-                        if (!form_check_string(name)) throw new Error("名称无效。");
+                        if (!form_field_checker.ffc_string(name)) throw new Error("名称无效。");
 
                         if (name === origin_name) {
                             fm.remove();
@@ -4650,7 +4913,7 @@
                 let name1 = this.get_item_display_name(dragging_item);
                 let name2;
                 if (root_path_item) {
-                    for (const mainaction of this.panel.mainactions[0]) {
+                    for (const mainaction of this.panel.mainactions[0].lis) {
                         if (mainaction.pagetype.name === this.constructor.name) {
                             name2 = mainaction.text;
                             break;
@@ -4732,7 +4995,7 @@
                                             select.insertAdjacentHTML("beforeend", html);
                                             const option = select.querySelector(":scope > option:last-of-type");
                                         }
-                                        const current_selecting = form_check_array(row.value, true) ? row.value : row.origin;
+                                        const current_selecting = form_field_checker.ffc_array(row.value, true) ? row.value : row.origin;
                                         let attr;
                                         for (const i of current_selecting) {
                                             if (i[args.xxid] === resultElement[args.xxid]) {
@@ -4755,9 +5018,9 @@
                                     for (const sub of row_custom.subs) {
                                         if (!sub.checkbox.checked) continue;
                                         let share_type = sub.select.value;
-                                        if (!form_check_string_int(share_type)) throw new Error("共享类型");
+                                        if (!form_field_checker.ffc_string_int(share_type)) throw new Error("共享类型");
                                         share_type = parseInt(share_type, 10);
-                                        if (!form_check_known(share_type, sub.column.options)) throw new Error("共享类型");
+                                        if (!form_field_checker.ffc_known(share_type, sub.column.options)) throw new Error("共享类型");
                                         map.push({[args.xxid]: sub.attr[args.xxid], share_type});
                                     }
                                     row_custom.value = map;
@@ -4770,7 +5033,7 @@
 
                             try {
                                 // let x = normalizeName(form[1].value);
-                                // if (!form_check_string(x)) throw new Error("");
+                                // if (!form_field_checker.ffc_string(x)) throw new Error("");
                                 row.value = form2[1].value;
                                 fm.remove();
                                 args.confirm_callback();
@@ -4819,7 +5082,7 @@
                                         xxid: "gid",
                                         func1: "fetch_contacts_groups",
                                         confirm_callback: () => {
-                                            if (form_check_array(row.value, true)) row.display_element.textContent = `${row.value.length}个；${row.value.map(i => i.gid).join("、")}`;
+                                            if (form_field_checker.ffc_array(row.value, true)) row.display_element.textContent = `${row.value.length}个；${row.value.map(i => i.gid).join("、")}`;
                                         },
                                     }, event, fm, row);
                                 },
@@ -4836,7 +5099,7 @@
                                         xxid: "uid",
                                         func1: "fetch_contacts_users",
                                         confirm_callback: () => {
-                                            if (form_check_array(row.value, true)) row.display_element.textContent = `${row.value.length}人；${row.value.map(i => i.uid).join("、")}`;
+                                            if (form_field_checker.ffc_array(row.value, true)) row.display_element.textContent = `${row.value.length}人；${row.value.map(i => i.uid).join("、")}`;
                                         },
                                     }, event, fm, row);
                                 },
@@ -4880,9 +5143,9 @@
 
                     try {
                         let share_any_type = form[1].form[0].value;
-                        if (!form_check_string_int(share_any_type)) throw new Error("所有用户");
+                        if (!form_field_checker.ffc_string_int(share_any_type)) throw new Error("所有用户");
                         share_any_type = parseInt(share_any_type, 10);
-                        if (!form_check_known(share_any_type, subviews.Drive.share_type_strings)) throw new Error("所有用户");
+                        if (!form_field_checker.ffc_known(share_any_type, subviews.Drive.share_type_strings)) throw new Error("所有用户");
 
                         let share_groups = form[1].form[1].value;
                         if (share_groups === undefined) share_groups = form[1].form[1].origin;
@@ -4890,15 +5153,15 @@
                         if (share_users === undefined) share_users = form[1].form[2].origin;
 
                         let share_public_type = form[2].form[0].value;
-                        if (!form_check_string_int(share_public_type)) throw new Error("所有访客");
+                        if (!form_field_checker.ffc_string_int(share_public_type)) throw new Error("所有访客");
                         share_public_type = parseInt(share_public_type, 10);
-                        if (!form_check_known(share_public_type, subviews.Drive.share_type_strings)) throw new Error("所有访客");
+                        if (!form_field_checker.ffc_known(share_public_type, subviews.Drive.share_type_strings)) throw new Error("所有访客");
 
                         let public_expiration = form[2].form[1].value;
-                        if (!form_check_int(public_expiration)) throw new Error("链接有效期至");
+                        if (!form_field_checker.ffc_int(public_expiration)) throw new Error("链接有效期至");
 
                         let public_pass = form[2].form[2].value;
-                        if (!form_check_string(public_pass, true)) throw new Error("访问密码");
+                        if (!form_field_checker.ffc_string(public_pass, true)) throw new Error("访问密码");
 
 
                         const put_form = {
@@ -5200,7 +5463,146 @@
         * 后台
         * */
         let backend_panel = {
-            activity(event) {
+            activity: class extends _ {
+                constructor(client, panel, li) {
+                    super(client, panel, li);
+                }
+
+                close_page() {
+                    this.tree1.remove()
+                    super.close_page();
+                }
+
+                open_page() {
+                    super.open_page();
+                    let html = `
+<div class="activity-rect">
+
+<div class="activity-filter">
+    <label>范围<select></select></label>
+    <label>日期<input type="date"></label>
+</div>
+
+<div class="activity-users">
+</div>
+
+</div>
+`;
+                    this.container.insertAdjacentHTML("beforeend", html);
+                    this.activity_rect = this.container.querySelector(":scope div.activity-rect");
+
+                    this.activity_filter = this.activity_rect.querySelector(":scope div.activity-filter");
+                    this.activity_filter_group_selector = this.activity_filter.querySelector(":scope select");
+                    this.activity_filter_group_selector.addEventListener("change", (event) => {
+                        this.fetch_list();
+                    });
+                    this.activity_filter_date = this.activity_filter.querySelector(":scope input[type=\"date\"]");
+                    this.activity_filter_date.value = format_timestamp_utc8((Date.now() / 1000), "YYYY-MM-DD")
+                    this.activity_filter_date.addEventListener("change", (event) => {
+                        this.fetch_list();
+                    });
+
+                    this.activity_users = this.activity_rect.querySelector(":scope div.activity-users");
+
+                    const tree_headers = [
+                        {text: "", width: 40,},
+                        {text: "用户", width: 120,},
+                        {text: "首次上线", width: 160,},
+                        {text: "最后在线", width: 160,},
+                    ];
+                    this.tree1 = new TreeWidget(this.activity_users, tree_headers, this.fill_tree_menu.bind(this))
+                    this.tree1.show();
+
+                    this.fetch_group_list();
+                }
+
+                fill_tree_menu(clicking_info) {
+                    const items = [];
+                    if (clicking_info.direction === TreeWidget.clicking_direction.header)
+                        return items;
+
+                    return items;
+                }
+
+                _attrs2columns(attr) {
+                    const left = !attr.first_login_time && !attr.first_login_time;
+                    return [
+                        {text: this.tree1.tree_items.length + 1, selectable: false,},
+                        {text: attr.uid, selectable: true,},
+                        {
+                            text: left ? "未上线" : format_timestamp_utc8(attr.first_login_time),
+                            selectable: true,
+                            highlight: left,
+                        },
+                        {text: left ? "" : format_timestamp_utc8(attr.last_login_time), selectable: true,},
+                    ];
+                }
+
+                remove_all_group_items() {
+                    this.activity_filter_group_selector.querySelectorAll(":scope > option").forEach(i => i.remove());
+                    let html = `
+<option value="所有用户">所有用户</option>
+`;
+                    this.activity_filter_group_selector.insertAdjacentHTML("beforeend", html);
+                }
+
+                add_group_item(attr) {
+                    let html = `
+<option value="${attr.gid}">组：${attr.gid}</option>
+`;
+                    this.activity_filter_group_selector.insertAdjacentHTML("beforeend", html);
+                    const option = this.activity_filter_group_selector.querySelector(":scope > option:last-of-type");
+                }
+
+                fetch_group_list() {
+                    this.loading_mark.show();
+                    this.client.subviews.admin.fetch_group_list()
+                        .then(result => {
+                            if (this.closed) return;
+                            this.remove_all_group_items();
+                            for (const resultElement of result) {
+                                this.add_group_item(resultElement);
+                            }
+                            this.remove_loading_mark();
+                            this.fetch_list();
+                        }).catch(error => {
+                        if (this.closed) return;
+                        this.remove_loading_mark()
+                        MessageMark.report(error);
+                    });
+                }
+
+                add_item(attr) {
+                    let tree_item = {
+                        clickable: false,
+                        columns: this._attrs2columns(attr),
+                    };
+                    this.tree1.add_item(tree_item);
+                }
+
+                fetch_list() {
+                    this.tree1.remove_all_items();
+
+                    const selected_group = this.activity_filter_group_selector.value;
+                    if (!selected_group) return;
+                    let selected_date = this.activity_filter_date.value;
+                    if (!form_field_checker.ffc_string_date(selected_date)) return;
+                    selected_date = format_timestamp_utc(Math.floor(new Date(selected_date).getTime() / 1000) - seconds_of_eight_hours);
+
+                    this.loading_mark.show();
+                    this.client.subviews.admin.fetch_activity(selected_group === "所有用户" ? null : selected_group, selected_date)
+                        .then(result => {
+                            if (this.closed) return;
+                            for (const resultElement of result) {
+                                this.add_item(resultElement);
+                            }
+                            this.remove_loading_mark();
+                        }).catch(error => {
+                        if (this.closed) return;
+                        this.remove_loading_mark()
+                        MessageMark.report(error);
+                    });
+                }
 
             },
 
@@ -5221,7 +5623,7 @@
                         {text: "", width: 40,},
                         {text: "状态", width: 60,},
                         {text: "名称", width: 120,},
-                        {text: "上次在线", width: 160,},
+                        {text: "上次在线", width: 210,},
                         {text: "所属组", width: -1,},
                     ];
                     this.tree1 = new TreeWidget(this.container, tree_headers, this.fill_tree_menu.bind(this))
@@ -5272,6 +5674,9 @@
                 }
 
                 _attrs2columns(attr) {
+                    const left_for_day = !form_field_checker.ffc_int(attr.last_login_time) ? true : attr.last_login_time < (Date.now() / 1000) - seconds_of_one_day;
+                    let text_last_login_time = format_timestamp_utc8(attr.last_login_time);
+                    if (left_for_day) text_last_login_time += "（>1天）";
                     return [
                         {text: this.tree1.tree_items.length + 1, selectable: false,},
                         {
@@ -5280,7 +5685,10 @@
                             inactive: attr.disabled
                         },
                         {text: attr.uid, selectable: true,},
-                        {text: format_timestamp_utc8(attr.last_login_time), selectable: true,},
+                        {
+                            text: text_last_login_time, selectable: true,
+                            highlight: left_for_day,
+                        },
                         {text: `${attr.groups.length}个；${attr.groups.join("、")}`, selectable: true,},
                     ];
                 }
@@ -5317,41 +5725,41 @@
                 }
 
                 _check_form(attr, is_edit = false) {
-                    if (!form_check_bool(attr["停用"])) throw new Error("停用");
-                    if (!form_check_string(attr["名称"])) throw new Error("名称");
-                    if (!form_check_string(attr["密码"], is_edit)) throw new Error("密码");
+                    if (!form_field_checker.ffc_bool(attr["停用"])) throw new Error("停用");
+                    if (!form_field_checker.ffc_string(attr["名称"])) throw new Error("名称");
+                    if (!form_field_checker.ffc_string(attr["密码"], is_edit)) throw new Error("密码");
                     if (is_edit) {
                         if (attr["密码"] === "不变") attr["密码"] = "";
                     }
 
                     const free_space = attr["储存空间"];
                     let free_space_number = /^(\d+)mb$/.exec(free_space.toString())
-                    if (!form_check_string(free_space) || !free_space_number) throw new Error("储存空间");
+                    if (!form_field_checker.ffc_string(free_space) || !free_space_number) throw new Error("储存空间");
                     free_space_number = parseInt(free_space_number[1]);
-                    if (!form_check_int(free_space_number)) throw new Error("储存空间-数值");
+                    if (!form_field_checker.ffc_int(free_space_number)) throw new Error("储存空间-数值");
                     attr["储存空间"] = free_space_number;
 
                     const groups = attr["所属组"];
-                    if (!form_check_array(groups, true)) throw new Error("所属组");
+                    if (!form_field_checker.ffc_array(groups, true)) throw new Error("所属组");
                     for (const group of groups) {
-                        if (!form_check_string(group)) throw new Error("所属组-组名");
+                        if (!form_field_checker.ffc_string(group)) throw new Error("所属组-组名");
                     }
 
-                    if (!form_check_bool(attr["允许主动与所有用户通信"])) throw new Error("允许主动与所有用户通信");
+                    if (!form_field_checker.ffc_bool(attr["允许主动与所有用户通信"])) throw new Error("允许主动与所有用户通信");
 
                     const contact_groups = attr["允许主动与这些组通信"];
-                    if (!form_check_array(contact_groups, true)) throw new Error("允许主动与这些组通信");
+                    if (!form_field_checker.ffc_array(contact_groups, true)) throw new Error("允许主动与这些组通信");
                     for (const contact_group of contact_groups) {
-                        if (!form_check_string(contact_group)) throw new Error("允许主动与这些组通信-组名");
+                        if (!form_field_checker.ffc_string(contact_group)) throw new Error("允许主动与这些组通信-组名");
                     }
 
                     const contact_users = attr["允许主动与这些用户通信"];
-                    if (!form_check_array(contact_users, true)) throw new Error("允许主动与这些用户通信");
+                    if (!form_field_checker.ffc_array(contact_users, true)) throw new Error("允许主动与这些用户通信");
                     for (const contact_user of contact_users) {
-                        if (!form_check_string(contact_user)) throw new Error("允许主动与这些用户通信-用户名");
+                        if (!form_field_checker.ffc_string(contact_user)) throw new Error("允许主动与这些用户通信-用户名");
                     }
 
-                    if (!form_check_bool(attr["允许管理所有用户的网盘"])) throw new Error("允许管理所有用户的网盘");
+                    if (!form_field_checker.ffc_bool(attr["允许管理所有用户的网盘"])) throw new Error("允许管理所有用户的网盘");
                 }
 
                 #_template = {
@@ -5381,7 +5789,7 @@
                         try {
                             let _template = JSON.parse(form[1].value)
 
-                            if (!form_check_array(_template)) throw new Error("array");
+                            if (!form_field_checker.ffc_array(_template)) throw new Error("array");
                             for (const attr of _template) {
                                 this._check_form(attr);
                             }
@@ -5462,7 +5870,7 @@
                         try {
                             let _template = JSON.parse(form[1].value)
 
-                            if (!form_check_object(_template)) throw new Error("object");
+                            if (!form_field_checker.ffc_object(_template)) throw new Error("object");
                             this._check_form(_template, true);
 
                             // fm.remove();
@@ -5619,9 +6027,9 @@
                         try {
                             let _template = JSON.parse(form[1].value)
 
-                            if (!form_check_array(_template)) throw new Error("array");
+                            if (!form_field_checker.ffc_array(_template)) throw new Error("array");
                             for (const attr of _template) {
-                                if (!form_check_string(attr["名称"])) throw new Error("名称");
+                                if (!form_field_checker.ffc_string(attr["名称"])) throw new Error("名称");
                             }
 
                             fm.remove();
@@ -5678,18 +6086,157 @@
                 }
             },
 
+            disk: class extends _ {
+                constructor(client, panel, li) {
+                    super(client, panel, li);
+                }
 
-            disk(event) {
+                close_page() {
+                    this.tree1.remove()
+                    super.close_page();
+                }
+
+                open_page() {
+                    super.open_page();
+
+                    const tree_headers = [
+                        {text: "", width: 40,},
+                        {text: "用户", width: 120,},
+                        {text: "个人空间", width: 120,},
+                        {text: "已使用", width: -1,},
+                    ];
+                    this.tree1 = new TreeWidget(this.container, tree_headers, this.fill_tree_menu.bind(this))
+                    this.tree1.show();
+
+
+                    this.fetch_list();
+                }
+
+                fill_tree_menu(clicking_info) {
+                    const items = [];
+                    if (clicking_info.direction === TreeWidget.clicking_direction.header)
+                        return items;
+
+                    return items;
+                }
+
+                _attrs2columns(attr) {
+                    return [
+                        {text: this.tree1.tree_items.length + 1, selectable: false,},
+                        {text: attr.uid, selectable: true,},
+                        {text: `${attr.free_space} MB`, selectable: true,},
+                        {text: `${format_bytes(attr.used_space, ["B", "KB", "MB",])}`, selectable: true,},
+                    ];
+                }
+
+                add_item(attr) {
+                    let tree_item = {
+                        clickable: false,
+                        columns: this._attrs2columns(attr),
+                    };
+                    this.tree1.add_item(tree_item);
+                }
+
+                fetch_list() {
+                    this.loading_mark.show();
+                    this.client.subviews.admin.fetch_disk_usage()
+                        .then(result => {
+                            if (this.closed) return;
+                            for (const resultElement of result.users) {
+                                this.add_item(resultElement);
+                            }
+                            this.remove_loading_mark();
+                        }).catch(error => {
+                        if (this.closed) return;
+                        this.remove_loading_mark()
+                        MessageMark.report(error);
+                    });
+                }
 
             },
-
-            status(event) {
-
-            },
-
         }
 
         return {_drive, dashboard_mail, dashboard_drive, dashboard_chat, dashboard_forum, backend_panel,};
+    })()
+
+
+    /*
+    * 应用元素包装层
+    * */
+    const dashboardwrappers = (() => {
+        class DashboardWrapper {
+            constructor(dashboard_element) {
+                this.dashboard_element = dashboard_element;
+                this.loading_mark = new LoadingMark(this.dashboard_element);
+            }
+
+            remove_loading_mark() {
+                this.loading_mark.remove();
+                this.loading_mark = new LoadingMark(this.dashboard_element);
+            }
+        }
+
+        class ChatDashboardWrapper extends DashboardWrapper {
+            constructor(dashboard_element) {
+                super(dashboard_element);
+            }
+
+            /*
+            * 左侧 联系人
+            * */
+            add_contact_item(attr,) {
+                if (attr.type === subviews.Chat.receiver_type.group) {
+                    const mainaction = {text: attr.gid, pagetype: contentpages.dashboard_chat.group,};
+                    mainaction.contact_attr = attr;
+                    const lis = this.dashboard_element.mainactions[0].lis;
+                    const ol = this.dashboard_element.mainactions[0].ol;
+                    lis.push(mainaction);
+                    this.add_contact_item_(mainaction, ol,);
+                } else if (attr.type === subviews.Chat.receiver_type.user) {
+                    const mainaction = {text: attr.uid, pagetype: contentpages.dashboard_chat.user,};
+                    mainaction.contact_attr = attr;
+                    const lis = this.dashboard_element.mainactions[1].lis;
+                    const ol = this.dashboard_element.mainactions[1].ol;
+                    lis.push(mainaction);
+                    this.add_contact_item_(mainaction, ol,);
+                }
+            }
+
+            add_contact_item_(mainaction, ol,) {
+                let html = `
+<div class="chat-contact">${mainaction.text}</div>
+`;
+                ol.insertAdjacentHTML("beforeend", html);
+                let li = ol.querySelector(":scope div.chat-contact:last-of-type");
+                li.bindmap = mainaction;
+                li.bindmap.element = li;
+                li.addEventListener("click", (event) => {
+                    checkin.switch_content_page(event);
+                });
+            }
+
+            remove_all_contact_items() {
+                for (let i = 0; i < 2; i++) {
+                    const lis = this.dashboard_element.mainactions[i].lis;
+                    for (const mainaction of lis) {
+                        mainaction.element.remove();
+                    }
+                    lis.length = 0;
+                }
+            }
+
+            contact_items() {
+                const result = [];
+                for (let i = 0; i < 2; i++) {
+                    const lis = this.dashboard_element.mainactions[i].lis;
+                    result.push(...lis);
+                }
+                return result;
+            }
+        }
+
+        return {DashboardWrapper, ChatDashboardWrapper,}
+
     })()
 
 
@@ -5698,12 +6245,14 @@
     * */
     class Checkin {
         constructor() {
+            this.name = document.title;
             this.subviews = {
                 api: new subviews.Api(this),
                 admin: new subviews.Admin(this),
                 me: new subviews.Me(this),
                 mail: new subviews.Mail(this),
                 drive: new subviews.Drive(this),
+                chat: new subviews.Chat(this),
             };
 
             this.header_btn_mail = document.getElementById("header-btn-mail"); // 切换面板
@@ -5711,15 +6260,17 @@
             this.header_btn_drive = document.getElementById("header-btn-drive");
             this.header_btn_chat = document.getElementById("header-btn-chat");
             this.header_btn_forum = document.getElementById("header-btn-forum");
-            this.header_btns = [this.header_btn_mail, this.header_btn_drive, this.header_btn_chat, this.header_btn_forum,];
+            this.header_btn_startpage = document.getElementById("header-btn-startpage");
+            this.header_btns = [this.header_btn_startpage, this.header_btn_mail, this.header_btn_drive, this.header_btn_chat, this.header_btn_forum,];
             for (const headerBtn of this.header_btns) {
+                // if (headerBtn !== this.header_btn_startpage) continue;
                 headerBtn.addEventListener("click", (event) => {
                     this.switch_panel_btn(event)
                 });
             }
 
-            this.header_btn_startpage = document.getElementById("header-btn-startpage"); // 返回首页
-            this.header_btn_startpage.addEventListener("click", (event) => {
+            this.header_btn_tostartpage = document.getElementById("header-btn-tostartpage"); // 返回首页
+            this.header_btn_tostartpage.addEventListener("click", (event) => {
                 this.open_startpage(event, true);
             });
 
@@ -5749,13 +6300,38 @@
                 MenuMark.exec({x: rect.left, y: rect.top + rect.height,}, items);
             });
 
+
+            this.apps_item_drive = document.getElementById("apps-item-drive"); // 应用按钮
+            this.apps_item_chat = document.getElementById("apps-item-chat");
+            this.apps_item_forum = document.getElementById("apps-item-forum");
+            this.apps_items = [
+                {app_item: this.apps_item_drive, header_btn: this.header_btn_drive,},
+                {app_item: this.apps_item_chat, header_btn: this.header_btn_chat,},
+                {app_item: this.apps_item_forum, header_btn: this.header_btn_forum,},
+            ];
+            for (const apps_item_attr of this.apps_items) {
+                apps_item_attr.app_item.addEventListener("click", (event) => {
+                    this.switch_apps(apps_item_attr.header_btn,);
+                });
+            }
+
+
             this.login_panel = document.getElementById("login-panel"); // 面板
+            this.apps_panel = document.getElementById("apps-panel");
             this.dashboard_mail = document.getElementById("dashboard-mail");
             this.dashboard_drive = document.getElementById("dashboard-drive");
             this.dashboard_chat = document.getElementById("dashboard-chat");
             this.dashboard_forum = document.getElementById("dashboard-forum");
             this.backend_panel = document.getElementById("backend-panel");
-            this.panels = [this.login_panel, this.dashboard_mail, this.dashboard_drive, this.dashboard_chat, this.dashboard_forum, this.backend_panel,];
+            this.panels = [this.login_panel, this.apps_panel, this.dashboard_mail, this.dashboard_drive, this.dashboard_chat, this.dashboard_forum, this.backend_panel,];
+            for (const panel of this.panels) {
+                if (panel === this.dashboard_chat) {
+                    panel.wrapper = new dashboardwrappers.ChatDashboardWrapper(panel);
+                } else {
+                    panel.wrapper = new dashboardwrappers.DashboardWrapper(panel);
+                }
+            }
+
 
             this.login_rect = document.getElementById("login-rect"); // 登录
             this.login_tip_user = document.getElementById("login-tip-user");
@@ -5794,12 +6370,8 @@
                 {text: "服务状态", pagetype: contentpages.backend_panel.status,},
             ])
 
-            this.#bind_mainactions(this.dashboard_chat, 0, [
-                {text: "组", pagetype: contentpages.dashboard_chat.group,},
-            ])
-            this.#bind_mainactions(this.dashboard_chat, 1, [
-                {text: "用户", pagetype: contentpages.dashboard_chat.user,},
-            ])
+            this.#bind_mainactions(this.dashboard_chat, 0, [])
+            this.#bind_mainactions(this.dashboard_chat, 1, [])
 
             this.#bind_mainactions(this.dashboard_forum, 0, [
                 {text: "全部主题", pagetype: contentpages.dashboard_forum.myspace,},
@@ -5807,6 +6379,17 @@
                 {text: "我的关注", pagetype: contentpages.dashboard_forum.myspace,},
             ])
 
+        }
+
+        set_title(header_btn) {
+            if (backend_panel) return;
+            let app_name = "";
+            if (!logged_user) {
+            } else {
+                app_name = header_btn.textContent;
+            }
+            if (app_name) app_name = " - " + app_name;
+            document.title = `${this.name}${app_name}`;
         }
 
         /*
@@ -5841,8 +6424,8 @@
 
         #bind_mainactions(panel, ol_index, lis,) {
             if (!panel.hasOwnProperty("mainactions")) panel.mainactions = {};
-            panel.mainactions[ol_index] = lis;
-            let ol = panel.querySelector(`:scope nav:nth-of-type(${ol_index + 1}) > ol.nav-buttons:first-of-type`);
+            const ol = panel.querySelector(`:scope nav:nth-of-type(${ol_index + 1}) > ol.nav-buttons:first-of-type`);
+            panel.mainactions[ol_index] = {lis, ol,};
             for (const m of lis) {
                 let html = `<li>${m.text}</li>`;
                 ol.insertAdjacentHTML("beforeend", html);
@@ -5889,9 +6472,10 @@
                         logged_user = result;
 
                         // this.header_btn_mail.classList.remove("hidden");
-                        this.header_btn_drive.classList.remove("hidden");
-                        this.header_btn_chat.classList.remove("hidden");
+                        // this.header_btn_drive.classList.remove("hidden");
+                        // this.header_btn_chat.classList.remove("hidden");
                         // this.header_btn_forum.classList.remove("hidden");
+                        this.header_btn_startpage.classList.remove("hidden");
 
                         floatball.show();
 
@@ -5958,16 +6542,17 @@
         }
 
         restore_selected_panel_id() {
-            if (backend_panel)
-                return
-            const id = localStorage.getItem("selected_panel_id");
-            for (const headerBtn of this.header_btns) {
-                if (headerBtn.id === id) {
-                    headerBtn.click();
-                    return;
-                }
-            }
-            this.header_btn_chat.click();
+            // if (backend_panel) return;
+            // const id = localStorage.getItem("selected_panel_id");
+            // for (const headerBtn of this.header_btns) {
+            //     if (headerBtn.id === id) {
+            //         headerBtn.click();
+            //         return;
+            //     }
+            // }
+            // this.header_btn_chat.click();
+
+            this.header_btn_startpage.click();
         }
 
         switch_panel_btn(event) {
@@ -5980,15 +6565,15 @@
                 event.target.classList.add("selected");
                 this.save_selected_panel_id(event.target);
             } else {
-                // this.clear_selected_panel_id()
+                // this.clear_selected_panel_id() // 退出登录时不必清理
             }
             this.switch_panel(event);
         }
 
         switch_panel(event) {
-            if (backend_panel)
-                return;
+            if (backend_panel) return;
             const btn = this.current_panel_btn();
+            this.set_title(btn);
             for (const panel of this.panels)
                 panel.classList.remove("active")
             if (btn === this.header_btn_mail) {
@@ -6007,6 +6592,10 @@
                 if (!logged_user) return this.switch_panel_to_login();
                 this.dashboard_forum.classList.add("active");
                 this._switch_panel_to_forum();
+            } else if (btn === this.header_btn_startpage) {
+                if (!logged_user) return this.switch_panel_to_login();
+                this.apps_panel.classList.add("active");
+                this._switch_panel_to_apps();
             } else {
                 this.login_panel.classList.add("active");
             }
@@ -6026,13 +6615,17 @@
             }
         }
 
+        _switch_panel_to_apps() {
+
+        }
+
         _switch_panel_to_mail() {
 
         }
 
         _switch_panel_to_drive() {
             let _mainaction_root = null;
-            for (const mainaction of this.dashboard_drive.mainactions[0]) {
+            for (const mainaction of this.dashboard_drive.mainactions[0].lis) {
                 if (mainaction.pagetype === contentpages.dashboard_drive.root) {
                     _mainaction_root = mainaction;
                     break;
@@ -6043,9 +6636,32 @@
             } else {
                 _mainaction_root.element.classList.add("hidden")
             }
+
+            if (this.current_content_page) {
+                this.current_content_page.refresh();
+            }
         }
 
         _switch_panel_to_chat() {
+            if (!form_field_checker.ffc_array(this.dashboard_chat.wrapper.contact_items())) { // 获取联系人列表
+                if (!this.dashboard_chat.wrapper.loading_mark.is_visible()) {
+                    this.dashboard_chat.wrapper.remove_all_contact_items();
+                    this.dashboard_chat.wrapper.loading_mark.show();
+                    this.subviews.chat.fetch_contacts()
+                        .then(result => {
+                            // if (this.closed) return;
+                            for (const resultElement of result) {
+                                this.dashboard_chat.wrapper.add_contact_item(resultElement);
+                            }
+                            this.dashboard_chat.wrapper.remove_loading_mark();
+                        }).catch(error => {
+                        // if (this.closed) return;
+                        this.dashboard_chat.wrapper.remove_loading_mark();
+                        MessageMark.report(error);
+                    });
+                }
+
+            }
 
         }
 
@@ -6059,6 +6675,19 @@
                 this.backend_panel.classList.add("active");
                 this.header_btn_more_right.textContent = `服务管理员`;
             }
+        }
+
+
+        /*
+        * 从首页打开应用
+        * */
+        switch_apps(header_btn) {
+            for (const headerBtn of this.header_btns) {
+                if (headerBtn === this.header_btn_startpage) continue;
+                headerBtn.classList.add("hidden");
+            }
+            header_btn.classList.remove("hidden");
+            this.switch_panel_btn({target: header_btn,});
         }
 
 
@@ -6101,11 +6730,11 @@
 
             checkin.login_tip_admin.classList.remove("hidden");
         } else {
-            checkin.header_btn_startpage.classList.add("hidden");
+            checkin.header_btn_tostartpage.classList.add("hidden");
 
             checkin.login_tip_user.classList.remove("hidden");
         }
-        checkin.header_btn_startpage.classList.remove("initiation_hidden");
+        checkin.header_btn_tostartpage.classList.remove("initiation_hidden");
 
 
         // 切换到默认面板
@@ -6120,9 +6749,10 @@
                 switched = true;
 
                 // checkin.header_btn_mail.classList.remove("hidden");
-                checkin.header_btn_drive.classList.remove("hidden");
-                checkin.header_btn_chat.classList.remove("hidden");
+                // checkin.header_btn_drive.classList.remove("hidden");
+                // checkin.header_btn_chat.classList.remove("hidden");
                 // checkin.header_btn_forum.classList.remove("hidden");
+                checkin.header_btn_startpage.classList.remove("hidden");
 
                 floatball.show();
 
