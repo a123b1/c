@@ -3384,7 +3384,7 @@
                 const uhj = url_hash_json();
 
                 const legacykeys = JSON.parse(localStorage.getItem("legacykeys")) || [];
-                if (form_field_checker.ffc_array(uhj.legackyeys)) {
+                if (form_field_checker.ffc_array(uhj.legacykeys)) {
                     uhj.legacykeys.forEach(i => {
                         i = i.replace(/[\r\n]+/g, "");
                         if (!legacykeys.includes(i)) legacykeys.push(i);
