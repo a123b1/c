@@ -5965,22 +5965,22 @@
             }
 
             update_activity(type) {
-                if (this.previous_activity_attr.is_sending) return;
+                // if (this.previous_activity_attr.is_sending) return;
                 const current_time = Date.now();
                 if (this.previous_activity_attr.type === type && current_time - this.previous_activity_attr.sent_time < 5 * 1000) return;
                 this.previous_activity_attr.type = type;
                 this.previous_activity_attr.sent_time = current_time;
 
-                this.previous_activity_attr.is_sending = true;
+                // this.previous_activity_attr.is_sending = true;
                 const {xxid, contact_type} = this.current_contact_xxid();
                 this.client.subviews.chat.act(contact_type, xxid, type)
                     .then(result => {
                         // if (this.closed) return;
-                        this.previous_activity_attr.is_sending = false;
+                        // this.previous_activity_attr.is_sending = false;
                         this.client.dashboard_chat.wrapper.update_contact_item_status(result);
                     }).catch(error => {
                     // if (this.closed) return;
-                    this.previous_activity_attr.is_sending = false;
+                    // this.previous_activity_attr.is_sending = false;
                     MessageMark.report(error);
                 });
 
