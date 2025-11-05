@@ -6399,7 +6399,7 @@
 
                 if (result.is_found_last_message) { // 按请求的起始消息
                     if (result.previous_message_id !== last_msgattr.id) {
-                        console.warn(`不匹配，last_msgattr=${JSON.stringify(last_msgattr)}，result=${JSON.stringify(result)}`);
+                        console.warn(`previous_message_id不匹配，last_msgattr.id=${last_msgattr.id}，result=${JSON.stringify(result)}`);
                     } else {
                         const new_msgattrs = this.msgflow_manage.store_msgs(last_msgattr, result.messages);
                         if (new_msgattrs.length > 0) {
