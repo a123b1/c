@@ -1888,7 +1888,7 @@
         }
 
         .unsent .chat-message-content-container {
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.07);
         }
 
         .align-right .chat-message-content-container {
@@ -6148,7 +6148,7 @@
                 this.interval__fetch_unread_msgs = 5000;
 
                 this.timer__update_read_progress = null;
-                this.interval__update_read_progress = 1000;
+                this.interval__update_read_progress = 1500;
             }
 
             close_page() {
@@ -8113,7 +8113,7 @@
             constructor(dashboard_element) {
                 super(dashboard_element);
                 this.timer__sync = null;
-                this.interval__sync = 5000;
+                this.interval__sync = 10000;
             }
 
             leave() {
