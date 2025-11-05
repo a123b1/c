@@ -6242,6 +6242,10 @@
                     clearTimeout(this.e_msgflow__scroll_timer);
                     this.e_msgflow__scroll_timer = null;
                 }
+                if (this.e_msgflow__load_history_timer) {
+                    clearTimeout(this.e_msgflow__load_history_timer);
+                    this.e_msgflow__load_history_timer = null;
+                }
             }
 
             open_page() {
@@ -6263,7 +6267,7 @@
 <div class="chat-session-msgflow-wrap">
     <div class="chat-session-msgflow"></div>
     <div class="chat-session-msgflow-mark-currentday"><div class="chat-session-msgflow-mark-currentday-layout"><p></p></div></div>
-    <div class="chat-session-msgflow-mark-loadhistory"><div class="chat-session-msgflow-mark-loadhistory-layout"><p>正在检查是否有历史消息...</p></div></div>
+    <div class="chat-session-msgflow-mark-loadhistory"><div class="chat-session-msgflow-mark-loadhistory-layout"><p>正在检查是否有更多历史消息...</p></div></div>
     <div class="chat-session-msgflow-mark-checknew"><div class="chat-session-msgflow-mark-checknew-layout"><p>正在检查是否有新消息...</p></div></div>
     <div class="chat-session-msgflow-mark-onlineusers"></div>
 </div>
@@ -6326,15 +6330,24 @@
                 this.change_loading_status__checknew();
 
                 // 滚动条
+                this.e_msgflow__load_history_timer = null;
                 this.e_msgflow.addEventListener('wheel', (event) => {
                     if (this.e_msgflow.scrollTop === 0) {
-                        this.start__load_history();
+                        clearTimeout(this.e_msgflow__load_history_timer);
+                        this.e_msgflow__load_history_timer = setTimeout(() => {
+                            if (this.e_msgflow.scrollTop > 10) return;
+                            this.start__load_history();
+                        }, 200);
                     }
                 });
                 this.e_msgflow__scroll_timer = null;
                 this.e_msgflow.addEventListener('scroll', (event) => {
                     if (this.e_msgflow.scrollTop === 0) {
-                        this.start__load_history();
+                        clearTimeout(this.e_msgflow__load_history_timer);
+                        this.e_msgflow__load_history_timer = setTimeout(() => {
+                            if (this.e_msgflow.scrollTop > 10) return;
+                            this.start__load_history();
+                        }, 200);
                     }
 
                     clearTimeout(this.e_msgflow__scroll_timer);
@@ -7440,6 +7453,7 @@
             * 加载历史
             * */
             start__load_history() {
+                // console.log("开始加载历史");
                 if (this.is_processing__load_history) return;
 
                 this.is_processing__load_history = true;
