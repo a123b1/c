@@ -289,13 +289,21 @@
 
     <!--通用 左右分栏-->
     <style>
-        .aside-left {
+
+        .aside-left-wrap {
+            display: flex;
+            flex-direction: column;
+
             width: 160px; /* 初始宽度 */
             min-width: 100px; /* 最小宽度 */
             max-width: 80%; /* 最大宽度 */
-            overflow: auto;
             background-color: rgba(118, 181, 246, 0.15);
             border-radius: 4px;
+        }
+
+        .aside-left {
+            flex-grow: 1;
+            overflow: auto;
 
             display: flex;
             flex-direction: column;
@@ -436,7 +444,7 @@
             position: relative; /* 关键：让 子div 以它为定位基准 */
             /*overflow: hidden; !* 防止 子div 溢出 *!*/
 
-            overflow: visible;
+            /*overflow: visible;*/
         }
 
         div.blur-mark {
@@ -2061,69 +2069,79 @@
     </section>
 
     <section id="dashboard-mail">
-        <aside class="aside-left tiny-scrollbar">
-            <button id="new-mail-btn">发信</button>
-            <nav>
-                <ol class="nav-buttons">
-                    <!--                    <li>收件箱</li>-->
-                </ol>
-            </nav>
-        </aside>
+        <div class="aside-left-wrap">
+            <aside class="aside-left tiny-scrollbar">
+                <button id="new-mail-btn">发信</button>
+                <nav>
+                    <ol class="nav-buttons">
+                        <!--                    <li>收件箱</li>-->
+                    </ol>
+                </nav>
+            </aside>
+        </div>
         <div class="aside-divider"></div>
         <aside class="aside-right">
         </aside>
     </section>
 
     <section id="dashboard-drive">
-        <aside class="aside-left tiny-scrollbar">
-            <nav>
-                <ol class="nav-buttons">
-                </ol>
-            </nav>
-        </aside>
+        <div class="aside-left-wrap">
+            <aside class="aside-left tiny-scrollbar">
+                <nav>
+                    <ol class="nav-buttons">
+                    </ol>
+                </nav>
+            </aside>
+        </div>
         <div class="aside-divider"></div>
         <aside class="aside-right">
         </aside>
     </section>
 
     <section id="dashboard-chat">
-        <aside class="aside-left tiny-scrollbar" style="width: 190px;">
-            <nav>
-                <p class="chat-contact-type">群聊：</p>
-                <ol class="nav-buttons">
-                </ol>
-            </nav>
-            <nav>
-                <p class="chat-contact-type">私聊：</p>
-                <ol class="nav-buttons">
-                </ol>
-            </nav>
-        </aside>
+        <div class="aside-left-wrap" style="width: 190px;">
+            <aside class="aside-left tiny-scrollbar">
+                <nav>
+                    <p class="chat-contact-type">群聊：</p>
+                    <ol class="nav-buttons">
+                    </ol>
+                </nav>
+                <nav>
+                    <p class="chat-contact-type">私聊：</p>
+                    <ol class="nav-buttons">
+                    </ol>
+                </nav>
+            </aside>
+        </div>
         <div class="aside-divider"></div>
         <aside class="aside-right">
         </aside>
     </section>
 
     <section id="dashboard-forum">
-        <aside class="aside-left tiny-scrollbar">
-            <button id="new-discussion-btn">发布主题</button>
-            <nav>
-                <ol class="nav-buttons">
-                </ol>
-            </nav>
-        </aside>
+        <div class="aside-left-wrap">
+            <aside class="aside-left tiny-scrollbar">
+                <button id="new-discussion-btn">发布主题</button>
+                <nav>
+                    <ol class="nav-buttons">
+                    </ol>
+                </nav>
+            </aside>
+        </div>
         <div class="aside-divider"></div>
         <aside class="aside-right">
         </aside>
     </section>
 
     <section id="backend-panel">
-        <aside class="aside-left tiny-scrollbar">
-            <nav>
-                <ol class="nav-buttons">
-                </ol>
-            </nav>
-        </aside>
+        <div class="aside-left-wrap">
+            <aside class="aside-left tiny-scrollbar">
+                <nav>
+                    <ol class="nav-buttons">
+                    </ol>
+                </nav>
+            </aside>
+        </div>
         <div class="aside-divider"></div>
         <aside class="aside-right">
         </aside>
@@ -8068,6 +8086,9 @@
             constructor(dashboard_element) {
                 this.dashboard_element = dashboard_element;
                 this.loading_mark = new LoadingMark(this.dashboard_element);
+
+                this.aside_left_wrap = this.dashboard_element.querySelector(':scope .aside-left-wrap');
+                if (this.aside_left_wrap) remove_simple_loading_mark(this.aside_left_wrap); // 某些页面没有aside_left
             }
 
             is_active() {
@@ -8307,7 +8328,13 @@
             /*
             * 定期同步
             * */
-            start_timer__sync() {
+            start_timer__sync(is_background = true) {
+                if (!is_background) {
+                    // this.remove_loading_mark();
+                    // this.loading_mark.show();
+                    remove_simple_loading_mark(this.aside_left_wrap);
+                    this.aside_left_wrap.simple_loading_mark.show();
+                }
                 this.stop_timer__sync();
                 this.sync();
             }
@@ -8340,10 +8367,18 @@
                 checkin.subviews.chat.sync(gid_args, uid_args)
                     .then(result => {
                         // if (this.closed) return;
+
+                        // this.remove_loading_mark();
+                        remove_simple_loading_mark(this.aside_left_wrap);
+
                         this.stop_timer__sync();
                         this.handle_response__sync(result);
                     }).catch(error => {
                     // if (this.closed) return;
+
+                    // this.remove_loading_mark();
+                    remove_simple_loading_mark(this.aside_left_wrap);
+
                     MessageMark.report(error, null, () => {
                         this.stop_timer__sync();
                         if (this.is_active()) this.sync();
@@ -8548,7 +8583,7 @@
         * */
         #setup_divider(panel) {
             const divider = panel.querySelector('.aside-divider');
-            const leftAside = panel.querySelector('.aside-left');
+            const leftAside = panel.querySelector('.aside-left-wrap');
             let isDragging = false;
 
             divider.addEventListener('mousedown', e => {
@@ -8826,7 +8861,7 @@
                         .then(result => {
                             // if (this.closed) return;
                             for (const resultElement of result) this.dashboard_chat.wrapper.add_contact_item(resultElement);
-                            if (this.dashboard_chat.wrapper.is_active()) this.dashboard_chat.wrapper.start_timer__sync();
+                            if (this.dashboard_chat.wrapper.is_active()) this.dashboard_chat.wrapper.start_timer__sync(false);
                             this.dashboard_chat.wrapper.remove_loading_mark();
                         }).catch(error => {
                         // if (this.closed) return;
@@ -8835,7 +8870,7 @@
                     });
                 }
             } else {
-                this.dashboard_chat.wrapper.start_timer__sync();
+                this.dashboard_chat.wrapper.start_timer__sync(false);
             }
 
             if (this.current_content_page) {
