@@ -2226,7 +2226,6 @@
         return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
-
     function pickBucket(str, arr) {
         let hash = 0x811c9dc5
         for (let i = 0; i < str.length; i++) {
@@ -2284,7 +2283,6 @@
         const l1 = format_timestamp_utc8(timestamp).split(" ");
         return l1;
     }
-
 
     function format_bytes(bytes, sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]) {
         if (!bytes) return "0 B";
@@ -6359,6 +6357,7 @@
                 if (!is_background) {
                     this.remove_loading_mark();
                     this.loading_mark.show();
+                    if (this.timer__fetch_unread_msgs !== null) return;
                 }
                 this.stop_timer__fetch_unread_msgs();
                 this.fetch_unread_msgs(is_background);
@@ -8337,6 +8336,7 @@
                     // this.loading_mark.show();
                     remove_simple_loading_mark(this.aside_left_wrap);
                     this.aside_left_wrap.simple_loading_mark.show();
+                    if (this.timer__sync !== null) return;
                 }
                 this.stop_timer__sync();
                 this.sync();
