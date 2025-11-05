@@ -6657,15 +6657,15 @@
                         }
                     }
                     const new_msgattrs = [];
-                    if (found_previous_msg) {
+                    if (found_previous_msg) { // 前一条消息被缓存过，检查在合适的位置插入或更新现有
                         const back_count = this.li.bindmap.msgs.length - found_previous_msg_index - 1;
-                        const part1 = new_messages.slice(0, back_count);
+                        const part1 = new_messages.slice(0, back_count); // 早缓存过的消息，这里更新以下数据
                         for (let i = found_previous_msg_index + 1; i < this.li.bindmap.msgs.length; i++) {
                             const msg = this.li.bindmap.msgs[i];
-                            Object.assign(msg, part1[i - found_previous_msg_index]);
+                            Object.assign(msg, part1[i - found_previous_msg_index - 1]);
                             msg.msgobj.update();
                         }
-                        const part2 = new_messages.slice(back_count);
+                        const part2 = new_messages.slice(back_count); // 末尾未缓存过的消息
                         for (const newMessage of part2) {
                             if (newMessage.sender_rand) {
                                 let sending_msg;
@@ -6688,7 +6688,7 @@
                             new_msgattrs.push(newMessage);
                         }
 
-                    } else {
+                    } else { // 没有前一条消息，flow不完整吧
                         this.msgflow_manage.clear_msgs();
                         for (const newMessage of new_messages) {
                             if (newMessage.sender_rand) {
