@@ -6142,8 +6142,10 @@
                     sent_time: 0,
                     is_sending: false,
                 }
+
                 this.timer__fetch_unread_msgs = null;
                 this.interval__fetch_unread_msgs = 5000;
+                this.is_processing__fetch_unread_msgs = false;
 
                 this.timer__update_read_progress = null;
                 this.interval__update_read_progress = 1500;
@@ -6357,7 +6359,7 @@
                 if (!is_background) {
                     this.remove_loading_mark();
                     this.loading_mark.show();
-                    if (this.timer__fetch_unread_msgs !== null) return;
+                    if (this.is_processing__fetch_unread_msgs) return;
                 }
                 this.stop_timer__fetch_unread_msgs();
                 this.fetch_unread_msgs(is_background);
@@ -6371,18 +6373,22 @@
             fetch_unread_msgs(is_background = true) {
                 if (!this.client.dashboard_chat.wrapper.is_active()) return;
 
+                this.is_processing__fetch_unread_msgs = true;
+
                 const last_msgattr = this.li.bindmap.msgs.length > 0 ? this.li.bindmap.msgs.at(-1) : null;
 
                 const {xxid, contact_type} = this.current_contact_xxid();
                 checkin.subviews.chat.load(contact_type, xxid, last_msgattr)
                     .then(result => {
                         // if (this.closed) return;
+                        this.is_processing__fetch_unread_msgs = false;
                         this.remove_loading_mark();
                         this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
                         this.stop_timer__fetch_unread_msgs();
                         this.handle_response__fetch_unread_msgs(last_msgattr, result, is_background);
                     }).catch(error => {
                     // if (this.closed) return;
+                    this.is_processing__fetch_unread_msgs = false;
                     this.remove_loading_mark();
                     MessageMark.report(error, null, () => {
                         this.stop_timer__fetch_unread_msgs();
@@ -8111,8 +8117,10 @@
         class ChatDashboardWrapper extends DashboardWrapper {
             constructor(dashboard_element) {
                 super(dashboard_element);
+
                 this.timer__sync = null;
                 this.interval__sync = 10000;
+                this.is_processing__sync = false;
             }
 
             leave() {
@@ -8336,7 +8344,7 @@
                     // this.loading_mark.show();
                     remove_simple_loading_mark(this.aside_left_wrap);
                     this.aside_left_wrap.simple_loading_mark.show();
-                    if (this.timer__sync !== null) return;
+                    if (this.is_processing__sync) return;
                 }
                 this.stop_timer__sync();
                 this.sync();
@@ -8357,6 +8365,8 @@
                     return;
                 }
 
+                this.is_processing__sync = true;
+
                 const gid_args = {};
                 const uid_args = {};
                 items.forEach(i => {
@@ -8371,6 +8381,8 @@
                     .then(result => {
                         // if (this.closed) return;
 
+                        this.is_processing__sync = false;
+
                         // this.remove_loading_mark();
                         remove_simple_loading_mark(this.aside_left_wrap);
 
@@ -8378,6 +8390,8 @@
                         this.handle_response__sync(result);
                     }).catch(error => {
                     // if (this.closed) return;
+
+                    this.is_processing__sync = false;
 
                     // this.remove_loading_mark();
                     remove_simple_loading_mark(this.aside_left_wrap);
