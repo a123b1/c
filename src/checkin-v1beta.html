@@ -1888,7 +1888,7 @@
         }
 
         .unsent .chat-message-content-container {
-            background: rgba(0, 0, 0, 0.03);
+            background: rgba(0, 0, 0, 0.1);
         }
 
         .align-right .chat-message-content-container {
@@ -6398,13 +6398,16 @@
                 if (!this.client.dashboard_chat.wrapper.is_active()) return;
 
                 if (result.is_found_last_message) { // 按请求的起始消息
-                    if (result.previous_message_id !== last_msgattr.id) throw new Error(`last_msgattr=${last_msgattr}，result=${result}`);
-                    const new_msgattrs = this.msgflow_manage.store_msgs(last_msgattr, result.messages);
-                    if (new_msgattrs.length > 0) {
-                        const msg = new_msgattrs.find(i => i.sender !== logged_user.uid);
-                        if (msg) {
-                            msg.msgobj.highlight();
-                            if (!is_background) msg.msgobj.scroll_to_view(true);
+                    if (result.previous_message_id !== last_msgattr.id) {
+                        console.warn(`不匹配，last_msgattr=${JSON.stringify(last_msgattr)}，result=${JSON.stringify(result)}`);
+                    } else {
+                        const new_msgattrs = this.msgflow_manage.store_msgs(last_msgattr, result.messages);
+                        if (new_msgattrs.length > 0) {
+                            const msg = new_msgattrs.find(i => i.sender !== logged_user.uid);
+                            if (msg) {
+                                msg.msgobj.highlight();
+                                if (!is_background) msg.msgobj.scroll_to_view(true);
+                            }
                         }
                     }
                 } else if (result.is_found_read_message && !result.is_no_more_unread) { // 按已读进度
