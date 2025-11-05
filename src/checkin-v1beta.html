@@ -8211,11 +8211,11 @@
                     item.e_ssb_lastmsgview.dataset.hasActivity = "false";
                 } else {
                     item.e_ssb_unreadcount.classList.add("hidden");
-                    if (item.msgs.length === 0) {
-                        if (string_activity.length > 0) {
-                            item.e_ssb_lastmsgview.textContent = string_activity;
-                            item.e_ssb_lastmsgview.dataset.hasActivity = "true";
-                        } else {
+                    if (string_activity.length > 0) {
+                        item.e_ssb_lastmsgview.textContent = string_activity;
+                        item.e_ssb_lastmsgview.dataset.hasActivity = "true";
+                    } else {
+                        if (item.msgs.length === 0) {
                             if (item.draft_text.length > 0) {
                                 item.e_ssb_lastmsgview.textContent = "[草稿] " + item.draft_text;
                                 item.e_ssb_lastmsgview.dataset.hasActivity = "false";
@@ -8223,10 +8223,10 @@
                                 item.e_ssb_lastmsgview.textContent = full_width_space;
                                 item.e_ssb_lastmsgview.dataset.hasActivity = "false";
                             }
+                        } else {
+                            item.e_ssb_lastmsgview.textContent = await this.format_contact_item_status__lastmsgview(item.msgs.at(-1));
+                            item.e_ssb_lastmsgview.dataset.hasActivity = "false";
                         }
-                    } else {
-                        item.e_ssb_lastmsgview.textContent = await this.format_contact_item_status__lastmsgview(item.msgs.at(-1));
-                        item.e_ssb_lastmsgview.dataset.hasActivity = "false";
                     }
                 }
 
