@@ -1839,6 +1839,57 @@
             text-align: center;
         }
 
+        .chat-session-msgflow-mark-loadhistory {
+            user-select: none;
+            position: absolute;
+            transition: opacity 0.4s ease;
+
+            left: 0;
+            right: 0;
+            /*left: 50%;*/
+            /*transform: translateX(calc(-50% - 8px));*/
+        }
+
+        .chat-session-msgflow-mark-loadhistory-layout {
+            display: flex;
+            flex-direction: row;
+            /*justify-content: center;*/
+        }
+
+        .chat-session-msgflow-mark-loadhistory-layout p {
+            background: #00000011;
+            font-size: 14px;
+            margin: 0 0;
+            padding: 4px 8px;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .chat-session-msgflow-mark-checknew {
+            user-select: none;
+            position: absolute;
+            transition: opacity 0.4s ease;
+
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        .chat-session-msgflow-mark-checknew-layout {
+            display: flex;
+            flex-direction: row;
+            /*justify-content: center;*/
+        }
+
+        .chat-session-msgflow-mark-checknew-layout p {
+            background: #00000011;
+            font-size: 14px;
+            margin: 0 0;
+            padding: 4px 8px;
+            text-align: center;
+            flex-grow: 1;
+        }
+
     </style>
 
     <!--聊天页面 消息-->
@@ -2008,23 +2059,25 @@
             cursor: pointer;
             border-radius: 2px;
             color: #F44336;
+            background: #69eefa66;
+            font-weight: bold;
         }
 
         .chat-mcm-send-status-btn-retry:hover {
-            background: rgba(0, 0, 0, 0.1);
+            background: #69eefabb;
         }
 
         .chat-mcm-send-status-btn-retry:active {
-            background: rgba(0, 0, 0, 0.24);
+            background: #69eefa66;
         }
 
     </style>
 
 </head>
+<body class="">
 
 <!---->
 
-<body class="">
 <header class="">
     <button id="header-btn-tostartpage" class="initiation_hidden">返回首页</button>
 
@@ -2150,7 +2203,6 @@
 </main>
 <footer>
 </footer>
-</body>
 
 <!---->
 
@@ -4804,6 +4856,25 @@
                 throw new Error(await format_error_response(r));
             }
 
+            async load_history(contact_type, xxid, first_msgattr) {
+                let url = join_path(this.api_url(), "load_history");
+                let body = {
+                    contact_type,
+                    first_message_id: first_msgattr ? first_msgattr.id : null,
+                };
+                if (contact_type === subviews.Chat.receiver_type.group) {
+                    body.gid = xxid;
+                } else if (contact_type === subviews.Chat.receiver_type.user) {
+                    body.uid = xxid;
+                }
+                let r = await net_fetcher.nf_post_json(url, body,);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
             async read(contact_type, xxid, visible_msgattr) {
                 let url = join_path(this.api_url(), "read");
                 let body = {
@@ -4822,6 +4893,7 @@
                 }
                 throw new Error(await format_error_response(r));
             }
+
         }
 
         return {Api, Admin, Me, Mail, Drive, Chat};
@@ -6149,10 +6221,15 @@
 
                 this.timer__update_read_progress = null;
                 this.interval__update_read_progress = 1500;
+
+                this.is_processing__load_history = false;
             }
 
             close_page() {
                 this.save_draft_text();
+                if (this.li.bindmap.draft_text.length > 0) {
+                    this.update_activity(dashboardwrappers.ChatDashboardWrapper.activity_type.none);
+                }
                 super.close_page();
 
                 this.stop_timer__fetch_unread_msgs();
@@ -6185,8 +6262,10 @@
 
 <div class="chat-session-msgflow-wrap">
     <div class="chat-session-msgflow"></div>
-    <div class="chat-session-msgflow-mark-onlineusers"></div>
     <div class="chat-session-msgflow-mark-currentday"><div class="chat-session-msgflow-mark-currentday-layout"><p></p></div></div>
+    <div class="chat-session-msgflow-mark-loadhistory"><div class="chat-session-msgflow-mark-loadhistory-layout"><p>正在检查是否有历史消息...</p></div></div>
+    <div class="chat-session-msgflow-mark-checknew"><div class="chat-session-msgflow-mark-checknew-layout"><p>正在检查是否有新消息...</p></div></div>
+    <div class="chat-session-msgflow-mark-onlineusers"></div>
 </div>
 
 <div class="chat-session-inputarea">
@@ -6238,9 +6317,26 @@
                 this.e_msgflow_mark_currentday__timer = null;
                 this.show_currentday_mark();
 
+                // 正在加载 历史和获新
+                this.e_msgflow_mark_loadhistory = this.container.querySelector(":scope div.chat-session-msgflow-mark-loadhistory");
+                this.e_msgflow_mark_loadhistory_p = this.e_msgflow_mark_loadhistory.querySelector(":scope p");
+                this.e_msgflow_mark_checknew = this.container.querySelector(":scope div.chat-session-msgflow-mark-checknew");
+                this.e_msgflow_mark_checknew_p = this.e_msgflow_mark_checknew.querySelector(":scope p");
+                this.change_loading_status__loadhistory();
+                this.change_loading_status__checknew();
+
                 // 滚动条
+                this.e_msgflow.addEventListener('wheel', (event) => {
+                    if (this.e_msgflow.scrollTop === 0) {
+                        this.start__load_history();
+                    }
+                });
                 this.e_msgflow__scroll_timer = null;
-                this.e_msgflow.addEventListener('scroll', () => {
+                this.e_msgflow.addEventListener('scroll', (event) => {
+                    if (this.e_msgflow.scrollTop === 0) {
+                        this.start__load_history();
+                    }
+
                     clearTimeout(this.e_msgflow__scroll_timer);
                     this.e_msgflow__scroll_timer = setTimeout(() => { // 找到首个可见元素
                         if (this.closed) return;
@@ -6374,6 +6470,7 @@
                 if (!this.client.dashboard_chat.wrapper.is_active()) return;
 
                 this.is_processing__fetch_unread_msgs = true;
+                this.change_loading_status__checknew();
 
                 const last_msgattr = this.li.bindmap.msgs.length > 0 ? this.li.bindmap.msgs.at(-1) : null;
 
@@ -6382,13 +6479,16 @@
                     .then(result => {
                         // if (this.closed) return;
                         this.is_processing__fetch_unread_msgs = false;
+                        this.change_loading_status__checknew();
                         this.remove_loading_mark();
                         this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
                         this.stop_timer__fetch_unread_msgs();
                         this.handle_response__fetch_unread_msgs(last_msgattr, result, is_background);
+                        this.client.dashboard_chat.wrapper._update_contact_item_status(this.li.bindmap, this.li.bindmap.status_attr, true);
                     }).catch(error => {
                     // if (this.closed) return;
                     this.is_processing__fetch_unread_msgs = false;
+                    this.change_loading_status__checknew();
                     this.remove_loading_mark();
                     MessageMark.report(error, null, () => {
                         this.stop_timer__fetch_unread_msgs();
@@ -6524,7 +6624,6 @@
                 this.e_inputarea_textarea.value = "";
                 this.save_draft_text();
 
-
                 const msg = {
                     sender: logged_user.uid,
                     sender_rand: generateRandomString(10),
@@ -6535,23 +6634,28 @@
                     plain_text: text,
                 }
 
+                this.msgflow_manage.append_sending_msg(msg);
+                this._send_msg_text(msg);
+            }
+
+            _send_msg_text(msg) {
                 const {xxid, contact_type} = this.current_contact_xxid();
-                checkin.subviews.chat.send_text(contact_type, xxid, msg.sender_rand, text,)
+                checkin.subviews.chat.send_text(contact_type, xxid, msg.sender_rand, msg.plain_text,)
                     .then(result => {
-                        if (this.closed) return;
+                        // if (this.closed) return;
                         this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
                         this.msgflow_manage.update_sending_msg(msg.sender_rand, result.message_attr, result.previous_message_id);
                     }).catch(error => {
-                    if (this.closed) return;
-                    MessageMark.report(error);
+                    msg.msgobj.on_send_failed(error);
+                    // if (this.closed) return;
+                    // MessageMark.report(error);
                 });
-
-                this.msgflow_manage.append_sending_msg(msg);
             }
 
-
             resend_msg(msgobj) {
-
+                // console.log("重新发送", msgobj);
+                msgobj.on_resend_started();
+                this._send_msg_text(msgobj.msgattr);
             }
 
             /*
@@ -6644,6 +6748,35 @@
                     }
                 },
 
+                insert_history_msgs: (next_msgattr, msgattrs) => {
+                    const msgs = [];
+                    for (const msgattr of msgattrs) {
+                        const msgseniors = [...msgs].reverse();
+                        msgs.push(msgattr);
+                        this.msgflow_manage.add_element(msgattr, msgseniors, true);
+                    }
+                    const histories = [...msgs];
+
+                    if (next_msgattr.msgobj.is_header()) {
+                        next_msgattr.msgobj.remove_from_flow();
+                        for (const msgattr of [next_msgattr, ...next_msgattr.msgobj.msgobjchildren.map(i => i.msgattr)]) {
+                            const msgseniors = [...msgs].reverse();
+                            msgs.push(msgattr);
+                            this.msgflow_manage.add_element(msgattr, msgseniors, true);
+                        }
+                    } else {
+                        const msgseniors = [...msgs].reverse();
+                        msgs.push(next_msgattr);
+                        this.msgflow_manage.add_element(next_msgattr, msgseniors, true);
+                    }
+
+                    this.li.bindmap.msgs.unshift(...histories);
+
+                    this.e_msgflow.prepend(...msgs.filter(i => i.msgobj.is_header()).map(i => i.msgobj.msgelement));
+
+                    return histories;
+                },
+
                 store_msgs: (last_msgattr, new_messages) => {
                     new_messages.forEach(i => {
                         i.is_sent = true;
@@ -6694,6 +6827,62 @@
                         }
 
                     } else { // 没有前一条消息，flow不完整吧
+                        this.msgflow_manage.clear_msgs();
+                        for (const newMessage of new_messages) {
+                            if (newMessage.sender_rand) {
+                                let sending_msg;
+                                for (let i = 0; i < this.li.bindmap.sending_msgs.length; i++) {
+                                    const sendingMsg = this.li.bindmap.sending_msgs[i];
+                                    if (sendingMsg.sender_rand === newMessage.sender_rand) {
+                                        this.li.bindmap.sending_msgs.splice(i, 1);
+                                        Object.assign(sendingMsg, newMessage);
+                                        sending_msg = sendingMsg;
+                                        break;
+                                    }
+                                }
+                                if (sending_msg) {
+                                    this.msgflow_manage.append_msg(sending_msg);
+                                    new_msgattrs.push(sending_msg);
+                                    continue;
+                                }
+                            }
+                            this.msgflow_manage.append_msg(newMessage);
+                            new_msgattrs.push(newMessage);
+                        }
+                    }
+                    return new_msgattrs;
+                },
+
+                insert_msgs: (first_msgattr, new_messages) => {
+                    new_messages.forEach(i => {
+                        i.is_sent = true;
+                    });
+
+                    let found_next_msg;
+                    let found_next_msg_index;
+                    if (first_msgattr) {
+                        for (let i = 0; i < this.li.bindmap.msgs.length; i++) {
+                            const msg = this.li.bindmap.msgs[i];
+                            if (msg.id === first_msgattr.id) {
+                                found_next_msg = msg;
+                                found_next_msg_index = i;
+                                break;
+                            }
+                        }
+                    }
+                    const new_msgattrs = [];
+                    if (found_next_msg) { // 后一条消息被缓存过，检查在合适的位置插入或更新现有
+                        const face_count = found_next_msg_index;
+                        const part1 = new_messages.slice(-face_count); // 早缓存过的消息，这里更新以下数据
+                        for (let i = found_next_msg_index - 1; i > -1; i--) {
+                            const msg = this.li.bindmap.msgs[i];
+                            Object.assign(msg, part1.at(-(i + 1)));
+                            msg.msgobj.update();
+                        }
+                        const part2 = new_messages.slice(0, face_count === 0 ? undefined : -face_count); // 末尾未缓存过的消息
+                        new_msgattrs.push(...this.msgflow_manage.insert_history_msgs(found_next_msg, part2));
+
+                    } else { // 没有后一条消息，flow不完整吧
                         this.msgflow_manage.clear_msgs();
                         for (const newMessage of new_messages) {
                             if (newMessage.sender_rand) {
@@ -6968,6 +7157,15 @@
                             this.msgelement.remove();
                         }
 
+                        on_send_failed(error) {
+                            this.e_send_status_text.classList.add("hidden");
+                            this.e_send_status_btn_retry.classList.remove("hidden");
+                        }
+
+                        on_resend_started() {
+                            this.e_send_status_text.classList.remove("hidden");
+                            this.e_send_status_btn_retry.classList.add("hidden");
+                        }
                     }
 
                     class TextMsg extends _ {
@@ -7027,12 +7225,12 @@
                 })(),
 
 
-                add_element: (msgattr, msgseniors) => {
+                add_element: (msgattr, msgseniors, noappend = false) => {
                     if (msgattr.type === dashboardwrappers.ChatDashboardWrapper.message_type.text) {
                         const msgobj = new this.msgflow_manage.msgtypes.TextMsg(this, msgattr, msgseniors);
                         msgattr.msgobj = msgobj;
                         if (msgobj.is_header()) {
-                            this.e_msgflow.append(msgobj.msgelement);
+                            if (!noappend) this.e_msgflow.append(msgobj.msgelement);
                         } else {
                             msgobj.header().append_child(msgobj);
                         }
@@ -7041,14 +7239,14 @@
                         const msgobj = new this.msgflow_manage.msgtypes.TextMsg(this, msgattr, msgseniors);
                         msgattr.msgobj = msgobj;
                         if (msgobj.is_header()) {
-                            this.e_msgflow.append(msgobj.msgelement);
+                            if (!noappend) this.e_msgflow.append(msgobj.msgelement);
                         }
                         return msgobj;
                     } else if (msgattr.type === dashboardwrappers.ChatDashboardWrapper.message_type.file) {
                         const msgobj = new this.msgflow_manage.msgtypes.TextMsg(this, msgattr, msgseniors);
                         msgattr.msgobj = msgobj;
                         if (msgobj.is_header()) {
-                            this.e_msgflow.append(msgobj.msgelement);
+                            if (!noappend) this.e_msgflow.append(msgobj.msgelement);
                         }
                         return msgobj;
                     }
@@ -7235,6 +7433,71 @@
                     MessageMark.report(error);
                 });
 
+            }
+
+
+            /*
+            * 加载历史
+            * */
+            start__load_history() {
+                if (this.is_processing__load_history) return;
+
+                this.is_processing__load_history = true;
+                this.change_loading_status__loadhistory();
+
+                const first_msgattr = this.li.bindmap.msgs.length > 0 ? this.li.bindmap.msgs.at(0) : null;
+
+                const {xxid, contact_type} = this.current_contact_xxid();
+                checkin.subviews.chat.load_history(contact_type, xxid, first_msgattr)
+                    .then(result => {
+                        // if (this.closed) return;
+                        this.is_processing__load_history = false;
+                        this.change_loading_status__loadhistory();
+                        this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
+                        this.handle_response__load_history(first_msgattr, result, false);
+                        this.client.dashboard_chat.wrapper._update_contact_item_status(this.li.bindmap, this.li.bindmap.status_attr, true);
+                    }).catch(error => {
+                    // if (this.closed) return;
+                    this.is_processing__load_history = false;
+                    this.change_loading_status__loadhistory();
+                    MessageMark.report(error);
+                });
+
+            }
+
+            async handle_response__load_history(first_msgattr, result, is_background = true) {
+                if (!this.client.dashboard_chat.wrapper.is_active()) return;
+
+                if (result.is_found_first_message) { // 按请求的起始消息
+                    if (result.next_message_id !== first_msgattr.id) {
+                        console.warn(`next_message_id不匹配，first_msgattr.id=${first_msgattr.id}，result=${JSON.stringify(result)}`);
+                    } else {
+                        const new_msgattrs = this.msgflow_manage.insert_msgs(first_msgattr, result.messages);
+                        if (new_msgattrs.length > 0) {
+                            const msg = new_msgattrs.at(-1);
+                            if (msg) {
+                                msg.msgobj.highlight();
+                                if (!is_background) msg.msgobj.scroll_to_view(false);
+                            }
+                        }
+                    }
+                }
+            }
+
+            change_loading_status__loadhistory() {
+                if (this.is_processing__load_history) {
+                    this.e_msgflow_mark_loadhistory.classList.remove("hidden");
+                } else {
+                    this.e_msgflow_mark_loadhistory.classList.add("hidden");
+                }
+            }
+
+            change_loading_status__checknew() {
+                if (this.is_processing__fetch_unread_msgs) {
+                    this.e_msgflow_mark_checknew.classList.remove("hidden");
+                } else {
+                    this.e_msgflow_mark_checknew.classList.add("hidden");
+                }
             }
 
         }
@@ -8225,17 +8488,17 @@
                         item.e_ssb_lastmsgview.textContent = string_activity;
                         item.e_ssb_lastmsgview.dataset.hasActivity = "true";
                     } else {
-                        if (item.msgs.length === 0) {
-                            if (item.draft_text.length > 0) {
-                                item.e_ssb_lastmsgview.textContent = "[草稿] " + item.draft_text;
-                                item.e_ssb_lastmsgview.dataset.hasActivity = "false";
-                            } else {
+                        if (item.draft_text.length > 0) {
+                            item.e_ssb_lastmsgview.textContent = "[草稿] " + this.format_text_for_msgview(item.draft_text);
+                            item.e_ssb_lastmsgview.dataset.hasActivity = "false";
+                        } else {
+                            if (item.msgs.length === 0) {
                                 item.e_ssb_lastmsgview.textContent = full_width_space;
                                 item.e_ssb_lastmsgview.dataset.hasActivity = "false";
+                            } else {
+                                item.e_ssb_lastmsgview.textContent = await this.format_contact_item_status__lastmsgview(item.msgs.at(-1));
+                                item.e_ssb_lastmsgview.dataset.hasActivity = "false";
                             }
-                        } else {
-                            item.e_ssb_lastmsgview.textContent = await this.format_contact_item_status__lastmsgview(item.msgs.at(-1));
-                            item.e_ssb_lastmsgview.dataset.hasActivity = "false";
                         }
                     }
                 }
@@ -8252,6 +8515,12 @@
                     }
                 }
 
+            }
+
+            format_text_for_msgview(text) {
+                text = text.replace(/[\r\n\f\t]+/g, " ");
+                if (text.length > 100) text = text.slice(0, 100) + "...";
+                return text;
             }
 
             format_contact_item_status__activity(item, status_attr) {
@@ -8290,9 +8559,7 @@
                             }
                         }
                         if (newest_msg.plain_data_text) {
-                            let text = newest_msg.plain_data_text.replace(/[\r\n\f\t]+/g, " ");
-                            if (text.length > 100) text = text.slice(0, 100);
-                            string = `${text}${full_width_space}`;
+                            string = `${this.format_text_for_msgview(newest_msg.plain_data_text)}${full_width_space}`;
                         }
                         if (failed_decrypting) {
                             string = `[系统] ${decrypt_error_string}`;
@@ -9011,4 +9278,5 @@
 
 <!---->
 
+</body>
 </html>
