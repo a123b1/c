@@ -7317,6 +7317,7 @@
             _send_msg_file(msg) {
                 const t = new FloatBall.tasktypes.Upload_ChatMessage(floatball.dialog.tab_content_backtasks, {
                     onfinished: () => {
+                        msg.msgobj.update();
                         // if (this.closed) return;
                         const text = new TextDecoder('utf-8').decode(t.xhr.response);
                         const result = JSON.parse(text);
@@ -7327,6 +7328,7 @@
                         msg.msgobj.update();
                     },
                     onfailed: () => {
+                        msg.msgobj.update();
                         msg.msgobj.on_send_failed();
                         // if (this.closed) return;
                         // MessageMark.report(error);
