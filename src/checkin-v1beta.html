@@ -3256,6 +3256,7 @@
             super(element)
 
             this.file_name = null;
+            this.file_data = null;
 
             this.scale = 1;
             this.originX = 0;
@@ -3293,6 +3294,8 @@
 
             this.e_top_action_close = this.rect.querySelector(":scope button.image-mark-top-actions-close");
             this.e_top_action_close.addEventListener("click", () => {
+                this.file_name = null;
+                this.file_data = null;
                 URL.revokeObjectURL(this.tempurl);
                 this.remove();
             });
@@ -3300,9 +3303,10 @@
             this.e_top_action_saveas = this.rect.querySelector(":scope button.image-mark-top-actions-saveas");
             this.e_top_action_saveas.addEventListener("click", () => {
                 if (!this.file_name) return;
-                getImgData(this.e_img, (blob) => {
-                    saveFile_from_blob(blob, this.file_name);
-                });
+                // getImgData(this.e_img, (blob) => {
+                //     saveFile_from_blob(blob, this.file_name);
+                // });
+                saveFile_from_uint8array(this.file_data, this.file_name);
             });
 
 
@@ -3374,10 +3378,14 @@
             this.e_img.style.transform = `translate(${this.offsetX}px, ${this.offsetY}px) scale(${this.scale})`;
         }
 
-        load_from_tempurl(url, file_name) {
-            this.tempurl = url;
+        load_from_uint8array(file_name, file_data) {
             this.file_name = file_name;
-            this.e_img.src = url;
+            this.file_data = file_data;
+
+            const blob = new Blob([this.file_data]);
+            this.tempurl = URL.createObjectURL(blob);
+
+            this.e_img.src = this.tempurl;
             this.e_img.onload = () => {
                 this.centerAndFit();
                 this.centerAndFit__timer = null;
@@ -7311,7 +7319,7 @@
 
                 this.msgflow_manage.append_sending_msg(msg);
                 const task = this._send_msg_file(msg);
-                floatball.look_upload_tasks(task);
+                // floatball.look_upload_tasks(task);
             }
 
             _send_msg_file(msg) {
@@ -7944,14 +7952,15 @@
                             this.e_mcr_img.addEventListener("click", (event) => {
                                 const im = new ImageMark(document.body);
                                 im.show();
-                                getImgData(this.e_mcr_img, (blob) => {
-                                    const url = URL.createObjectURL(blob);
-                                    if (im.is_visible()) {
-                                        im.load_from_tempurl(url, this.msgattr.plain_file_name);
-                                    } else {
-                                        URL.revokeObjectURL(url);
-                                    }
-                                });
+                                // getImgData(this.e_mcr_img, (blob) => { // 需要canvas权限
+                                //     const url = URL.createObjectURL(blob);
+                                //     if (im.is_visible()) {
+                                //         im.load_from_tempurl(url, this.msgattr.plain_file_name);
+                                //     } else {
+                                //         URL.revokeObjectURL(url);
+                                //     }
+                                // });
+                                im.load_from_uint8array(this.msgattr.plain_file_name, this.msgattr.plain_file_data);
                             });
 
                             this.e_mcr_span = this.e_mcr.querySelector(":scope span"); // 点击开始下载
@@ -8021,26 +8030,32 @@
                                     // task的状态变化时，会调用msgobj的update
                                     // if (this.msgattr.download_task.status === floatball.taskstatus.finished) {
                                     // }
-                                    set_textContent_if_different(this.e_mcr_span, `[图片] ${this.msgattr.plain_file_name} ${this.contentpage.panel.wrapper.format_text_for_msgview(this.msgattr.download_task.backtask_status_text.textContent)}`);
 
-                                    if (this.msgattr.download_task.args.plain_file_data) {
-                                        this.e_mcr_img.classList.remove("hidden");
-                                        this.e_mcr_span.classList.add("hidden");
+                                    if (this.msgattr.plain_file_data) {
+                                    } else {
+                                        set_textContent_if_different(this.e_mcr_span, `[图片] ${this.msgattr.plain_file_name} ${this.contentpage.panel.wrapper.format_text_for_msgview(this.msgattr.download_task.backtask_status_text.textContent)}`);
 
-                                        const blob = new Blob([this.msgattr.download_task.args.plain_file_data]); // blob不能指定名称
-                                        // const file = new File([this.msgattr.download_task.args.plain_file_data], // img也不读取file的name
-                                        //     this.msgattr.plain_file_name, {type: "image/png"});
-                                        this.msgattr.download_task.args.plain_file_data = null;
+                                        if (this.msgattr.download_task.args.plain_file_data) {
+                                            this.e_mcr_img.classList.remove("hidden");
+                                            this.e_mcr_span.classList.add("hidden");
 
-                                        this.e_mcr_img__urlobj = URL.createObjectURL(blob);
-                                        this.e_mcr_img.src = this.e_mcr_img__urlobj;
-                                        this.e_mcr_img.onload = () => {
-                                            if (this.e_mcr_img__urlobj) { // 先不删，不然不能右键另存为了。由于不能指定另存为的名称，删吧
-                                                URL.revokeObjectURL(this.e_mcr_img__urlobj);
-                                                this.e_mcr_img__urlobj = null;
-                                            }
-                                        };
+                                            const blob = new Blob([this.msgattr.download_task.args.plain_file_data]); // blob不能指定名称
+                                            // const file = new File([this.msgattr.download_task.args.plain_file_data], // img也不读取file的name
+                                            //     this.msgattr.plain_file_name, {type: "image/png"});
 
+                                            this.msgattr.plain_file_data = this.msgattr.download_task.args.plain_file_data; // 在全屏查看时用到
+                                            this.msgattr.download_task.args.plain_file_data = null;
+
+                                            this.e_mcr_img__urlobj = URL.createObjectURL(blob);
+                                            this.e_mcr_img.src = this.e_mcr_img__urlobj;
+                                            this.e_mcr_img.onload = () => {
+                                                if (this.e_mcr_img__urlobj) { // 先不删，不然不能右键另存为了。由于不能指定另存为的名称，删吧
+                                                    URL.revokeObjectURL(this.e_mcr_img__urlobj);
+                                                    this.e_mcr_img__urlobj = null;
+                                                }
+                                            };
+
+                                        }
                                     }
                                 }
 
