@@ -672,6 +672,64 @@
 
     </style>
 
+    <!--遮罩内容 图片查看-->
+    <style>
+        .image-mark-rect {
+            flex-grow: 1;
+            height: 100%;
+            position: relative;
+
+            overflow: hidden;
+        }
+
+        .image-mark-rect > img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: 0 0;
+        }
+
+        .image-mark-top-actions {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            display: flex;
+            flex-direction: row;
+            background: rgba(0, 0, 0, 0.1);
+            min-height: 10px;
+        }
+
+        .image-mark-action-gap {
+            flex-grow: 1;
+        }
+
+        .image-mark-top-actions > button {
+            display: inline-block;
+            padding: 8px 20px;
+            font-size: 16px;
+            background: transparent;
+            transition: all 0.1s ease-in-out;
+            border: none;
+            border-radius: 0;
+            cursor: pointer;
+        }
+
+        .image-mark-top-actions > button:hover {
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        .image-mark-top-actions > button:active {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .image-mark-top-actions > button.image-mark-top-actions-close {
+            color: #dc1d1d;
+        }
+
+
+    </style>
+
     <!--遮罩内容 悬浮球弹出窗口-->
     <style>
         div#floatball-mark-dialog {
@@ -2022,6 +2080,97 @@
             word-break: break-all;
             overflow-wrap: anywhere;
         }
+
+        .chat-mcr-image {
+            padding: 6px;
+        }
+
+        .chat-mcr-image img {
+            height: 40px;
+            cursor: pointer;
+        }
+
+        .chat-mcr-image span:not(.red) {
+            white-space: pre-wrap;
+
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow-wrap: anywhere;
+
+            color: #0655b0;
+            cursor: pointer;
+            user-select: none;
+            border: 0 transparent solid;
+            border-bottom-width: 1px;
+            font-size: 14px;
+        }
+
+        .chat-mcr-image span:hover {
+            border-bottom-color: #0655b0;
+        }
+
+
+        .chat-mcr-file {
+            padding: 6px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .chat-mcr-file-icon {
+            font-size: 32px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .chat-mcr-file-info {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+        }
+
+        .chat-mcr-file-info-name {
+            white-space: pre-wrap;
+
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow-wrap: anywhere;
+        }
+
+        .chat-mcr-file-info-others {
+            display: flex;
+            flex-direction: row;
+
+            align-items: end;
+        }
+
+        .chat-mcr-file-info-size {
+            font-size: 12px;
+            color: #000000aa;
+            white-space: nowrap;
+        }
+
+        .chat-mcr-file-status {
+            white-space: pre-wrap;
+
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow-wrap: anywhere;
+
+            color: #0655b0;
+            user-select: none;
+            font-size: 14px;
+
+            margin-left: 4px;
+        }
+
+
+        .chat-mcr-text span.red, .chat-mcr-image span.red, .chat-mcr-file-info-name.red {
+            color: red;
+        }
+
     </style>
 
     <!--聊天页面 消息附加属性-->
@@ -2224,6 +2373,36 @@
     let dragging_item = null;
     const full_width_space = "　";
 
+    // 按住alt后某些元素设为文本可选
+    const elements_can_select_text_when_alt_pressed = [];
+    elements_can_select_text_when_alt_pressed.add = (element) => {
+        elements_can_select_text_when_alt_pressed.push(element);
+        element.addEventListener('mousedown', (event) => {
+            if (!event.altKey) event.preventDefault();
+        });
+    }
+    elements_can_select_text_when_alt_pressed.remove = (element) => {
+        const index = elements_can_select_text_when_alt_pressed.indexOf(element);
+        if (index > -1) elements_can_select_text_when_alt_pressed.splice(index, 1);
+    }
+    document.addEventListener('keydown', (event) => {
+        if (event.altKey) {
+            for (const element of elements_can_select_text_when_alt_pressed) {
+                element.style.userSelect = 'text';
+                element.style.cursor = 'auto';
+            }
+        }
+    });
+    document.addEventListener('keyup', (event) => {
+        if (!event.altKey) {
+            for (const element of elements_can_select_text_when_alt_pressed) {
+                element.style.userSelect = 'none';
+                element.style.cursor = 'pointer';
+            }
+        }
+    });
+
+
     function current_url() {
         return new URL(window.location.href);
     }
@@ -2285,6 +2464,36 @@
             hash = (hash * 0x01000193) >>> 0
         }
         return arr[hash % arr.length]
+    }
+
+    function saveFile_from_uint8array(totalArray, fileName) {
+        let blob = new Blob([totalArray]);
+        return saveFile_from_blob(blob, fileName);
+    }
+
+    function saveFile_from_blob(blob, fileName) {
+        let a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    function getImgData(img, callback) {
+        console.log(img.width, img.height)
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        // 将 img 内容绘制到 canvas
+        ctx.drawImage(img, 0, 0);
+        // 获取 Base64
+        // const base64 = canvas.toDataURL('image/png');
+
+        // 获取 Blob
+        canvas.toBlob(blob => {
+            callback(blob);
+        }, 'image/png');
     }
 
     const seconds_of_one_hour = 60 * 60;
@@ -3042,6 +3251,147 @@
 
     }
 
+    class ImageMark extends BlurMark {
+        constructor(element) {
+            super(element)
+
+            this.file_name = null;
+
+            this.scale = 1;
+            this.originX = 0;
+            this.originY = 0;
+            this.startX = 0;
+            this.startY = 0;
+            this.isDragging = false;
+            this.offsetX = 0;
+            this.offsetY = 0;
+        }
+
+        fill() {
+            this.mark.style.background = "rgba(255, 255, 255, 0.6)";
+            let html = `
+<div class="image-mark-rect">
+
+<img src="" alt="" draggable="false">
+
+<div class="image-mark-top-actions">
+    <span class="image-mark-action-gap"></span>
+    <button class="image-mark-top-actions-saveas">另存为</button>
+    <button class="image-mark-top-actions-close">✕</button>
+</div>
+
+<!--<div class="image-mark-bottom-actions">-->
+<!--    <span class="image-mark-action-gap"></span>-->
+<!--    <button class="image-mark-bottom-actions-"></button>-->
+<!--</div>-->
+
+</div>
+`;
+            this.mark.insertAdjacentHTML("beforeend", html);
+            this.rect = this.mark.querySelector(":scope .image-mark-rect");
+            this.e_img = this.rect.querySelector(":scope > img");
+
+            this.e_top_action_close = this.rect.querySelector(":scope button.image-mark-top-actions-close");
+            this.e_top_action_close.addEventListener("click", () => {
+                URL.revokeObjectURL(this.tempurl);
+                this.remove();
+            });
+
+            this.e_top_action_saveas = this.rect.querySelector(":scope button.image-mark-top-actions-saveas");
+            this.e_top_action_saveas.addEventListener("click", () => {
+                if (!this.file_name) return;
+                getImgData(this.e_img, (blob) => {
+                    saveFile_from_blob(blob, this.file_name);
+                });
+            });
+
+
+            {
+                // 滚轮缩放
+                this.rect.addEventListener('wheel', (event) => {
+                    event.preventDefault();
+                    const rectBounds = this.rect.getBoundingClientRect();
+
+                    // 鼠标相对于图片左上角的位置
+                    const mouseX = event.clientX - rectBounds.left - this.offsetX;
+                    const mouseY = event.clientY - rectBounds.top - this.offsetY;
+
+                    const zoom = event.deltaY < 0 ? 1.1 : 0.9;
+                    this.scale *= zoom;
+
+                    // 调整 offset，使缩放以鼠标为中心
+                    this.offsetX -= (mouseX) * (zoom - 1);
+                    this.offsetY -= (mouseY) * (zoom - 1);
+
+                    this.updateTransform();
+                });
+
+                // 按住拖动
+                this.rect.addEventListener('mousedown', (event) => {
+                    this.isDragging = true;
+                    this.startX = event.clientX - this.offsetX;
+                    this.startY = event.clientY - this.offsetY;
+                });
+
+                document.addEventListener('mousemove', (event) => {
+                    if (!this.isDragging) return;
+                    this.offsetX = event.clientX - this.startX;
+                    this.offsetY = event.clientY - this.startY;
+                    this.updateTransform();
+                });
+
+                document.addEventListener('mouseup', () => {
+                    this.isDragging = false;
+                });
+
+            }
+
+        }
+
+        centerAndFit() {
+            const rectW = this.rect.clientWidth;
+            const rectH = this.rect.clientHeight;
+            const imgW = this.e_img.naturalWidth;
+            const imgH = this.e_img.naturalHeight;
+
+            // 计算适合比例
+            if (imgW > rectW || imgH > rectH) {
+                const scaleX = (rectW - 40) / imgW;
+                const scaleY = (rectH - 40) / imgH;
+                this.scale = Math.min(scaleX, scaleY);
+            } else {
+                this.scale = 1;
+            }
+
+            // 居中位置
+            this.offsetX = (rectW - imgW * this.scale) / 2;
+            this.offsetY = (rectH - imgH * this.scale) / 2;
+
+            this.updateTransform();
+        }
+
+        updateTransform() {
+            this.e_img.style.transform = `translate(${this.offsetX}px, ${this.offsetY}px) scale(${this.scale})`;
+        }
+
+        load_from_tempurl(url, file_name) {
+            this.tempurl = url;
+            this.file_name = file_name;
+            this.e_img.src = url;
+            this.e_img.onload = () => {
+                this.centerAndFit();
+                this.centerAndFit__timer = null;
+                window.addEventListener('resize', () => {
+                    if (!this.is_visible()) return;
+                    if (this.centerAndFit__timer) clearTimeout(this.centerAndFit__timer);
+                    this.centerAndFit__timer = setTimeout(() => {
+                        this.centerAndFit();
+                    }, 200);
+                });
+            };
+        }
+    }
+
     class BlankMark {
         constructor(element,) {
             this.element = element;
@@ -3626,7 +3976,10 @@
                     } else {
                         this.backtask_progress.classList.remove("sliding-bar-animation");
                         this.backtask_progress.style.width = `${i}%`;
-                        if (this.status === FloatBall.taskstatus.processing) this.update_progress_text(i);
+                        if (this.status === FloatBall.taskstatus.processing) {
+                            this.update_progress_text(i);
+                            if (this.callbacks.onprogress) this.callbacks.onprogress();
+                        }
                     }
                 }
 
@@ -3650,11 +4003,9 @@
                     } else if (ts === FloatBall.taskstatus.finished) {
                         this.update_progress(100);
                         this.backtask_progress_bar.classList.add("hidden");
-                        if (this.callbacks.onfinished) this.callbacks.onfinished();
                     } else if (ts === FloatBall.taskstatus.failed) {
                         this.backtask_btn_retry.classList.remove("hidden");
                         this.update_progress(0);
-                        if (this.callbacks.onfailed) this.callbacks.onfailed();
                     }
                 }
 
@@ -3709,8 +4060,10 @@
                         this.backtask_status_text.textContent = ts;
                     } else if (ts === FloatBall.taskstatus.finished) {
                         this.backtask_status_text.textContent = ts.replace("{}", "上传");
+                        if (this.callbacks.onfinished) this.callbacks.onfinished();
                     } else if (ts === FloatBall.taskstatus.failed) {
                         this.backtask_status_text.textContent = ts.replace("{}", "上传") + this.error_string;
+                        if (this.callbacks.onfailed) this.callbacks.onfailed();
                     }
                 }
 
@@ -3775,6 +4128,68 @@
                 }
             }
 
+            class Upload_ChatMessage extends Upload {
+                constructor(task_container, callbacks) {
+                    super(task_container, callbacks)
+                    Object.assign(this.args, {})
+                }
+
+                async core() {
+                    try {
+                        const callbacks = {
+                            onprogress: (event) => {
+                                if (event.lengthComputable) {
+                                    const percentComplete = Math.round(((event.loaded + this.args.lstartindex) / (event.total + this.args.lstartindex)) * 100);
+                                    this.args.total = event.total
+                                    this.args.curr = event.loaded
+                                    if (percentComplete === 100) {
+                                        this.update_status_text(FloatBall.taskstatus.finalizing);
+                                    } else {
+                                        this.update_progress(percentComplete);
+                                    }
+                                }
+                            },
+
+                            onload: (event) => {
+                                if (this.xhr.status === 200) {
+                                    console.log("后台任务 上传 成功", event);
+                                    this.update_status_text(FloatBall.taskstatus.finished);
+                                } else {
+                                    console.error("后台任务 上传 失败", this.xhr.status, this.xhr.statusText, event);
+                                    this.error_string = format_xhr_error_response(this.xhr);
+                                    this.update_status_text(FloatBall.taskstatus.failed);
+                                }
+                                floatball.dialog.checkToStartTask();
+                            },
+
+                            onerror: (event) => {
+                                console.error("后台任务 上传 请求错误", event);
+                                this.error_string = format_xhr_error_response(this.xhr);
+                                this.update_status_text(FloatBall.taskstatus.failed);
+                                floatball.dialog.checkToStartTask();
+                            },
+
+                            onabort: (event) => {
+                                console.error("后台任务 上传 取消", event);
+                                this.error_string = "被用户取消";
+                                this.update_status_text(FloatBall.taskstatus.failed);
+                                floatball.dialog.checkToStartTask();
+                                this.xhr.canceled = true;
+                            },
+                        }
+                        this.xhr = await checkin.subviews.chat.send_file(this.args, callbacks);
+
+                    } catch (error) {
+                        console.error("后台任务 上传 异常", error);
+                        this.error_string = error.toString();
+                        this.update_status_text(FloatBall.taskstatus.failed);
+                        floatball.dialog.checkToStartTask();
+                        // MessageMark.report(error,);
+                    }
+
+                }
+            }
+
             class Download extends _ {
                 constructor(task_container, callbacks) {
                     super(task_container, callbacks)
@@ -3826,8 +4241,10 @@
                         this.backtask_status_text.textContent = ts;
                     } else if (ts === FloatBall.taskstatus.finished) {
                         this.backtask_status_text.textContent = ts.replace("{}", "下载");
+                        if (this.callbacks.onfinished) this.callbacks.onfinished();
                     } else if (ts === FloatBall.taskstatus.failed) {
                         this.backtask_status_text.textContent = ts.replace("{}", "下载") + this.error_string;
+                        if (this.callbacks.onfailed) this.callbacks.onfailed();
                     }
                 }
 
@@ -3864,7 +4281,46 @@
                 }
             }
 
-            return {Upload, Download};
+            class Download_ChatMessage extends Download {
+                constructor(task_container, callbacks) {
+                    super(task_container, callbacks)
+                    Object.assign(this.args, {})
+                }
+
+                async core() {
+                    try {
+
+                        const callbacks = {
+                            onprogress: () => {
+                                let percentComplete = Math.round((this.args.curr / this.args.total) * 100);
+                                if (percentComplete === 100) {
+                                    this.update_status_text(FloatBall.taskstatus.finalizing);
+                                } else {
+                                    this.update_progress(percentComplete);
+                                }
+                            },
+
+                            onload: () => {
+                                console.log("后台任务 下载 成功",);
+                                this.update_status_text(FloatBall.taskstatus.finished);
+                                floatball.dialog.checkToStartTask();
+                            },
+
+                        }
+                        await checkin.subviews.chat.download(this.args, callbacks);
+
+                    } catch (error) {
+                        console.error("后台任务 下载 异常", error);
+                        this.error_string = error.toString();
+                        this.update_status_text(FloatBall.taskstatus.failed);
+                        floatball.dialog.checkToStartTask();
+                        // MessageMark.report(error,);
+                    }
+
+                }
+            }
+
+            return {Upload, Download, Upload_ChatMessage, Download_ChatMessage,};
         })()
 
 
@@ -4174,6 +4630,10 @@
 
         }
 
+
+        /*
+        * 更新球上的文本
+        * */
         updateText() {
             const _ = this.dialog.unfinishedTasks();
             const unfinished_task_count = _[FloatBall.tasktypes.Upload.name].length + _[FloatBall.tasktypes.Download.name].length;
@@ -4185,6 +4645,17 @@
             this.setText();
         }
 
+        look_upload_tasks(t) {
+            this.showDialog();
+            this.dialog.switchTab(this.dialog.tab_btn_backtasks__upload);
+            if (t) t.rect.scrollIntoView({behavior: 'smooth', block: 'center'});
+        }
+
+        look_download_tasks(t) {
+            this.showDialog();
+            this.dialog.switchTab(this.dialog.tab_btn_backtasks__download);
+            if (t) t.rect.scrollIntoView({behavior: 'smooth', block: 'center'});
+        }
     }
 
     const floatball = new FloatBall(document.querySelector("main"));
@@ -4625,12 +5096,8 @@
 
                 totalArray = await encryptors.decrypt(totalArray, true);
 
-                let blob = new Blob([totalArray]);
-                let a = document.createElement("a");
-                a.href = URL.createObjectURL(blob);
-                a.download = feedbackargs.name.split("/").at(-1);
-                a.click();
-                URL.revokeObjectURL(a.href);
+                saveFile_from_uint8array(totalArray, feedbackargs.name.split("/").at(-1));
+
                 feedbackargs.chunks.length = 0;
                 feedbackargs.curr = 0;
 
@@ -4835,6 +5302,117 @@
                     return d;
                 }
                 throw new Error(await format_error_response(r));
+            }
+
+            async send_file(feedbackargs, callbacks) {
+                let url = join_path(this.api_url(), "send_file",);
+
+                const xhr = new XMLHttpRequest();
+                xhr._url = url;
+                xhr.open("POST", url, true);
+                xhr.responseType = 'arraybuffer';
+                // xhr.setRequestHeader("Content-Type", "multipart/form-data"); // 不需要手动设置
+                xhr.upload.onprogress = callbacks.onprogress;
+                xhr.onload = callbacks.onload;
+                xhr.onerror = callbacks.onerror;
+                xhr.onabort = callbacks.onabort;
+
+                const uint8 = new Uint8Array(await readFileAsync(feedbackargs.msg.file));
+                if (xhr.canceled) return callbacks.onabort();
+                const encrypted = await encryptors.encrypt(uint8);
+                feedbackargs.total = encrypted.length;
+                if (xhr.canceled) return callbacks.onabort();
+
+                const metadata = {
+                    contact_type: feedbackargs.contact_type,
+
+                    sender_rand: feedbackargs.msg.sender_rand,
+                    type: feedbackargs.msg.type,
+
+                    file_attr: {
+                        "name": await encryptors.encrypt2base64(feedbackargs.msg.file.name),
+                        "name_encrypted": true,
+                        "size": feedbackargs.msg.file.size,
+                    },
+                }
+                if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_image(feedbackargs.msg.type)) {
+                    metadata.image_attr = feedbackargs.msg.image_attr;
+                }
+
+                if (feedbackargs.contact_type === subviews.Chat.receiver_type.group) {
+                    metadata.gid = feedbackargs.xxid;
+                } else if (feedbackargs.contact_type === subviews.Chat.receiver_type.user) {
+                    metadata.uid = feedbackargs.xxid;
+                }
+
+                const blob = new Blob([encrypted], {type: "application/octet-stream"});
+                const formData = new FormData();
+                formData.append('file', blob, "filename");
+                formData.append('metadata', JSON.stringify(metadata));
+
+                xhr.send(formData);
+
+                return xhr;
+            }
+
+            async download(feedbackargs, callbacks) {
+                let url = join_path(this.api_url(), "download", feedbackargs.msg.id,);
+                // let params = {id: feedbackargs.msg.id,};
+                // for (const key of Object.keys(params)) url.searchParams.set(key, params[key]);
+
+                let response;
+                let controller = new AbortController();
+                feedbackargs.controller = controller;
+                try {
+                    response = await fetch(url, {
+                        method: "GET",
+                        headers: {"Range": `bytes=${feedbackargs.curr}-`},
+                        signal: controller.signal
+                    });
+                } catch (e) {
+                    throw e;
+                }
+
+                if (!response.ok && response.status !== 206) {
+                    throw new Error(await format_error_response(response));
+                }
+
+                let reader = response.body.getReader();
+                let contentLength = Number(response.headers.get("Content-Length")) || 0;
+                console.log(`预计下载`, format_bytes(contentLength));
+                if (feedbackargs.total === null) feedbackargs.total = contentLength;
+
+                while (true) {
+                    let done, value;
+                    try {
+                        const _ = await reader.read();
+                        value = _.value;
+                        done = _.done;
+                    } catch (e) {
+                        throw e;
+                    }
+                    if (done) break;
+                    feedbackargs.chunks.push(value);
+                    feedbackargs.curr += value.length;
+                    callbacks.onprogress();
+                }
+                console.log(`已读完`, format_bytes(feedbackargs.curr), format_bytes(contentLength), format_bytes(feedbackargs.total), feedbackargs.curr === feedbackargs.total, feedbackargs.curr === contentLength);
+                let totalArray = new Uint8Array(feedbackargs.curr);
+                let offset = 0;
+                for (let chunk of feedbackargs.chunks) {
+                    totalArray.set(chunk, offset);
+                    offset += chunk.length;
+                }
+
+                totalArray = await encryptors.decrypt(totalArray, true);
+
+                feedbackargs.plain_file_data = totalArray;
+
+                feedbackargs.chunks.length = 0;
+                feedbackargs.curr = 0;
+
+                callbacks.onload();
+
             }
 
             async load(contact_type, xxid, last_msgattr) {
@@ -5048,7 +5626,7 @@
                             }
                         }
                         const task = this.add_upload_task(file);
-                        this.look_upload_tasks(task);
+                        floatball.look_upload_tasks(task);
                     }
                 });
 
@@ -5186,7 +5764,7 @@
                                 const task = this.add_upload_task(file);
                                 if (!first_task) first_task = task;
                             }
-                            this.look_upload_tasks(first_task);
+                            floatball.look_upload_tasks(first_task);
                         }, MessageMark.colors.blue)
                     }
                 });
@@ -5699,12 +6277,6 @@
                 return t;
             }
 
-            look_upload_tasks(t) {
-                floatball.showDialog();
-                floatball.dialog.switchTab(floatball.dialog.tab_btn_backtasks__upload);
-                if (t) t.rect.scrollIntoView({behavior: 'smooth', block: 'center'});
-            }
-
             download(event, item) {
                 if (item.attr.type === subviews.Drive.item_type.folder) {
 
@@ -5720,9 +6292,7 @@
                     floatball.dialog.checkToStartTask();
                     floatball.dialog.checkToHide(t);
 
-                    floatball.showDialog();
-                    floatball.dialog.switchTab(floatball.dialog.tab_btn_backtasks__download);
-                    t.rect.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    floatball.look_download_tasks(t);
 
                 }
             }
@@ -6274,8 +6844,8 @@
 
 <div class="chat-session-inputarea">
     <div class="chat-session-inputarea-othertypes">
-        <button class="chat-session-inputarea-othertypes-image">图片</button>
-        <button class="chat-session-inputarea-othertypes-file">文件</button>
+        <button class="chat-session-inputarea-othertypes-image"><input type="file" class="hidden" accept="image/*">图片</button>
+        <button class="chat-session-inputarea-othertypes-file"><input type="file" class="hidden">文件</button>
     </div>
     <div class="chat-session-inputarea-textarea-warp">
         <textarea class="chat-session-inputarea-textarea" placeholder="输入消息..." spellcheck="false"></textarea>
@@ -6420,11 +6990,62 @@
                 // 其他消息类型
                 this.e_othertypes_image = this.container.querySelector(":scope button.chat-session-inputarea-othertypes-image");
                 this.e_othertypes_image.addEventListener("click", (event) => {
-
+                    this.e_othertypes_image__input.click();
                 });
+                this.e_othertypes_image__input = this.e_othertypes_image.querySelector(":scope > input");
+                this.e_othertypes_image__input.addEventListener('change', (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        let name = normalizeName(file.name);
+                        if (!name) return;
+
+                        const img = new Image();
+                        const url = URL.createObjectURL(file);
+                        img.onload = () => {
+                            URL.revokeObjectURL(url);
+                            const d = {
+                                file_name: name,
+                                image_attr: {
+                                    width: img.width,
+                                    height: img.height,
+                                }
+                            }
+                            this.send_msg_file(file, dashboardwrappers.ChatDashboardWrapper.message_type.image, d);
+                        };
+                        img.onerror = () => {
+                            MessageMark.report("选择的图片无效。");
+                        };
+                        img.src = url;
+
+                    }
+                });
+
+
                 this.e_othertypes_file = this.container.querySelector(":scope button.chat-session-inputarea-othertypes-file");
                 this.e_othertypes_file.addEventListener("click", (event) => {
-
+                    this.e_othertypes_file__input.click();
+                });
+                this.e_othertypes_file__input = this.e_othertypes_file.querySelector(":scope > input");
+                this.e_othertypes_file__input.addEventListener('change', (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        let name = normalizeName(file.name);
+                        if (!name) return;
+                        // for (let disallowedUploadElement of disallowed_upload) {
+                        //     if (name.endsWith(disallowedUploadElement)) {
+                        //         MessageMark.report(`不允许上传：${disallowedUploadElement}`);
+                        //         return;
+                        //     }
+                        // }
+                        const d = {
+                            file_name: name,
+                            file_attr: {
+                                name: "发送用不上",
+                                size: file.size,
+                            },
+                        }
+                        this.send_msg_file(file, dashboardwrappers.ChatDashboardWrapper.message_type.file, d);
+                    }
                 });
 
 
@@ -6668,8 +7289,64 @@
             resend_msg(msgobj) {
                 // console.log("重新发送", msgobj);
                 msgobj.on_resend_started();
-                this._send_msg_text(msgobj.msgattr);
+                if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_text(msgobj.msgattr.type)) {
+                    this._send_msg_text(msgobj.msgattr);
+                } else if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_drive_item(msgobj.msgattr.type)) {
+                    floatball.dialog.retryToStartTask(msgobj.msgattr.upload_task);
+                }
             }
+
+            send_msg_file(file, type, attach_attrs) {
+
+                const msg = {
+                    sender: logged_user.uid,
+                    sender_rand: generateRandomString(10),
+                    is_sent: false,
+
+                    type: type,
+
+                    file: file,
+                    ...attach_attrs,
+                }
+
+                this.msgflow_manage.append_sending_msg(msg);
+                const task = this._send_msg_file(msg);
+                floatball.look_upload_tasks(task);
+            }
+
+            _send_msg_file(msg) {
+                const t = new FloatBall.tasktypes.Upload_ChatMessage(floatball.dialog.tab_content_backtasks, {
+                    onfinished: () => {
+                        // if (this.closed) return;
+                        const text = new TextDecoder('utf-8').decode(t.xhr.response);
+                        const result = JSON.parse(text);
+                        this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
+                        this.msgflow_manage.update_sending_msg(msg.sender_rand, result.message_attr, result.previous_message_id);
+                    },
+                    onprogress: () => {
+                        msg.msgobj.update();
+                    },
+                    onfailed: () => {
+                        msg.msgobj.on_send_failed();
+                        // if (this.closed) return;
+                        // MessageMark.report(error);
+                    },
+                });
+                floatball.dialog.addTask(t);
+                t.set_name(normalizeName(msg.file.name));
+                t.set_args({
+                    msg,
+                    ...this.current_contact_xxid(),
+                });
+
+                msg.upload_task = t;
+
+                floatball.dialog.checkToStartTask();
+                floatball.dialog.checkToHide(t);
+
+                return t;
+            }
+
 
             /*
             * 管理缓存的消息和渲染
@@ -6948,6 +7625,7 @@
 
                             this.init();
                             this.fill_marks();
+                            this.update();
                         }
 
                         init() {
@@ -7049,7 +7727,6 @@
                             this.e_sent_time = this.e_marks.querySelector(":scope .chat-mcm-sent-time");
                             this.e_read_status = this.e_marks.querySelector(":scope .chat-mcm-read-status");
 
-                            this.update();
                         }
 
                         update() {
@@ -7155,18 +7832,22 @@
                             const index = this.msgobjchildren.indexOf(msgobj_child);
                             if (index > -1) {
                                 this.msgobjchildren.splice(index, 1);
-                                msgobj_child.msgelement.remove();
+                                msgobj_child.remove_from_group();
                             }
                         }
 
                         remove_all_children() {
                             for (const msgchild of this.msgobjchildren) {
-                                msgchild.msgelement.remove();
+                                msgchild.remove_from_group();
                             }
                             this.msgobjchildren.length = 0;
                         }
 
                         remove_from_flow() {
+                            this.msgelement.remove();
+                        }
+
+                        remove_from_group() {
                             this.msgelement.remove();
                         }
 
@@ -7189,35 +7870,295 @@
                         init() {
                             super.init();
 
-                            if (this.msgattr.type === dashboardwrappers.ChatDashboardWrapper.message_type.text) {
-                                let html = `
+                            let html = `
 <div class="chat-message-content-rect chat-mcr-text">
 <span></span>
 </div>
 `;
-                                this.e_container.insertAdjacentHTML("beforeend", html);
-                                this.e_mcr = this.e_container.querySelector(":scope .chat-message-content-rect");
-                                this.e_mcr.style.background = this.palette.rect_bg;
+                            this.e_container.insertAdjacentHTML("beforeend", html);
+                            this.e_mcr = this.e_container.querySelector(":scope .chat-message-content-rect");
+                            this.e_mcr.style.background = this.palette.rect_bg;
 
-                                const span = this.e_mcr.querySelector(":scope span");
-                                if (!this.msgattr.is_sent && this.msgattr.plain_text) {
-                                    span.textContent = this.msgattr.plain_text;
+                            this.e_mcr_span = this.e_mcr.querySelector(":scope span");
+
+                        }
+
+                        update() {
+                            super.update();
+
+                            if (!this.msgattr.is_sent && this.msgattr.plain_text) {
+                                this.e_mcr_span.textContent = this.msgattr.plain_text;
+                            } else {
+                                if (this.msgattr.plain_data_text) {
+                                    this.e_mcr_span.textContent = this.msgattr.id + " | " + this.msgattr.plain_data_text;
                                 } else {
-                                    if (this.msgattr.plain_data_text) {
-                                        span.textContent = this.msgattr.id + " | " + this.msgattr.plain_data_text;
+                                    if (this.msgattr.status & dashboardwrappers.ChatDashboardWrapper.message_status.encrypted) {
+                                        encryptors.decrypt2string(this.msgattr.data_text).then(result => {
+                                            this.e_mcr_span.textContent = this.msgattr.id + " | " + result;
+                                            this.msgattr.plain_data_text = result;
+                                        }).catch(error => {
+                                            this.e_mcr_span.classList.add("red");
+                                            this.e_mcr_span.textContent = decrypt_error_string;
+                                        });
                                     } else {
-                                        if (this.msgattr.status & dashboardwrappers.ChatDashboardWrapper.message_status.encrypted) {
-                                            encryptors.decrypt2string(this.msgattr.data_text).then(result => {
-                                                span.textContent = this.msgattr.id + " | " + result;
-                                                this.msgattr.plain_data_text = result;
-                                            }).catch(error => {
-                                                // span.classList.add("red");
-                                                span.textContent = decrypt_error_string;
-                                            });
-                                        } else {
-                                            span.textContent = this.msgattr.data_text;
-                                            this.msgattr.plain_data_text = this.msgattr.data_text;
-                                        }
+                                        this.e_mcr_span.textContent = this.msgattr.data_text;
+                                        this.msgattr.plain_data_text = this.msgattr.data_text;
+                                    }
+
+                                }
+                            }
+
+
+                        }
+
+                    }
+
+                    class ImageMsg extends _ {
+                        constructor(contentpage, msgattr, msgattrseniors,) {
+                            super(contentpage, msgattr, msgattrseniors,);
+                        }
+
+                        init() {
+                            super.init();
+
+                            let html = `
+<div class="chat-message-content-rect chat-mcr-image">
+<img src="" alt="" draggable="false">
+<span>[图片]</span>
+</div>
+`;
+                            this.e_container.insertAdjacentHTML("beforeend", html);
+                            this.e_mcr = this.e_container.querySelector(":scope .chat-message-content-rect");
+                            this.e_mcr.style.background = this.palette.rect_bg;
+
+                            this.e_mcr_img = this.e_mcr.querySelector(":scope img");
+
+                            const width = this.msgattr.image_attr.width;
+                            const height = this.msgattr.image_attr.height;
+                            if (width * 0.5 > height) {
+                                this.e_mcr_img.style.width = "140px";
+                                this.e_mcr_img.style.height = "auto";
+                            }
+                            this.e_mcr_img.addEventListener("click", (event) => {
+                                const im = new ImageMark(document.body);
+                                im.show();
+                                getImgData(this.e_mcr_img, (blob) => {
+                                    const url = URL.createObjectURL(blob);
+                                    if (im.is_visible()) {
+                                        im.load_from_tempurl(url, this.msgattr.plain_file_name);
+                                    } else {
+                                        URL.revokeObjectURL(url);
+                                    }
+                                });
+                            });
+
+                            this.e_mcr_span = this.e_mcr.querySelector(":scope span"); // 点击开始下载
+                            elements_can_select_text_when_alt_pressed.add(this.e_mcr_span);
+                            this.e_mcr_span.addEventListener("click", (event) => {
+                                if (!this.msgattr.is_sent) return
+                                if (this.msgattr.upload_task && this.msgattr.upload_task.status !== FloatBall.taskstatus.finished) return;
+                                if (!this.msgattr.plain_file_name) return;
+                                if (this.msgattr.download_task) {
+                                    floatball.look_download_tasks(this.msgattr.download_task);
+                                    return;
+                                }
+
+                                const t = new FloatBall.tasktypes.Download_ChatMessage(floatball.dialog.tab_content_backtasks, {
+                                    onfinished: () => {
+                                        this.update();
+                                    },
+                                    onprogress: () => {
+                                        this.update();
+                                    },
+                                    onfailed: () => {
+                                        this.update();
+                                    }
+                                });
+                                floatball.dialog.addTask(t);
+                                t.set_name(this.msgattr.plain_file_name);
+                                t.set_args({
+                                    msg: this.msgattr,
+                                });
+
+                                this.msgattr.download_task = t;
+
+                                floatball.dialog.checkToStartTask();
+                                floatball.dialog.checkToHide(t);
+
+                                // floatball.look_download_tasks(t);
+                            });
+
+                        }
+
+                        update() {
+                            super.update();
+
+                            if (!this.msgattr.is_sent) {
+                                this.e_mcr_img.classList.add("hidden");
+                                if (this.msgattr.upload_task) {
+                                    set_textContent_if_different(this.e_mcr_span, `[图片] ${this.msgattr.file_name} ${this.contentpage.panel.wrapper.format_text_for_msgview(this.msgattr.upload_task.backtask_status_text.textContent)}`);
+                                } else {
+                                    set_textContent_if_different(this.e_mcr_span, `[图片] ${this.msgattr.file_name} 正在上传...`);
+                                }
+                            } else {
+                                if (!this.msgattr.download_task) { // 未下载
+                                    this.e_mcr_img.classList.add("hidden");
+                                    if (this.msgattr.status & dashboardwrappers.ChatDashboardWrapper.message_status.encrypted) {
+                                        encryptors.decrypt2string(this.msgattr.file_attr.name).then(result => {
+                                            set_textContent_if_different(this.e_mcr_span, `[图片] ${result} 点击下载`);
+                                            this.msgattr.plain_file_name = result;
+                                        }).catch(error => {
+                                            this.e_mcr_span.classList.add("red");
+                                            set_textContent_if_different(this.e_mcr_span, `[图片] ${decrypt_error_string}`);
+                                        });
+                                    } else {
+                                        set_textContent_if_different(this.e_mcr_span, `[图片] ${this.msgattr.file_attr.name} 点击下载`);
+                                        this.msgattr.plain_file_name = this.msgattr.file_attr.name;
+                                    }
+                                } else {
+                                    // task的状态变化时，会调用msgobj的update
+                                    // if (this.msgattr.download_task.status === floatball.taskstatus.finished) {
+                                    // }
+                                    set_textContent_if_different(this.e_mcr_span, `[图片] ${this.msgattr.plain_file_name} ${this.contentpage.panel.wrapper.format_text_for_msgview(this.msgattr.download_task.backtask_status_text.textContent)}`);
+
+                                    if (this.msgattr.download_task.args.plain_file_data) {
+                                        this.e_mcr_img.classList.remove("hidden");
+                                        this.e_mcr_span.classList.add("hidden");
+
+                                        const blob = new Blob([this.msgattr.download_task.args.plain_file_data]); // blob不能指定名称
+                                        // const file = new File([this.msgattr.download_task.args.plain_file_data], // img也不读取file的name
+                                        //     this.msgattr.plain_file_name, {type: "image/png"});
+                                        this.msgattr.download_task.args.plain_file_data = null;
+
+                                        this.e_mcr_img__urlobj = URL.createObjectURL(blob);
+                                        this.e_mcr_img.src = this.e_mcr_img__urlobj;
+                                        this.e_mcr_img.onload = () => {
+                                            if (this.e_mcr_img__urlobj) { // 先不删，不然不能右键另存为了。由于不能指定另存为的名称，删吧
+                                                URL.revokeObjectURL(this.e_mcr_img__urlobj);
+                                                this.e_mcr_img__urlobj = null;
+                                            }
+                                        };
+
+                                    }
+                                }
+
+                            }
+
+                        }
+
+                        remove_from_group() {
+                            super.remove_from_group();
+                            elements_can_select_text_when_alt_pressed.remove(this.e_mcr_span);
+                            if (this.e_mcr_img__urlobj) {
+                                URL.revokeObjectURL(this.e_mcr_img__urlobj);
+                                this.e_mcr_img__urlobj = null;
+                            }
+                        }
+
+                    }
+
+                    class FileMsg extends _ {
+                        constructor(contentpage, msgattr, msgattrseniors,) {
+                            super(contentpage, msgattr, msgattrseniors,);
+                        }
+
+                        init() {
+                            super.init();
+
+                            let html = `
+<div class="chat-message-content-rect chat-mcr-file">
+<span class="chat-mcr-file-icon">🗳️</span>
+<div class="chat-mcr-file-info">
+    <span class="chat-mcr-file-info-name"></span>
+    <div class="chat-mcr-file-info-others">
+        <span class="chat-mcr-file-info-size"></span>
+        <span class="chat-mcr-file-status"></span>
+    </div>
+</div>
+</div>
+`;
+                            this.e_container.insertAdjacentHTML("beforeend", html);
+                            this.e_mcr = this.e_container.querySelector(":scope .chat-message-content-rect");
+                            this.e_mcr.style.background = this.palette.rect_bg;
+
+                            this.e_mcr_icon = this.e_mcr.querySelector(":scope .chat-mcr-file-icon");
+                            this.e_mcr_info_name = this.e_mcr.querySelector(":scope .chat-mcr-file-info-name");
+                            this.e_mcr_info_size = this.e_mcr.querySelector(":scope .chat-mcr-file-info-size");
+                            this.e_mcr_status = this.e_mcr.querySelector(":scope .chat-mcr-file-status");
+
+                            this.e_mcr_info_size.textContent = format_bytes(this.msgattr.file_attr.size);
+
+                            this.e_mcr_icon = this.e_mcr.querySelector(":scope span"); // 点击开始下载
+                            this.e_mcr_icon.addEventListener("click", (event) => {
+                                if (!this.msgattr.is_sent) return
+                                if (this.msgattr.upload_task && this.msgattr.upload_task.status !== FloatBall.taskstatus.finished) return;
+                                if (!this.msgattr.plain_file_name) return;
+                                if (this.msgattr.download_task && this.msgattr.download_task.status !== FloatBall.taskstatus.finished) {
+                                    floatball.look_download_tasks(this.msgattr.download_task);
+                                    return;
+                                }
+
+                                const t = new FloatBall.tasktypes.Download_ChatMessage(floatball.dialog.tab_content_backtasks, {
+                                    onfinished: () => {
+                                        this.update();
+                                    },
+                                    onprogress: () => {
+                                        this.update();
+                                    },
+                                    onfailed: () => {
+                                        this.update();
+                                    }
+                                });
+                                floatball.dialog.addTask(t);
+                                t.set_name(this.msgattr.plain_file_name);
+                                t.set_args({
+                                    msg: this.msgattr,
+                                });
+
+                                this.msgattr.download_task = t;
+
+                                floatball.dialog.checkToStartTask();
+                                floatball.dialog.checkToHide(t);
+
+                                // floatball.look_download_tasks(t);
+                            });
+
+                        }
+
+                        update() {
+                            super.update();
+
+                            if (!this.msgattr.is_sent) {
+                                if (this.msgattr.upload_task) {
+                                    set_textContent_if_different(this.e_mcr_info_name, `${this.msgattr.file_name}`);
+                                    set_textContent_if_different(this.e_mcr_status, `${this.contentpage.panel.wrapper.format_text_for_msgview(this.msgattr.upload_task.backtask_status_text.textContent)}`);
+                                } else {
+                                    set_textContent_if_different(this.e_mcr_info_name, `${this.msgattr.file_name}`);
+                                    set_textContent_if_different(this.e_mcr_status, `正在上传...`);
+                                }
+                            } else {
+                                if (!this.msgattr.download_task) { // 未下载
+                                    if (this.msgattr.status & dashboardwrappers.ChatDashboardWrapper.message_status.encrypted) {
+                                        encryptors.decrypt2string(this.msgattr.file_attr.name).then(result => {
+                                            set_textContent_if_different(this.e_mcr_info_name, `${result}`);
+                                            this.msgattr.plain_file_name = result;
+                                        }).catch(error => {
+                                            this.e_mcr_info_name.classList.add("red");
+                                            set_textContent_if_different(this.e_mcr_info_name, `${decrypt_error_string}`);
+                                        });
+                                    } else {
+                                        set_textContent_if_different(this.e_mcr_info_name, `${this.msgattr.file_attr.name}`);
+                                        this.msgattr.plain_file_name = this.msgattr.file_attr.name;
+                                    }
+                                } else {
+                                    set_textContent_if_different(this.e_mcr_info_name, `${this.msgattr.plain_file_name}`);
+                                    set_textContent_if_different(this.e_mcr_status, `${this.contentpage.panel.wrapper.format_text_for_msgview(this.msgattr.download_task.backtask_status_text.textContent)}`);
+
+                                    if (this.msgattr.download_task.args.plain_file_data) {
+                                        // this.e_mcr_status.classList.add("hidden");
+
+                                        saveFile_from_uint8array(this.msgattr.download_task.args.plain_file_data, this.msgattr.plain_file_name);
+                                        this.msgattr.download_task.args.plain_file_data = null;
 
                                     }
                                 }
@@ -7228,18 +8169,12 @@
 
                     }
 
-                    class ImageMsg extends _ {
-                        constructor(contentpage, msgattr, msgattrseniors,) {
-                            super(contentpage, msgattr, msgattrseniors,);
-                        }
-                    }
-
-                    return {TextMsg, ImageMsg,};
+                    return {TextMsg, ImageMsg, FileMsg,};
                 })(),
 
 
                 add_element: (msgattr, msgseniors, noappend = false) => {
-                    if (msgattr.type === dashboardwrappers.ChatDashboardWrapper.message_type.text) {
+                    if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_text(msgattr.type)) {
                         const msgobj = new this.msgflow_manage.msgtypes.TextMsg(this, msgattr, msgseniors);
                         msgattr.msgobj = msgobj;
                         if (msgobj.is_header()) {
@@ -7248,18 +8183,22 @@
                             msgobj.header().append_child(msgobj);
                         }
                         return msgobj;
-                    } else if (msgattr.type === dashboardwrappers.ChatDashboardWrapper.message_type.image) {
-                        const msgobj = new this.msgflow_manage.msgtypes.TextMsg(this, msgattr, msgseniors);
+                    } else if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_image(msgattr.type)) {
+                        const msgobj = new this.msgflow_manage.msgtypes.ImageMsg(this, msgattr, msgseniors);
                         msgattr.msgobj = msgobj;
                         if (msgobj.is_header()) {
                             if (!noappend) this.e_msgflow.append(msgobj.msgelement);
+                        } else {
+                            msgobj.header().append_child(msgobj);
                         }
                         return msgobj;
-                    } else if (msgattr.type === dashboardwrappers.ChatDashboardWrapper.message_type.file) {
-                        const msgobj = new this.msgflow_manage.msgtypes.TextMsg(this, msgattr, msgseniors);
+                    } else if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_file(msgattr.type)) {
+                        const msgobj = new this.msgflow_manage.msgtypes.FileMsg(this, msgattr, msgseniors);
                         msgattr.msgobj = msgobj;
                         if (msgobj.is_header()) {
                             if (!noappend) this.e_msgflow.append(msgobj.msgelement);
+                        } else {
+                            msgobj.header().append_child(msgobj);
                         }
                         return msgobj;
                     }
@@ -7453,7 +8392,6 @@
             * 加载历史
             * */
             start__load_history() {
-                // console.log("开始加载历史");
                 if (this.is_processing__load_history) return;
 
                 this.is_processing__load_history = true;
@@ -8559,7 +9497,7 @@
                 if (newest_msg.formated_lastmsgview) {
                     string = newest_msg.formated_lastmsgview;
                 } else {
-                    if (newest_msg.type === ChatDashboardWrapper.message_type.text) {
+                    if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_text(newest_msg.type)) {
                         let failed_decrypting = false;
                         if (!newest_msg.plain_data_text) {
                             if (newest_msg.status & ChatDashboardWrapper.message_status.encrypted) {
@@ -8578,10 +9516,34 @@
                         if (failed_decrypting) {
                             string = `[系统] ${decrypt_error_string}`;
                         }
-                    } else if (newest_msg.type === ChatDashboardWrapper.message_type.image) {
-                        string = `[图片] xxxx`;
-                    } else if (newest_msg.type === ChatDashboardWrapper.message_type.file) {
-                        string = `[文件] xxxx`;
+
+                    } else if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_drive_item(newest_msg.type)) {
+                        let prefix;
+                        if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_image(newest_msg.type)) {
+                            prefix = "[图片]";
+                        } else if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_file(newest_msg.type)) {
+                            prefix = "[文件]";
+                        }
+
+                        let failed_decrypting = false;
+                        if (!newest_msg.plain_file_name) {
+                            if (newest_msg.status & ChatDashboardWrapper.message_status.encrypted) {
+                                try {
+                                    newest_msg.plain_file_name = await encryptors.decrypt2string(newest_msg.file_attr.name);
+                                } catch (e) {
+                                    failed_decrypting = true;
+                                }
+                            } else {
+                                newest_msg.plain_file_name = newest_msg.file_attr.name;
+                            }
+                        }
+                        if (newest_msg.plain_file_name) {
+                            string = `${prefix} ${this.format_text_for_msgview(newest_msg.plain_file_name)}${full_width_space}`;
+                        }
+                        if (failed_decrypting) {
+                            string = `[系统] ${decrypt_error_string}`;
+                        }
+
                     } else if (newest_msg.type === ChatDashboardWrapper.message_type.sys) {
                         string = `[系统] xxxx`;
                     }
@@ -8615,6 +9577,19 @@
             static message_type = "chat";
             static message_status = "chat";
             static data_spec_action_type = "chat";
+            static message_type_checker = {
+                is_drive_item: (type) => {
+                    return type === dashboardwrappers.ChatDashboardWrapper.message_type.image || type === dashboardwrappers.ChatDashboardWrapper.message_type.file;
+                }, is_image: (type) => {
+                    return type === dashboardwrappers.ChatDashboardWrapper.message_type.image;
+                }, is_file: (type) => {
+                    return type === dashboardwrappers.ChatDashboardWrapper.message_type.file;
+                }, is_text: (type) => {
+                    return type === dashboardwrappers.ChatDashboardWrapper.message_type.text;
+                }, is_sys: (type) => {
+                    return type === dashboardwrappers.ChatDashboardWrapper.message_type.sys;
+                },
+            }
 
             /*
             * 定期同步
