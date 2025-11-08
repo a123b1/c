@@ -687,6 +687,7 @@
             top: 0;
             left: 0;
             transform-origin: 0 0;
+            user-select: none;
         }
 
         .image-mark-top-actions {
@@ -1540,6 +1541,24 @@
     <!--聊天页面 联系人-->
     <style>
 
+        .chat-contacts-mark-syncing {
+            user-select: none;
+            position: absolute;
+            transition: opacity 0.4s ease;
+
+            left: 0;
+            right: 0;
+        }
+
+        .chat-contacts-mark-syncing p {
+            /*background: #00000011;*/
+            background: rgba(253, 25, 25, 0.1);
+            font-size: 12px;
+            margin: 0 0;
+            padding: 4px 8px;
+            text-align: center;
+        }
+
         p.chat-contact-type {
             margin: 0;
             padding: 0 0 0 4px;
@@ -1817,7 +1836,7 @@
 
         .chat-session-inputarea-textarea-warp {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             flex-grow: 1;
             margin-left: 2px;
         }
@@ -1831,6 +1850,22 @@
             min-width: 10px;
         }
 
+        .chat-session-inputarea-tip-editing {
+            display: flex;
+            flex-direction: row;
+            align-items: end;
+        }
+
+        .chat-session-inputarea-tip-editing > span {
+            font-weight: bold;
+            font-size: 14px;
+            color: #0655b0;
+        }
+
+        .chat-session-inputarea-tip-editing > button {
+            padding: 0 4px;
+        }
+
     </style>
 
     <!--聊天页面 消息流-->
@@ -1840,6 +1875,10 @@
             display: flex;
             position: relative;
             min-height: 10px;
+        }
+
+        .chat-session-msgflow-wrap.drag-active {
+            background-color: rgba(255, 255, 0, 0.35);
         }
 
         .chat-session-msgflow {
@@ -1915,8 +1954,9 @@
         }
 
         .chat-session-msgflow-mark-loadhistory-layout p {
-            background: #00000011;
-            font-size: 14px;
+            /*background: #00000011;*/
+            background: rgba(253, 25, 25, 0.1);
+            font-size: 12px;
             margin: 0 0;
             padding: 4px 8px;
             text-align: center;
@@ -1940,12 +1980,48 @@
         }
 
         .chat-session-msgflow-mark-checknew-layout p {
-            background: #00000011;
-            font-size: 14px;
+            /*background: #00000011;*/
+            background: rgba(253, 25, 25, 0.1);
+            font-size: 12px;
             margin: 0 0;
             padding: 4px 8px;
             text-align: center;
             flex-grow: 1;
+        }
+
+        .chat-session-msgflow-mark-droparea {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            padding: 8px;
+        }
+
+        .chat-session-msgflow-mark-droparea-image {
+            border: 2px rgba(25, 71, 253, 0.4) dashed;
+            background: rgba(25, 71, 253, 0.12);
+            color: rgba(25, 71, 253, 0.7);
+            font-size: 20px;
+            font-weight: bold;
+            flex-grow: 1;
+            display: grid;
+            place-items: center;
+        }
+
+        .chat-session-msgflow-mark-droparea-file {
+            border: 2px rgba(253, 25, 25, 0.4) dashed;
+            background: rgba(253, 25, 25, 0.12);
+            color: rgba(253, 25, 25, 0.7);
+            font-size: 20px;
+            font-weight: bold;
+            flex-grow: 1;
+            display: grid;
+            place-items: center;
         }
 
     </style>
@@ -1985,7 +2061,12 @@
             margin: 1px 0;
             padding-right: 10%;
             gap: 2px;
-            transition: background-color 3s, transform 3s;
+            /*transition: background-color 3s, transform 3s;*/
+        }
+
+        .chat-message-content-container.active {
+            transition: none !important;
+            background-color: rgba(255, 255, 0, 0.35) !important;
         }
 
         .chat-message-content-container.highlight {
@@ -2007,6 +2088,12 @@
         .sent-by-me .chat-message-content-container {
             padding-right: 0;
             padding-left: 10%;
+        }
+
+        .chat-message-content-container.sys-msg {
+            padding-right: 0;
+            padding-left: 0;
+            justify-content: center;
         }
 
         .chat-message-group-header {
@@ -2063,17 +2150,38 @@
             flex-direction: row;
             min-width: 40px;
             min-height: 20px;
+            position: relative;
         }
 
         .sent-by-me .chat-message-content-rect {
             justify-content: right;
         }
 
+        .chat-message-content-rect-mark-edited {
+            border-top-right-radius: 4px;
+            width: 8px;
+            height: 8px;
+            background: rgba(253, 25, 25, 0.8);
+            clip-path: polygon(100% 0, 100% 100%, 0 0);
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+
+        .sent-by-me .chat-message-content-rect-mark-edited {
+            border-top-right-radius: 0;
+            border-top-left-radius: 4px;
+            clip-path: polygon(0 0, 100% 0, 0 100%);
+            right: auto;
+            left: 0;
+        }
+
+
         .chat-mcr-text {
             padding: 6px;
         }
 
-        .chat-mcr-text span {
+        .chat-mcr-text > span {
             white-space: pre-wrap;
 
             word-wrap: break-word;
@@ -2124,6 +2232,10 @@
             user-select: none;
         }
 
+        .chat-mcr-file-icon.red {
+            cursor: default;
+        }
+
         .chat-mcr-file-info {
             flex-grow: 1;
             display: flex;
@@ -2166,6 +2278,23 @@
             margin-left: 4px;
         }
 
+        .chat-mcr-sys {
+            padding: 6px;
+            display: flex;
+            flex-direction: row;
+            align-items: end;
+        }
+
+        .chat-mcr-sys span {
+            white-space: pre-wrap;
+
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow-wrap: anywhere;
+
+            font-size: 14px;
+            color: #000000dd;
+        }
 
         .chat-mcr-text span.red, .chat-mcr-image span.red, .chat-mcr-file-info-name.red {
             color: red;
@@ -2179,11 +2308,11 @@
             display: flex;
             flex-direction: row;
             user-select: none;
+            gap: 2px;
         }
 
         .sent-by-me .chat-message-content-marks {
             flex-direction: row-reverse;
-            gap: 2px;
         }
 
         .chat-message-content-mark {
@@ -2196,6 +2325,10 @@
             white-space: nowrap;
 
             margin-bottom: 2px;
+        }
+
+        .chat-message-content-mark.noticing {
+            color: #0650b0;
         }
 
         .chat-mcm-send-status-text {
@@ -2218,6 +2351,155 @@
 
         .chat-mcm-send-status-btn-retry:active {
             background: #69eefa66;
+        }
+
+    </style>
+
+    <!--聊天页面 Markdown-->
+    <style>
+
+        .md-area-code-wrap {
+            display: flex;
+            position: relative;
+        }
+
+        .md-area-code {
+            min-height: 60px;
+            min-width: 100px;
+            font-size: 12px;
+            background-color: rgba(0, 0, 0, 0.05);
+            border: 1px rgba(0, 0, 0, 0.2) solid;
+            border-radius: 2px;
+            margin: 0;
+            padding: 1px;
+            flex-grow: 1;
+            cursor: text;
+        }
+
+        .md-area-code-btn-copy {
+            position: absolute;
+            top: 1px;
+            right: 1px;
+            border: none;
+        }
+
+        .md-line {
+            margin: 0;
+        }
+
+        .md-line-blockquote {
+            background-color: rgba(25, 124, 253, 0.2);
+            border: 0 rgba(25, 124, 253, 0.8) solid;
+            border-left-width: 3px;
+            display: flex;
+            flex-direction: row;
+            min-width: 60px;
+            min-height: 30px;
+            align-items: center;
+            padding: 4px;
+            padding-right: 8px;
+            box-sizing: border-box;
+        }
+
+        span.md-text {
+            white-space: normal;
+            word-wrap: normal;
+            word-break: normal;
+            overflow-wrap: normal;
+            /*display: inline;*/
+            /*white-space: initial;*/
+        }
+
+        span.md-text-bold {
+            white-space: normal;
+            word-wrap: normal;
+            word-break: normal;
+            overflow-wrap: normal;
+
+            font-weight: bold;
+        }
+
+        span.md-text-italic {
+            white-space: normal;
+            word-wrap: normal;
+            word-break: normal;
+            overflow-wrap: normal;
+
+            font-style: italic;
+        }
+
+        span.md-text-underline {
+            white-space: normal;
+            word-wrap: normal;
+            word-break: normal;
+            overflow-wrap: normal;
+
+            text-decoration: underline;
+        }
+
+        span.md-text-del {
+            white-space: normal;
+            word-wrap: normal;
+            word-break: normal;
+            overflow-wrap: normal;
+
+            text-decoration: line-through;
+        }
+
+        span.md-text-code {
+            white-space: normal;
+            word-wrap: normal;
+            word-break: normal;
+            overflow-wrap: normal;
+            /*display: inline;*/
+            /*white-space: initial;*/
+
+            background: rgba(255, 255, 255, 0.7);
+            color: rgba(0, 0, 0, 0.9);
+            font-size: 14px;
+            border-radius: 3px;
+            padding: 2px 4px;
+            margin-left: 2px;
+            margin-right: 2px;
+        }
+
+        span.md-text-at {
+            white-space: normal;
+            word-wrap: normal;
+            word-break: normal;
+            overflow-wrap: normal;
+            /*display: inline;*/
+            /*white-space: initial;*/
+
+            /*background: rgba(0, 0, 0, 0.7);*/
+            color: white;
+            font-size: 14px;
+            border-radius: 3px;
+            padding: 2px 4px 2px 3px;
+            margin-left: 0;
+            /*margin-right: 2px;*/
+
+            font-weight: bold;
+        }
+
+        span.md-text-cite {
+            white-space: normal;
+            word-wrap: normal;
+            word-break: normal;
+            overflow-wrap: normal;
+            /*display: inline;*/
+            /*white-space: initial;*/
+
+            background: rgba(255, 255, 255, 0.7);
+            color: rgba(0, 0, 0, 0.7);
+            font-size: 14px;
+            border-radius: 3px;
+            padding: 2px 4px 2px 3px;
+            margin-left: 0;
+            margin-right: 2px;
+
+            text-decoration: underline;
+
         }
 
     </style>
@@ -2314,6 +2596,7 @@
                     </ol>
                 </nav>
             </aside>
+            <div class="chat-contacts-mark-syncing"><p>正在同步...</p></div>
         </div>
         <div class="aside-divider"></div>
         <aside class="aside-right">
@@ -2373,7 +2656,7 @@
     let dragging_item = null;
     const full_width_space = "　";
 
-    // 按住alt后某些元素设为文本可选
+    // 按住alt后某些元素设为文本可选 // 没用上
     const elements_can_select_text_when_alt_pressed = [];
     elements_can_select_text_when_alt_pressed.add = (element) => {
         elements_can_select_text_when_alt_pressed.push(element);
@@ -3269,7 +3552,7 @@
         }
 
         fill() {
-            this.mark.style.background = "rgba(255, 255, 255, 0.6)";
+            this.mark.style.background = "rgba(255, 255, 255, 0.7)";
             let html = `
 <div class="image-mark-rect">
 
@@ -3676,7 +3959,17 @@
                     highlighted = true;
                 }
 
-                MenuMark.exec({x: event.clientX, y: event.clientY,}, items, () => {
+                let rect = clicking_info?.tree_item?.getBoundingClientRect();
+                let position;
+                if (rect) {
+                    position = {x: rect.left, y: rect.top + rect.height,};
+                } else {
+                    rect = this.container_tree_headers.getBoundingClientRect();
+                    position = {x: rect.left, y: event.clientY,};
+                }
+
+                // MenuMark.exec({x: event.clientX, y: event.clientY,}, items, () => {
+                MenuMark.exec(position, items, () => {
                     if (highlighted) {
                         clicking_info.tree_item.classList.remove("active");
                     }
@@ -3886,6 +4179,8 @@
                     this.callbacks = {
                         onfinished: null,
                         onfailed: null,
+                        onprogress: null,
+                        onwaiting: null,
                     };
                     if (callbacks) Object.assign(this.callbacks, callbacks);
                     this.filled = false;
@@ -4062,6 +4357,7 @@
                     super.update_status_text(ts);
                     if (ts === FloatBall.taskstatus.waiting) {
                         this.backtask_status_text.textContent = ts;
+                        if (this.callbacks.onwaiting) this.callbacks.onwaiting();
                     } else if (ts === FloatBall.taskstatus.processing) {
                         this.backtask_status_text.textContent = ts.replace("{}", "上传");
                     } else if (ts === FloatBall.taskstatus.finalizing) {
@@ -4243,6 +4539,7 @@
                     super.update_status_text(ts);
                     if (ts === FloatBall.taskstatus.waiting) {
                         this.backtask_status_text.textContent = ts;
+                        if (this.callbacks.onwaiting) this.callbacks.onwaiting();
                     } else if (ts === FloatBall.taskstatus.processing) {
                         this.backtask_status_text.textContent = ts.replace("{}", "下载");
                     } else if (ts === FloatBall.taskstatus.finalizing) {
@@ -5237,10 +5534,10 @@
                 throw new Error(await format_error_response(r));
             }
 
-            async sync_one(contact_type, xxid) {
+            async sync_one(contact_type, xxid, ceid) {
                 let url = join_path(this.api_url(), "sync_one");
                 let body = {
-                    contact_type,
+                    contact_type, ceid,
                 };
                 if (contact_type === subviews.Chat.receiver_type.group) {
                     body.gid = xxid;
@@ -5255,10 +5552,10 @@
                 throw new Error(await format_error_response(r));
             }
 
-            async act(contact_type, xxid, activity_type) {
+            async act(contact_type, xxid, ceid, activity_type,) {
                 let url = join_path(this.api_url(), "act");
                 let body = {
-                    contact_type,
+                    contact_type, ceid,
                     activity_type,
                 };
                 if (contact_type === subviews.Chat.receiver_type.group) {
@@ -5290,14 +5587,75 @@
                 throw new Error(await format_error_response(r));
             }
 
-            async send_text(contact_type, xxid, sender_rand, plain_text,) {
+            async send_text(contact_type, xxid, ceid, sender_rand, plain_text,) {
                 let url = join_path(this.api_url(), "send");
                 let body = {
-                    contact_type,
+                    contact_type, ceid,
 
                     sender_rand,
                     type: dashboardwrappers.ChatDashboardWrapper.message_type.text,
                     data_text: await encryptors.encrypt2base64(plain_text),
+                };
+                if (contact_type === subviews.Chat.receiver_type.group) {
+                    body.gid = xxid;
+                } else if (contact_type === subviews.Chat.receiver_type.user) {
+                    body.uid = xxid;
+                }
+                let r = await net_fetcher.nf_post_json(url, body,);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async edit_text(contact_type, xxid, ceid, message_id, plain_text,) {
+                let url = join_path(this.api_url(), "edit");
+                let body = {
+                    contact_type, ceid,
+
+                    message_id,
+                    data_text: await encryptors.encrypt2base64(plain_text),
+                };
+                if (contact_type === subviews.Chat.receiver_type.group) {
+                    body.gid = xxid;
+                } else if (contact_type === subviews.Chat.receiver_type.user) {
+                    body.uid = xxid;
+                }
+                let r = await net_fetcher.nf_post_json(url, body,);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async revoke_message(contact_type, xxid, ceid, message_id,) {
+                let url = join_path(this.api_url(), "revoke");
+                let body = {
+                    contact_type, ceid,
+
+                    message_id,
+                };
+                if (contact_type === subviews.Chat.receiver_type.group) {
+                    body.gid = xxid;
+                } else if (contact_type === subviews.Chat.receiver_type.user) {
+                    body.uid = xxid;
+                }
+                let r = await net_fetcher.nf_post_json(url, body,);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async mark_read(contact_type, xxid, ceid, message_ids,) {
+                let url = join_path(this.api_url(), "mark_read");
+                let body = {
+                    contact_type, ceid,
+
+                    message_ids,
                 };
                 if (contact_type === subviews.Chat.receiver_type.group) {
                     body.gid = xxid;
@@ -5333,6 +5691,7 @@
 
                 const metadata = {
                     contact_type: feedbackargs.contact_type,
+                    ceid: feedbackargs.ceid,
 
                     sender_rand: feedbackargs.msg.sender_rand,
                     type: feedbackargs.msg.type,
@@ -5423,10 +5782,10 @@
 
             }
 
-            async load(contact_type, xxid, last_msgattr) {
+            async load(contact_type, xxid, ceid, last_msgattr) {
                 let url = join_path(this.api_url(), "load");
                 let body = {
-                    contact_type,
+                    contact_type, ceid,
                     last_message_id: last_msgattr ? last_msgattr.id : null,
                 };
                 if (contact_type === subviews.Chat.receiver_type.group) {
@@ -5442,10 +5801,10 @@
                 throw new Error(await format_error_response(r));
             }
 
-            async load_history(contact_type, xxid, first_msgattr) {
+            async load_history(contact_type, xxid, ceid, first_msgattr) {
                 let url = join_path(this.api_url(), "load_history");
                 let body = {
-                    contact_type,
+                    contact_type, ceid,
                     first_message_id: first_msgattr ? first_msgattr.id : null,
                 };
                 if (contact_type === subviews.Chat.receiver_type.group) {
@@ -5461,11 +5820,30 @@
                 throw new Error(await format_error_response(r));
             }
 
-            async read(contact_type, xxid, visible_msgattr) {
+            async read(contact_type, xxid, ceid, visible_msgattr) {
                 let url = join_path(this.api_url(), "read");
                 let body = {
-                    contact_type,
+                    contact_type, ceid,
                     visible_message_id: visible_msgattr.id,
+                };
+                if (contact_type === subviews.Chat.receiver_type.group) {
+                    body.gid = xxid;
+                } else if (contact_type === subviews.Chat.receiver_type.user) {
+                    body.uid = xxid;
+                }
+                let r = await net_fetcher.nf_post_json(url, body,);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async sync_message(contact_type, xxid, ceid, message_ids) {
+                let url = join_path(this.api_url(), "sync_message");
+                let body = {
+                    contact_type, ceid,
+                    message_ids,
                 };
                 if (contact_type === subviews.Chat.receiver_type.group) {
                     body.gid = xxid;
@@ -5485,17 +5863,23 @@
         return {Api, Admin, Me, Mail, Drive, Chat};
     })()
 
+
+    function checkIfElementVisible(container, child) {
+        const el = child;
+        const rect = el.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        // 判断元素是否在容器可视范围内
+        if (rect.bottom > containerRect.top && rect.top < containerRect.bottom) {
+            // if (rect.top >= containerRect.top && rect.bottom <= containerRect.bottom) { // 完全可见
+            return true;
+        }
+        return false;
+    }
+
     function findLastVisibleElement(container, children) {
         // 从后向前遍历
         for (let i = children.length - 1; i >= 0; i--) {
-            const el = children[i];
-            const rect = el.getBoundingClientRect();
-            const containerRect = container.getBoundingClientRect();
-            // 判断元素是否在容器可视范围内
-            if (rect.bottom > containerRect.top && rect.top < containerRect.bottom) {
-                // if (rect.top >= containerRect.top && rect.bottom <= containerRect.bottom) { // 完全可见
-                return el; // 找到最后一个可见元素
-            }
+            if (checkIfElementVisible(container, children[i])) return children[i];
         }
         return null; // 如果没有可见元素
     }
@@ -6794,11 +7178,11 @@
                 }
 
                 this.timer__fetch_unread_msgs = null;
-                this.interval__fetch_unread_msgs = 5000;
+                this.interval__fetch_unread_msgs = 7500;
                 this.is_processing__fetch_unread_msgs = false;
 
                 this.timer__update_read_progress = null;
-                this.interval__update_read_progress = 1500;
+                this.interval__update_read_progress = 2000;
 
                 this.is_processing__load_history = false;
             }
@@ -6824,6 +7208,10 @@
                     clearTimeout(this.e_msgflow__load_history_timer);
                     this.e_msgflow__load_history_timer = null;
                 }
+                if (this.e_msgflow__checknew_timer) {
+                    clearTimeout(this.e_msgflow__checknew_timer);
+                    this.e_msgflow__checknew_timer = null;
+                }
             }
 
             open_page() {
@@ -6848,6 +7236,10 @@
     <div class="chat-session-msgflow-mark-loadhistory"><div class="chat-session-msgflow-mark-loadhistory-layout"><p>正在检查是否有更多历史消息...</p></div></div>
     <div class="chat-session-msgflow-mark-checknew"><div class="chat-session-msgflow-mark-checknew-layout"><p>正在检查是否有新消息...</p></div></div>
     <div class="chat-session-msgflow-mark-onlineusers"></div>
+    <div class="chat-session-msgflow-mark-droparea hidden">
+        <div class="chat-session-msgflow-mark-droparea-image">上传图片</div>
+        <div class="chat-session-msgflow-mark-droparea-file">上传文件</div>
+    </div>
 </div>
 
 <div class="chat-session-inputarea">
@@ -6856,6 +7248,7 @@
         <button class="chat-session-inputarea-othertypes-file"><input type="file" class="hidden">文件</button>
     </div>
     <div class="chat-session-inputarea-textarea-warp">
+        <div class="chat-session-inputarea-tip-editing hidden"><span>编辑消息：</span><button>取消</button></div>
         <textarea class="chat-session-inputarea-textarea" placeholder="输入消息..." spellcheck="false"></textarea>
     </div>
 </div>
@@ -6907,26 +7300,26 @@
                 this.change_loading_status__loadhistory();
                 this.change_loading_status__checknew();
 
+                // 托放提示
+                this.e_msgflow_mark_droparea = this.container.querySelector(":scope div.chat-session-msgflow-mark-droparea");
+                this.e_msgflow_mark_droparea_image = this.container.querySelector(":scope div.chat-session-msgflow-mark-droparea-image");
+                this.e_msgflow_mark_droparea_file = this.container.querySelector(":scope div.chat-session-msgflow-mark-droparea-file");
+                this.e_msgflow_mark_droparea.addEventListener("click", (event) => {
+                    this.e_msgflow_mark_droparea.classList.add("hidden");
+                });
+
+
                 // 滚动条
                 this.e_msgflow__load_history_timer = null;
+                this.e_msgflow__checknew_timer = null;
+                this.e_msgflow__checknew_timer__enabled = false; // 避免在打开页面时重复请求
+                this.e_msgflow__checknew_timer__last_emit_time = Date.now(); // 避免在发送消息等时的自动滚动，导致重复请求
                 this.e_msgflow.addEventListener('wheel', (event) => {
-                    if (this.e_msgflow.scrollTop === 0) {
-                        clearTimeout(this.e_msgflow__load_history_timer);
-                        this.e_msgflow__load_history_timer = setTimeout(() => {
-                            if (this.e_msgflow.scrollTop > 10) return;
-                            this.start__load_history();
-                        }, 200);
-                    }
+                    this.check_scroll_position_to_load(event);
                 });
                 this.e_msgflow__scroll_timer = null;
                 this.e_msgflow.addEventListener('scroll', (event) => {
-                    if (this.e_msgflow.scrollTop === 0) {
-                        clearTimeout(this.e_msgflow__load_history_timer);
-                        this.e_msgflow__load_history_timer = setTimeout(() => {
-                            if (this.e_msgflow.scrollTop > 10) return;
-                            this.start__load_history();
-                        }, 200);
-                    }
+                    this.check_scroll_position_to_load(event);
 
                     clearTimeout(this.e_msgflow__scroll_timer);
                     this.e_msgflow__scroll_timer = setTimeout(() => { // 找到首个可见元素
@@ -6995,6 +7388,12 @@
                 });
                 this.load_draft_text();
 
+                this.e_inputarea_tip_editing = this.container.querySelector(":scope .chat-session-inputarea-tip-editing");
+                this.e_inputarea_tip_editing__cancel_btn = this.e_inputarea_tip_editing.querySelector(":scope > button");
+                this.e_inputarea_tip_editing__cancel_btn.addEventListener("click", (event) => {
+                    this.end_editing_msg();
+                });
+
                 // 其他消息类型
                 this.e_othertypes_image = this.container.querySelector(":scope button.chat-session-inputarea-othertypes-image");
                 this.e_othertypes_image.addEventListener("click", (event) => {
@@ -7004,27 +7403,7 @@
                 this.e_othertypes_image__input.addEventListener('change', (event) => {
                     const file = event.target.files[0];
                     if (file) {
-                        let name = normalizeName(file.name);
-                        if (!name) return;
-
-                        const img = new Image();
-                        const url = URL.createObjectURL(file);
-                        img.onload = () => {
-                            URL.revokeObjectURL(url);
-                            const d = {
-                                file_name: name,
-                                image_attr: {
-                                    width: img.width,
-                                    height: img.height,
-                                }
-                            }
-                            this.send_msg_file(file, dashboardwrappers.ChatDashboardWrapper.message_type.image, d);
-                        };
-                        img.onerror = () => {
-                            MessageMark.report("选择的图片无效。");
-                        };
-                        img.src = url;
-
+                        this.start__send_msg_image(file);
                     }
                 });
 
@@ -7037,22 +7416,123 @@
                 this.e_othertypes_file__input.addEventListener('change', (event) => {
                     const file = event.target.files[0];
                     if (file) {
-                        let name = normalizeName(file.name);
-                        if (!name) return;
-                        // for (let disallowedUploadElement of disallowed_upload) {
-                        //     if (name.endsWith(disallowedUploadElement)) {
-                        //         MessageMark.report(`不允许上传：${disallowedUploadElement}`);
-                        //         return;
-                        //     }
-                        // }
-                        const d = {
-                            file_name: name,
-                            file_attr: {
-                                name: "发送用不上",
-                                size: file.size,
-                            },
+                        this.start__send_msg_file(file);
+                    }
+                });
+
+                // 拖拽上传
+                this.e_msgflow_wrap.addEventListener('dragenter', (event) => {
+                    if (dragging_item) return;
+                    event.preventDefault();
+                    // this.e_msgflow_wrap.classList.add("drag-active");
+                    this.e_msgflow_mark_droparea.classList.remove("hidden");
+                });
+                this.e_msgflow_wrap.addEventListener('dragover', (event) => {
+                    if (dragging_item) return;
+                    event.preventDefault();
+                    event.dataTransfer.dropEffect = 'copy';
+                    // this.e_msgflow_wrap.classList.add("drag-active");
+                    this.e_msgflow_mark_droparea.classList.remove("hidden");
+                });
+                this.e_msgflow_wrap.addEventListener('dragleave', () => {
+                    if (dragging_item) return;
+                    // this.e_msgflow_wrap.classList.remove("drag-active");
+                    this.e_msgflow_mark_droparea.classList.add("hidden");
+                });
+                this.e_msgflow_wrap.addEventListener('drop', async (event) => {
+                    if (dragging_item) return;
+                    event.preventDefault();
+                    // this.e_msgflow_wrap.classList.remove("drag-active");
+                    this.e_msgflow_mark_droparea.classList.add("hidden");
+                    const dataTransferItems = event.dataTransfer.items;
+                    const validFiles = [];
+                    const validFolders = [];
+                    for (let i = 0; i < dataTransferItems.length; i++) {
+                        const item = dataTransferItems[i];
+                        const entry = item.webkitGetAsEntry && item.webkitGetAsEntry();
+                        // console.log(item, entry);
+                        if (item.kind === 'file') {
+                            if (entry && entry.isDirectory) {
+                                // validFolders.push(entry);
+                            } else {
+                                const file = item.getAsFile();
+                                // console.log(file,);
+                                if (file) {
+                                    validFiles.push(file);
+                                }
+                            }
                         }
-                        this.send_msg_file(file, dashboardwrappers.ChatDashboardWrapper.message_type.file, d);
+                    }
+                    if (validFolders.length > 0) {
+                        for (const entry of validFolders) {
+                            const files = await getAllFilesFromDroppedFolder(entry);
+                            for (const file of files) {
+                                // console.log(file.relativePath, file);
+                                file.relativePath.pop()
+                                validFiles.push(file);
+                            }
+                        }
+                        // return;
+                    }
+                    let files = [];
+                    if (validFiles.length > 0) {
+                        for (const file of validFiles) {
+                            let can = true;
+
+                            let name = normalizeName(file.name);
+                            if (!name) can = false;
+
+                            if (!can) {
+                                // continue;
+                                return;
+                            }
+
+                            // for (let disallowedUploadElement of disallowed_upload) {
+                            //     if (name.endsWith(disallowedUploadElement)) {
+                            //         MessageMark.report(`不允许上传：${disallowedUploadElement}`);
+                            //         can = false;
+                            //         break;
+                            //     }
+                            // }
+
+                            if (!can) {
+                                // continue;
+                                return;
+                            }
+
+                            // if (root_attr.max_upload_size > 0 && file.size >= root_attr.max_upload_size * 1024 * 1024) {
+                            //     alert(`单文件大小限制为${root_attr.max_upload_size}MB。`);
+                            //     can = false;
+                            //     // continue;
+                            //     return;
+                            // }
+
+                            if (file.relativePath && file.relativePath.length > 0) {
+                            } else {
+                            }
+
+                            if (!can) {
+                                // continue;
+                                return;
+                            }
+
+                            files.push(file)
+                        }
+                    }
+                    if (files.length > 0) {
+                        if (event.target === this.e_msgflow_mark_droparea_image) {
+                            for (const file of files) {
+                                this.start__send_msg_image(file);
+                            }
+                            // floatball.look_upload_tasks();
+                        } else if (event.target === this.e_msgflow_mark_droparea_file) {
+                            for (const file of files) {
+                                this.start__send_msg_file(file);
+                            }
+                            // floatball.look_upload_tasks();
+                        }
+                        // MessageMark.confirm(`${files.length}个文件，开始上传？`, null, null, () => {
+                        // }, MessageMark.colors.blue)
                     }
                 });
 
@@ -7075,12 +7555,13 @@
                 return {
                     contact_type: this.li.bindmap.contact_attr.type,
                     xxid: this.is_group() ? this.li.bindmap.contact_attr.gid : this.li.bindmap.contact_attr.uid,
+                    ceid: this.li.bindmap.ceid,
                 }
             }
 
             refresh() {
-                // const {xxid, contact_type} = this.current_contact_xxid(); // 与fetch_unread_msgs重复了
-                // checkin.subviews.chat.sync_one(contact_type, xxid)
+                // const {xxid, contact_type, ceid} = this.current_contact_xxid(); // 与fetch_unread_msgs重复了
+                // checkin.subviews.chat.sync_one(contact_type, xxid, ceid,)
                 //     .then(result => {
                 //         // if (this.closed) return;
                 //         this.client.dashboard_chat.wrapper.update_contact_item_status(result);
@@ -7090,6 +7571,31 @@
                 // });
             }
 
+            check_scroll_position_to_load(event) {
+                if (this.closed) return;
+                if (this.e_msgflow.scrollTop === 0) {
+                    clearTimeout(this.e_msgflow__load_history_timer);
+                    this.e_msgflow__load_history_timer = setTimeout(() => {
+                        if (this.e_msgflow.scrollTop > 10) return;
+                        this.start__load_history();
+                    }, 200);
+                }
+                if (this.e_msgflow__checknew_timer__enabled) {
+                    const current_time = Date.now();
+                    if (current_time - this.e_msgflow__checknew_timer__last_emit_time < 4000) return;
+                    if (this.e_msgflow.scrollTop + this.e_msgflow.clientHeight >= this.e_msgflow.scrollHeight) {
+                        this.e_msgflow__checknew_timer__last_emit_time = current_time;
+                        clearTimeout(this.e_msgflow__checknew_timer);
+                        this.e_msgflow__checknew_timer = setTimeout(() => {
+                            const distanceToBottom = this.e_msgflow.scrollHeight - this.e_msgflow.scrollTop - this.e_msgflow.clientHeight;
+                            if (distanceToBottom > 10) return;
+                            this.start_timer__fetch_unread_msgs();
+                        }, 200);
+                    }
+                }
+            }
+
+
             /*
             * 定期获取新消息
             * */
@@ -7097,6 +7603,8 @@
                 if (!is_background) {
                     this.remove_loading_mark();
                     this.loading_mark.show();
+                    if (this.is_processing__fetch_unread_msgs) return;
+                } else {
                     if (this.is_processing__fetch_unread_msgs) return;
                 }
                 this.stop_timer__fetch_unread_msgs();
@@ -7116,8 +7624,8 @@
 
                 const last_msgattr = this.li.bindmap.msgs.length > 0 ? this.li.bindmap.msgs.at(-1) : null;
 
-                const {xxid, contact_type} = this.current_contact_xxid();
-                checkin.subviews.chat.load(contact_type, xxid, last_msgattr)
+                const {xxid, contact_type, ceid} = this.current_contact_xxid();
+                checkin.subviews.chat.load(contact_type, xxid, ceid, last_msgattr)
                     .then(result => {
                         // if (this.closed) return;
                         this.is_processing__fetch_unread_msgs = false;
@@ -7200,6 +7708,8 @@
                 if (this.client.dashboard_chat.wrapper.is_active()) this.timer__fetch_unread_msgs = setTimeout(() => {
                     this.fetch_unread_msgs()
                 }, this.interval__fetch_unread_msgs);
+
+                this.e_msgflow__checknew_timer__enabled = true;
             }
 
             /*
@@ -7225,12 +7735,17 @@
                     if (this.client.dashboard_chat.wrapper.is_active()) this.timer__update_read_progress = setTimeout(() => {
                         this.update_read_progress()
                     }, this.interval__update_read_progress);
+
+                    this.check_and_auto_mark_as_read();
+
                     return;
                 }
                 const visible_msgattr = lastVisible.msgobj.msgattr;
 
-                const {xxid, contact_type} = this.current_contact_xxid();
-                checkin.subviews.chat.read(contact_type, xxid, visible_msgattr)
+                this.check_and_auto_mark_as_read();
+
+                const {xxid, contact_type, ceid} = this.current_contact_xxid();
+                checkin.subviews.chat.read(contact_type, xxid, ceid, visible_msgattr)
                     .then(result => {
                         // if (this.closed) return;
                         this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
@@ -7266,23 +7781,30 @@
                 this.e_inputarea_textarea.value = "";
                 this.save_draft_text();
 
-                const msg = {
-                    sender: logged_user.uid,
-                    sender_rand: generateRandomString(10),
-                    is_sent: false,
+                if (this.is_editing_msg) {
+                    if (text !== this.editing_msg.plain_data_text) {
+                        this._edit_msg(this.editing_msg, text);
+                    }
+                    this.end_editing_msg();
+                } else {
+                    const msg = {
+                        sender: logged_user.uid,
+                        sender_rand: generateRandomString(10),
+                        is_sent: false,
 
-                    type: dashboardwrappers.ChatDashboardWrapper.message_type.text,
+                        type: dashboardwrappers.ChatDashboardWrapper.message_type.text,
 
-                    plain_text: text,
+                        plain_text: text,
+                    }
+
+                    this.msgflow_manage.append_sending_msg(msg);
+                    this._send_msg_text(msg);
                 }
-
-                this.msgflow_manage.append_sending_msg(msg);
-                this._send_msg_text(msg);
             }
 
             _send_msg_text(msg) {
-                const {xxid, contact_type} = this.current_contact_xxid();
-                checkin.subviews.chat.send_text(contact_type, xxid, msg.sender_rand, msg.plain_text,)
+                const {xxid, contact_type, ceid} = this.current_contact_xxid();
+                checkin.subviews.chat.send_text(contact_type, xxid, ceid, msg.sender_rand, msg.plain_text,)
                     .then(result => {
                         // if (this.closed) return;
                         this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
@@ -7302,6 +7824,49 @@
                 } else if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_drive_item(msgobj.msgattr.type)) {
                     floatball.dialog.retryToStartTask(msgobj.msgattr.upload_task);
                 }
+            }
+
+            start__send_msg_image(file) {
+                let name = normalizeName(file.name);
+                if (!name) return;
+
+                const img = new Image();
+                const url = URL.createObjectURL(file);
+                img.onload = () => {
+                    URL.revokeObjectURL(url);
+                    const d = {
+                        file_name: name,
+                        image_attr: {
+                            width: img.width,
+                            height: img.height,
+                        }
+                    }
+                    this.send_msg_file(file, dashboardwrappers.ChatDashboardWrapper.message_type.image, d);
+                };
+                img.onerror = () => {
+                    MessageMark.report("选择的图片无效。");
+                };
+                img.src = url;
+
+            }
+
+            start__send_msg_file(file) {
+                let name = normalizeName(file.name);
+                if (!name) return;
+                // for (let disallowedUploadElement of disallowed_upload) {
+                //     if (name.endsWith(disallowedUploadElement)) {
+                //         MessageMark.report(`不允许上传：${disallowedUploadElement}`);
+                //         return;
+                //     }
+                // }
+                const d = {
+                    file_name: name,
+                    file_attr: {
+                        name: "发送用不上",
+                        size: file.size,
+                    },
+                }
+                this.send_msg_file(file, dashboardwrappers.ChatDashboardWrapper.message_type.file, d);
             }
 
             send_msg_file(file, type, attach_attrs) {
@@ -7332,6 +7897,9 @@
                         this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
                         this.msgflow_manage.update_sending_msg(msg.sender_rand, result.message_attr, result.previous_message_id);
                     },
+                    onwaiting: () => {
+                        msg.msgobj.update();
+                    },
                     onprogress: () => {
                         msg.msgobj.update();
                     },
@@ -7342,6 +7910,9 @@
                         // MessageMark.report(error);
                     },
                 });
+
+                msg.upload_task = t;
+
                 floatball.dialog.addTask(t);
                 t.set_name(normalizeName(msg.file.name));
                 t.set_args({
@@ -7349,12 +7920,137 @@
                     ...this.current_contact_xxid(),
                 });
 
-                msg.upload_task = t;
-
                 floatball.dialog.checkToStartTask();
                 floatball.dialog.checkToHide(t);
 
                 return t;
+            }
+
+            edit_msg(msgattr) {
+                this.save_draft_text();
+                this.is_editing_msg = true;
+                this.editing_msg = msgattr;
+                this.e_inputarea_tip_editing.classList.remove("hidden");
+                this.e_inputarea_textarea.placeholder = "";
+                this.e_inputarea_textarea.value = msgattr.plain_data_text;
+                this.e_inputarea_textarea.focus();
+            }
+
+            end_editing_msg() {
+                this.is_editing_msg = false;
+                this.editing_msg = null;
+                this.e_inputarea_tip_editing.classList.add("hidden");
+                this.e_inputarea_textarea.placeholder = "输入消息...";
+                this.load_draft_text();
+            }
+
+            _edit_msg(msgattr, new_text) {
+                msgattr.msgobj.blur_content();
+
+                const {xxid, contact_type, ceid} = this.current_contact_xxid();
+                checkin.subviews.chat.edit_text(contact_type, xxid, ceid, msgattr.id, new_text,)
+                    .then(result => {
+                        // if (this.closed) return;
+                        if (result.sync.editions.length === 1 && result.sync.editions[0] === result.message_attr.id) {
+                            result.sync.editions.splice(0, 1); // 自己编辑后免了再次同步
+                            // console.log("免了重复同步二编消息", result.sync.edition_id, result.sync.editions);
+                        }
+                        this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
+                        this.msgflow_manage.update_msg(msgattr, result.message_attr,);
+                    }).catch(error => {
+                    // if (this.closed) return;
+                    MessageMark.report(error);
+                    msgattr.msgobj.unblur_content();
+                });
+            }
+
+            revoke_msg(msgattr) {
+                msgattr.msgobj.blur_content();
+
+                const {xxid, contact_type, ceid} = this.current_contact_xxid();
+                checkin.subviews.chat.revoke_message(contact_type, xxid, ceid, msgattr.id,)
+                    .then(result => {
+                        // if (this.closed) return;
+                        if (result.sync.editions.length === 1 && result.sync.editions[0] === result.message_attr.id) {
+                            result.sync.editions.splice(0, 1);
+                        }
+                        this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
+                        this.msgflow_manage.update_msg(msgattr, result.message_attr,);
+                    }).catch(error => {
+                    // if (this.closed) return;
+                    MessageMark.report(error);
+                    msgattr.msgobj.unblur_content();
+                });
+            }
+
+            /*
+            * 标记已读
+            * */
+            mark_as_read(msgattr) {
+                const {xxid, contact_type, ceid} = this.current_contact_xxid();
+                checkin.subviews.chat.mark_read(contact_type, xxid, ceid, [msgattr.id,],)
+                    .then(result => {
+                        // if (this.closed) return;
+
+                        if (result.sync.editions.length === 1 && result.message_attrs.length === 1 && result.sync.editions[0] === result.message_attrs[0].id) {
+                            result.sync.editions.splice(0, 1);
+                        }
+                        this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
+                        if (result.message_attrs.length > 0) this.msgflow_manage.update_msg(msgattr, result.message_attrs[0],);
+                    }).catch(error => {
+                    // if (this.closed) return;
+                    MessageMark.report(error);
+                });
+            }
+
+            check_and_auto_mark_as_read() {
+                const msgattrs = this.li.bindmap.msgs.filter(i => {
+                    if (i.status & dashboardwrappers.ChatDashboardWrapper.message_status.i_read) return false;
+                    if (i.msgobj.at_attr.is_marking) return false;
+                    if (i.msgobj.is_sys_msg()) return false;
+                    if (this.is_group()) {
+                        return (i.msgobj.at_attr.at_all && i.sender !== logged_user.uid) || i.msgobj.at_attr.at_users.includes(logged_user.uid);
+                    } else {
+                        return i.sender !== logged_user.uid;
+                    }
+                });
+                const e_containers = msgattrs.map(i => i.msgobj.e_container);
+                const unread_msgobjs = [];
+                for (const eContainer of e_containers) {
+                    if (checkIfElementVisible(this.e_msgflow, eContainer)) unread_msgobjs.push(eContainer.msgobj);
+                }
+                // console.log("需要标记已读的消息", unread_msgobjs);
+                if (unread_msgobjs.length === 0) return;
+                const unreadIds = [];
+                for (const unreadMsgobj of unread_msgobjs) {
+                    unreadMsgobj.at_attr.is_marking = true;
+                    const msgattr = unreadMsgobj.msgattr;
+                    unreadIds.push(msgattr.id);
+                }
+                const {xxid, contact_type, ceid} = this.current_contact_xxid();
+                checkin.subviews.chat.mark_read(contact_type, xxid, ceid, unreadIds,)
+                    .then(result => {
+                        // if (this.closed) return;
+
+                        if (result.sync.editions.length === result.message_attrs.length) {
+                            let is_same = true;
+                            for (let i = 0; i < result.sync.editions.length; i++) {
+                                if (i !== result.message_attrs.findIndex(j => j.id === result.sync.editions[i])) {
+                                    is_same = false;
+                                    break;
+                                }
+                            }
+                            if (is_same) result.sync.editions.splice(0, result.sync.editions.length);
+                        }
+                        this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
+                        for (const message_attr of result.message_attrs) this.msgflow_manage.update_msg(unread_msgobjs.find(i => i.msgattr.id === message_attr.id).msgattr, message_attr,);
+
+                    }).catch(error => {
+                    // if (this.closed) return;
+                    MessageMark.report(error, null, () => {
+                        for (const unreadMsgobj of unread_msgobjs) unreadMsgobj.at_attr.is_marking = false;
+                    });
+                });
             }
 
 
@@ -7374,10 +8070,13 @@
                     //     this.msgflow_manage.append_sending_msg(sendingMsg);
                     // }
                     for (const sendingMsg of this.li.bindmap.sending_msgs) {
+                        sendingMsg.msgobj.contentpage = this;
                         if (sendingMsg.msgobj.is_header()) {
                             this.e_msgflow.append(sendingMsg.msgobj.msgelement);
                         }
                     }
+                    for (const msgattr of this.li.bindmap.sending_msgs) msgattr.msgobj.update();
+
                     if (this.li.bindmap.sending_msgs.length > 0) {
                         this.li.bindmap.sending_msgs.at(-1).msgobj.scroll_to_view(false);
                     }
@@ -7386,7 +8085,9 @@
                 append_sending_msg: (msgattr) => {
                     const msgseniors = [...this.li.bindmap.sending_msgs].reverse();
                     this.li.bindmap.sending_msgs.push(msgattr);
-                    this.msgflow_manage.add_element(msgattr, msgseniors);
+                    this.panel.wrapper.msgflow_manage.add_element(this, msgattr, msgseniors);
+
+                    this.e_msgflow__checknew_timer__last_emit_time = Date.now();
 
                     msgattr.msgobj.scroll_to_view(true);
                 },
@@ -7414,10 +8115,13 @@
 
                 load_msgs: () => {
                     for (const sendingMsg of this.li.bindmap.msgs) {
+                        sendingMsg.msgobj.contentpage = this;
                         if (sendingMsg.msgobj.is_header()) {
                             this.e_msgflow.append(sendingMsg.msgobj.msgelement);
                         }
                     }
+                    for (const msgattr of this.li.bindmap.msgs) msgattr.msgobj.update();
+
                     if (this.li.bindmap.msgs.length > 0) {
                         if (this.li.bindmap.status_attr.read_message_id !== null) { // 可能有未读
                             const first_unread_msg = this.li.bindmap.msgs.find(i => i.id > this.li.bindmap.status_attr.read_message_id);
@@ -7441,11 +8145,15 @@
                     }
                     const msgseniors = [...this.li.bindmap.msgs].reverse();
                     this.li.bindmap.msgs.push(msgattr);
-                    this.msgflow_manage.add_element(msgattr, msgseniors);
+                    this.panel.wrapper.msgflow_manage.add_element(this, msgattr, msgseniors);
 
                     if (sent_one) {
                         msgattr.msgobj.scroll_to_view(true);
                     }
+                },
+
+                update_msg: (msgattr, new_message_attr) => {
+                    return this.panel.wrapper.msgflow_manage.update_msg(this, msgattr, new_message_attr);
                 },
 
                 insert_history_msgs: (next_msgattr, msgattrs) => {
@@ -7453,21 +8161,23 @@
                     for (const msgattr of msgattrs) {
                         const msgseniors = [...msgs].reverse();
                         msgs.push(msgattr);
-                        this.msgflow_manage.add_element(msgattr, msgseniors, true);
+                        this.panel.wrapper.msgflow_manage.add_element(this, msgattr, msgseniors, true);
                     }
                     const histories = [...msgs];
+
+                    if (msgattrs.length === 0) return histories; // 没有需要插入的历史
 
                     if (next_msgattr.msgobj.is_header()) {
                         next_msgattr.msgobj.remove_from_flow();
                         for (const msgattr of [next_msgattr, ...next_msgattr.msgobj.msgobjchildren.map(i => i.msgattr)]) {
                             const msgseniors = [...msgs].reverse();
                             msgs.push(msgattr);
-                            this.msgflow_manage.add_element(msgattr, msgseniors, true);
+                            this.panel.wrapper.msgflow_manage.add_element(this, msgattr, msgseniors, true);
                         }
                     } else {
                         const msgseniors = [...msgs].reverse();
                         msgs.push(next_msgattr);
-                        this.msgflow_manage.add_element(next_msgattr, msgseniors, true);
+                        this.panel.wrapper.msgflow_manage.add_element(this, next_msgattr, msgseniors, true);
                     }
 
                     this.li.bindmap.msgs.unshift(...histories);
@@ -7617,60 +8327,181 @@
                     this.li.bindmap.msgs.length = 0;
                 },
 
+                remove_element: (msgattr) => {
+                    if (msgattr.msgobj.is_header()) {
+                        msgattr.msgobj.remove_all_children();
+                        msgattr.msgobj.remove_from_flow();
+                    } else {
+                        msgattr.msgobj.header().remove_child(msgattr.msgobj);
+                    }
+                    msgattr.msgobj = null;
+                },
+            }
 
-                msgtypes: (() => {
-                    class _ {
-                        constructor(contentpage, msgattr, msgattrseniors,) {
-                            this.contentpage = contentpage;
+            static msgtypes = (() => {
+                class _ {
+                    constructor(panel, contentpage, msgattr, msgattrseniors,) {
+                        this.panel = panel;
+                        this.contentpage = contentpage; // 注意可能为null直到点击mainaction填充msgs时，例如在后台创建的msgtype对象
 
-                            this.msgattr = msgattr;
+                        this.msgattr = msgattr;
+                        this.msgattrseniors = msgattrseniors;
+                        if (this.is_sys_msg()) {
+                            this.palette = contentpages._chat.get_message_palette(msgattr.sender, true);
+                        } else {
                             this.palette = contentpages._chat.get_message_palette(msgattr.sender);
-
-                            this.msgattrparents = [];
-                            this.is_different_day = false;
-                            this.#resolve_relations(msgattrseniors);
-
-                            // this.msgobjparent = null;
-                            this.msgobjchildren = [];
-
-                            this.init();
-                            this.fill_marks();
-                            this.update();
                         }
 
-                        init() {
+                        this.msgattrparents = [];
+                        this.is_different_day = false;
+                        this.#resolve_relations(msgattrseniors);
+
+                        // this.msgobjparent = null;
+                        this.msgobjchildren = [];
+
+                        this.at_attr = {
+                            at_all: false,
+                            at_users: [],
+                            is_marking: false,
+                        };
+
+                        this.init();
+                        this.fill_marks();
+                        this.update();
+                    }
+
+                    init() {
+                        const temp_parent_element = document.createElement('template');
+                        let html = `<div class="chat-message"></div>`;
+                        temp_parent_element.insertAdjacentHTML("beforeend", html);
+                        this.msgelement = temp_parent_element.querySelector(":scope *:first-child");
+                        temp_parent_element.remove();
+                        this.msgelement.msgobj = this;
+
+                        this.sent_by_me = false;
+                        this.sent_by_me = this.msgattr.sender === logged_user.uid;
+                        if (this.sent_by_me) {
+                            this.msgelement.classList.add("sent-by-me");
+                        }
+
+                        // 消息内容 container
+                        {
                             const temp_parent_element = document.createElement('template');
-                            let html = `<div class="chat-message"></div>`;
+                            let html = `
+<div class="chat-message-content-container">
+</div>
+`;
                             temp_parent_element.insertAdjacentHTML("beforeend", html);
-                            this.msgelement = temp_parent_element.querySelector(":scope *:first-child");
+                            this.e_container = temp_parent_element.querySelector(":scope .chat-message-content-container");
                             temp_parent_element.remove();
-                            this.msgelement.msgobj = this;
+                            this.e_container.msgobj = this;
 
-                            this.sent_by_me = false;
-                            this.sent_by_me = this.msgattr.sender === logged_user.uid;
-                            if (this.sent_by_me) {
-                                this.msgelement.classList.add("sent-by-me");
-                            }
+                            // 菜单
+                            this.e_container.addEventListener("contextmenu", (event) => {
+                                const rect = this.e_container.getBoundingClientRect();
+                                const items = [];
 
-                            // 消息内容 container
-                            {
-                                const temp_parent_element = document.createElement('template');
-                                let html = `<div class="chat-message-content-container"></div>`;
-                                temp_parent_element.insertAdjacentHTML("beforeend", html);
-                                this.e_container = temp_parent_element.querySelector(":scope .chat-message-content-container");
-                                temp_parent_element.remove();
-                                this.e_container.msgobj = this;
-                            }
+                                if (this.msgattr.is_sent && (!this.blur_mark || !this.blur_mark.is_visible())) {
+                                    if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_text(this.msgattr.type) ||
+                                        dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_drive_item(this.msgattr.type)) {
+                                        items.push(
+                                            {
+                                                type: "button", text: "引用", callback: event => {
+                                                    this.contentpage.add_textarea_element__cite(this.msgattr.id)
+                                                },
+                                            },
+                                            {type: "section", text: "",},
+                                        );
+                                    }
+
+                                    if (!this.sent_by_me && !(this.msgattr.status & dashboardwrappers.ChatDashboardWrapper.message_status.i_read)) {
+                                        if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_text(this.msgattr.type) ||
+                                            dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_drive_item(this.msgattr.type)) {
+                                            items.push(
+                                                {
+                                                    type: "button", text: "标记已读", callback: event => {
+                                                        this.contentpage.mark_as_read(this.msgattr)
+                                                    },
+                                                },
+                                                {type: "section", text: "",},
+                                            );
+                                        }
+                                    }
+
+                                    if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_text(this.msgattr.type)) {
+                                        const _ = {
+                                            type: "button", text: "复制文本", callback: event => {
+                                                if (this.msgattr.plain_data_text) {
+                                                    navigator.clipboard.writeText(this.msgattr.plain_data_text);
+                                                }
+                                            },
+                                        }
+                                        items.push(_, {type: "section", text: "",},);
+                                        if (!this.msgattr.plain_data_text) {
+                                            _.disabled = true;
+                                        }
+                                    }
+
+                                    if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_drive_item(this.msgattr.type)) {
+                                        const _ = {
+                                            type: "button", text: "复制文件名称", callback: event => {
+                                                if (this.msgattr.plain_file_name) {
+                                                    navigator.clipboard.writeText(this.msgattr.plain_file_name);
+                                                }
+                                            },
+                                        }
+                                        items.push(_, {type: "section", text: "",},);
+                                        if (!this.msgattr.plain_file_name) {
+                                            _.disabled = true;
+                                        }
+                                    }
+
+                                    if (this.sent_by_me && dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_text(this.msgattr.type)) {
+                                        const _ = {
+                                            type: "button", text: "编辑", callback: event => {
+                                                this.contentpage.edit_msg(this.msgattr);
+                                            },
+                                        };
+                                        items.push(_, {type: "section", text: "",},);
+                                        if (!this.msgattr.plain_data_text || Date.now() / 1000 - this.msgattr.sent_time > seconds_of_minutes(10)) {
+                                            _.disabled = true;
+                                        }
+                                    }
+
+                                    if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_text(this.msgattr.type) ||
+                                        dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_drive_item(this.msgattr.type)) {
+                                        const _ = {
+                                            type: "button", text: "撤回", callback: event => {
+                                                MessageMark.confirm(`确定${_.text}消息？`, null, null, () => {
+                                                    this.contentpage.revoke_msg(this.msgattr);
+                                                },);
+                                            },
+                                        };
+                                        items.push(_);
+                                        if (Date.now() / 1000 - this.msgattr.sent_time > seconds_of_minutes(10)) {
+                                            _.text = "删除";
+                                        }
+                                    }
+
+                                }
+
+                                this.e_container.classList.add("active");
+                                MenuMark.exec({x: rect.left, y: rect.top + rect.height,}, items, () => {
+                                    this.e_container.classList.remove("active");
+                                });
+                            });
+
+                        }
 
 
-                            if (this.is_header()) {
-                                const html = `<div class="chat-message-group"></div>`;
-                                this.msgelement.insertAdjacentHTML("beforeend", html);
-                                this.e_group = this.msgelement.querySelector(":scope .chat-message-group");
+                        if (this.is_header()) {
+                            const html = `<div class="chat-message-group"></div>`;
+                            this.msgelement.insertAdjacentHTML("beforeend", html);
+                            this.e_group = this.msgelement.querySelector(":scope .chat-message-group");
 
-                                const tree_headers = [];
-                                this.e_tree_item = new TreeWidget(this.e_group, tree_headers, null, 0, false, false, this.sent_by_me, 6)
-                                const html2 = `
+                            const tree_headers = [];
+                            this.e_tree_item = new TreeWidget(this.e_group, tree_headers, null, 0, false, false, this.sent_by_me, 6)
+                            const html2 = `
 <div class="chat-message-group-header">
 
 <div class="chat-message-group-header-row1">
@@ -7683,34 +8514,38 @@
 
 </div>
 `;
-                                this.e_tree_item.set_raw_header(html2);
-                                this.e_tree_item.show();
-                                this.e_tree_item.summary.style.padding = "0";
-                                this.e_tree_item.summary.style.background = "transparent";
-                                this.msgelement_li = this.e_tree_item.container_tree_items;
+                            this.e_tree_item.set_raw_header(html2);
+                            this.e_tree_item.show();
+                            this.e_tree_item.summary.style.padding = "0";
+                            this.e_tree_item.summary.style.background = "transparent";
+                            this.msgelement_li = this.e_tree_item.container_tree_items;
 
 
-                                const group_header_name = this.e_tree_item.raw_header.querySelector(":scope p.chat-message-group-header-name");
-                                group_header_name.style.color = "white";
-                                group_header_name.style.background = this.palette.name_bg;
+                            const group_header_name = this.e_tree_item.raw_header.querySelector(":scope p.chat-message-group-header-name");
+                            group_header_name.style.color = "white";
+                            group_header_name.style.background = this.palette.name_bg;
 
-                                if (this.is_different_day && form_field_checker.ffc_int(this.msgattr.sent_time)) {
-                                    const group_header_date = this.e_tree_item.raw_header.querySelector(":scope p.chat-message-group-header-date");
-                                    group_header_date.textContent = format_timestamp_utc8_day_time(this.msgattr.sent_time)[0];
-                                    group_header_date.classList.remove("hidden");
-                                }
-
-                                this.msgelement_li.style.margin = "0";
-                                this.msgelement_li.style.transform = "translateY(-4px)";
-
-                                this.msgelement_li.append(this.e_container);
-                            } else {
-                                this.msgelement.append(this.e_container);
+                            if (this.is_different_day && form_field_checker.ffc_int(this.msgattr.sent_time)) {
+                                const group_header_date = this.e_tree_item.raw_header.querySelector(":scope p.chat-message-group-header-date");
+                                group_header_date.textContent = format_timestamp_utc8_day_time(this.msgattr.sent_time)[0];
+                                group_header_date.classList.remove("hidden");
                             }
-                        }
 
-                        fill_marks() {
-                            let html = `
+                            this.msgelement_li.style.margin = "0";
+                            this.msgelement_li.style.transform = "translateY(-4px)";
+
+                            this.msgelement_li.append(this.e_container);
+
+                            if (this.is_sys_msg()) {
+                                this.e_tree_item.summary.classList.add("hidden");
+                            }
+                        } else {
+                            this.msgelement.append(this.e_container);
+                        }
+                    }
+
+                    fill_marks() {
+                        let html = `
 <div class="chat-message-content-marks">
 
     <div class="chat-message-content-mark chat-mcm-send-status hidden">
@@ -7724,365 +8559,568 @@
 
 </div>
 `;
-                            this.e_container.insertAdjacentHTML(this.sent_by_me ? "afterbegin" : "beforeend", html);
-                            this.e_marks = this.e_container.querySelector(":scope .chat-message-content-marks");
+                        this.e_container.insertAdjacentHTML(this.sent_by_me ? "afterbegin" : "beforeend", html);
+                        this.e_marks = this.e_container.querySelector(":scope .chat-message-content-marks");
 
-                            this.e_send_status = this.e_marks.querySelector(":scope .chat-mcm-send-status");
-                            this.e_send_status_text = this.e_marks.querySelector(":scope .chat-mcm-send-status-text");
-                            this.e_send_status_btn_retry = this.e_marks.querySelector(":scope .chat-mcm-send-status-btn-retry");
-                            this.e_send_status_btn_retry.addEventListener("click", () => {
-                                this.contentpage.resend_msg(this);
-                            });
+                        this.e_send_status = this.e_marks.querySelector(":scope .chat-mcm-send-status");
+                        this.e_send_status_text = this.e_marks.querySelector(":scope .chat-mcm-send-status-text");
+                        this.e_send_status_btn_retry = this.e_marks.querySelector(":scope .chat-mcm-send-status-btn-retry");
+                        this.e_send_status_btn_retry.addEventListener("click", () => {
+                            this.contentpage.resend_msg(this);
+                        });
 
-                            this.e_sent_time = this.e_marks.querySelector(":scope .chat-mcm-sent-time");
-                            this.e_read_status = this.e_marks.querySelector(":scope .chat-mcm-read-status");
+                        this.e_sent_time = this.e_marks.querySelector(":scope .chat-mcm-sent-time");
+                        this.e_read_status = this.e_marks.querySelector(":scope .chat-mcm-read-status");
 
+                        // 二编标记
+                        {
+                            let html = `<div class="chat-message-content-rect-mark-edited hidden"></div>`;
+                            this.e_mcr.insertAdjacentHTML("beforeend", html);
+                            this.e_mark_edited = this.e_mcr.querySelector(":scope .chat-message-content-rect-mark-edited");
                         }
 
-                        update() {
-                            if (!this.msgattr.is_sent) {
-                                this.msgelement.classList.add("unsent");
-                            } else {
-                                this.msgelement.classList.remove("unsent");
-                            }
+                    }
 
+                    update() {
+                        if (!this.msgattr.is_sent) {
+                            this.msgelement.classList.add("unsent");
+                        } else {
+                            this.msgelement.classList.remove("unsent");
+                        }
+
+                        if (this.is_sys_msg()) {
+                            this.e_marks.classList.add("hidden");
+                            this.e_container.classList.add("sys-msg");
+                        }
+
+                        if (!this.is_sys_msg()) {
                             if (!this.msgattr.is_sent) {
                                 this.e_send_status.classList.remove("hidden");
                             } else {
-                                if (this.is_header()) {
+                                if (this.is_header()) { // 发送时间
                                     if (form_field_checker.ffc_int(this.msgattr.sent_time)) {
                                         this.e_sent_time.textContent = format_timestamp_utc8_day_time(this.msgattr.sent_time)[1];
                                         this.e_sent_time.classList.remove("hidden");
                                     }
                                 }
 
-                                // if (form_field_checker.ffc_int(this.msgattr.sent_time)) {
-                                //     this.e_sent_time = format_timestamp_utc8_day(this.msgattr.sent_time);
-                                // }
+                                if (this.contentpage) { // 已读状态
+                                    this.e_read_status.classList.remove("hidden");
+
+                                    if (this.contentpage.is_group()) { // 群聊
+                                        if (this.at_attr.at_all) { // 所有人
+                                            if (this.sent_by_me) {
+                                                this.e_read_status.textContent = `${this.msgattr.read_count}人已读`;
+                                                this.e_read_status.classList.remove("noticing");
+                                            } else if (this.msgattr.status & dashboardwrappers.ChatDashboardWrapper.message_status.i_read) {
+                                                this.e_read_status.textContent = `${this.msgattr.read_count}人已读`;
+                                                this.e_read_status.classList.remove("noticing");
+                                            } else {
+                                                this.e_read_status.textContent = `未读`;
+                                                this.e_read_status.classList.add("noticing");
+                                            }
+                                        } else if (this.at_attr.at_users.length > 0) { // 某些用户
+                                            if (this.at_attr.at_users.length > 1) { // 多人
+                                                if (this.sent_by_me) {
+                                                    this.e_read_status.textContent = `${this.msgattr.read_count}人已读`;
+                                                    this.e_read_status.classList.remove("noticing");
+                                                } else if (this.at_attr.at_users.includes(logged_user.uid)) {
+                                                    if (this.msgattr.status & dashboardwrappers.ChatDashboardWrapper.message_status.i_read) {
+                                                        this.e_read_status.textContent = `${this.msgattr.read_count}人已读`;
+                                                        this.e_read_status.classList.remove("noticing");
+                                                    } else {
+                                                        this.e_read_status.textContent = `未读`;
+                                                        this.e_read_status.classList.add("noticing");
+                                                    }
+                                                } else {
+                                                    this.e_read_status.classList.add("hidden");
+                                                }
+                                            } else { // 单人
+                                                if (this.sent_by_me) {
+                                                    if (this.msgattr.read_count > 0) {
+                                                        this.e_read_status.textContent = `已读`;
+                                                        this.e_read_status.classList.remove("noticing");
+                                                    } else {
+                                                        this.e_read_status.textContent = `对方未读`;
+                                                        this.e_read_status.classList.add("noticing");
+                                                    }
+                                                } else if (this.at_attr.at_users.includes(logged_user.uid)) {
+                                                    if (this.msgattr.status & dashboardwrappers.ChatDashboardWrapper.message_status.i_read) {
+                                                        this.e_read_status.textContent = `已读`;
+                                                        this.e_read_status.classList.remove("noticing");
+                                                    } else {
+                                                        this.e_read_status.textContent = `未读`;
+                                                        this.e_read_status.classList.add("noticing");
+                                                    }
+                                                } else {
+                                                    this.e_read_status.classList.add("hidden");
+                                                }
+                                            }
+                                        } else {
+                                            this.e_read_status.classList.add("hidden");
+                                        }
+
+                                    } else { // 私聊
+                                        if (this.sent_by_me) {
+                                            if (this.msgattr.read_count > 0) {
+                                                this.e_read_status.textContent = `已读`;
+                                                this.e_read_status.classList.remove("noticing");
+                                            } else {
+                                                this.e_read_status.textContent = `对方未读`;
+                                                this.e_read_status.classList.add("noticing");
+                                            }
+                                        } else {
+                                            if (this.msgattr.status & dashboardwrappers.ChatDashboardWrapper.message_status.i_read) {
+                                                this.e_read_status.textContent = `已读`;
+                                                this.e_read_status.classList.remove("noticing");
+                                            } else {
+                                                this.e_read_status.textContent = `未读`;
+                                                this.e_read_status.classList.add("noticing");
+                                            }
+                                        }
+                                    }
+
+
+                                }
+
 
                             }
-
-
                         }
 
-                        highlight() {
-                            this.e_container.classList.add("highlight");
-                            setTimeout(() => {
-                                this.e_container.classList.remove("highlight");
-                            }, 2000);
+                        if (!this.is_sys_msg()) {
+                            if (!this.msgattr.is_sent) {
+                            } else {
+                                if (this.msgattr.status & dashboardwrappers.ChatDashboardWrapper.message_status.edited) {
+                                    this.e_mark_edited.classList.remove("hidden");
+                                }
+                            }
                         }
 
-                        scroll_to_view(smooth) {
+
+                    }
+
+                    highlight() {
+                        this.e_container.classList.add("highlight");
+                        setTimeout(() => {
+                            this.e_container.classList.remove("highlight");
+                        }, 2000);
+                    }
+
+                    scroll_to_view(smooth) {
+                        this.e_container.scrollIntoView({
+                            behavior: smooth ? 'smooth' : 'instant',
+                            block: 'center'
+                        });
+                        setTimeout(() => {
                             this.e_container.scrollIntoView({
                                 behavior: smooth ? 'smooth' : 'instant',
                                 block: 'center'
                             });
-                            setTimeout(() => {
-                                this.e_container.scrollIntoView({
-                                    behavior: smooth ? 'smooth' : 'instant',
-                                    block: 'center'
-                                });
-                            }, 200);
-                        }
+                        }, 200);
+                    }
 
-                        #resolve_relations(msgattrseniors) {
-                            for (let i = 0; i < msgattrseniors.length; i++) {
-                                const msgattrsenior = msgattrseniors[i];
-                                if (msgattrsenior.sender !== this.msgattr.sender) return;
-                                if (!msgattrsenior.is_sent || !this.msgattr.is_sent) return;
+                    blur_content() {
+                        if (!this.blur_mark) this.blur_mark = new BlurMark(this.e_container);
+                        this.blur_mark.show();
+                    }
 
-                                if (i === 0) {
-                                    if (!form_field_checker.ffc_int(this.msgattr.sent_time) || !form_field_checker.ffc_int(msgattrsenior.sent_time)) return;
-                                    const this_dt = format_timestamp_utc8_day_time(this.msgattr.sent_time);
-                                    const previous_dt = format_timestamp_utc8_day_time(msgattrsenior.sent_time);
-                                    this.is_different_day = this_dt[0] !== previous_dt[0];
-                                    if (this.is_different_day) return;
-                                    if (this.msgattr.sent_time - msgattrsenior.sent_time > seconds_of_minutes(30)) return;
-                                }
+                    unblur_content() {
+                        if (this.blur_mark) this.blur_mark.remove();
+                        this.blur_mark = null;
+                    }
 
-                                if (msgattrsenior.msgobj.is_header()) {
-                                    this.msgattrparents.push(msgattrsenior);
-                                    return;
-                                }
+                    #resolve_relations(msgattrseniors) {
+                        for (let i = 0; i < msgattrseniors.length; i++) {
+                            const msgattrsenior = msgattrseniors[i];
+                            if (msgattrsenior.sender !== this.msgattr.sender) return;
+                            if (!msgattrsenior.is_sent || !this.msgattr.is_sent) return;
+
+                            if (i === 0) {
+                                if (!form_field_checker.ffc_int(this.msgattr.sent_time) || !form_field_checker.ffc_int(msgattrsenior.sent_time)) return;
+                                const this_dt = format_timestamp_utc8_day_time(this.msgattr.sent_time);
+                                const previous_dt = format_timestamp_utc8_day_time(msgattrsenior.sent_time);
+                                this.is_different_day = this_dt[0] !== previous_dt[0];
+                                if (this.is_different_day) return;
+                                if (this.msgattr.sent_time - msgattrsenior.sent_time > seconds_of_minutes(30)) return;
+                            }
+
+                            if (this.is_sys_msg() || msgattrsenior.msgobj.is_sys_msg()) {
+                                return;
+                            }
+
+                            if (msgattrsenior.msgobj.is_header()) {
                                 this.msgattrparents.push(msgattrsenior);
+                                return;
                             }
-                            if (msgattrseniors.length === 0) {
-                                this.is_different_day = true;
-                            }
+                            this.msgattrparents.push(msgattrsenior);
                         }
-
-                        is_header() {
-                            return this.msgattrparents.length === 0;
-                        }
-
-                        header() {
-                            // if (this.msgobjparent === null) return this;
-                            // let msgobjparent = this.msgobjparent;
-                            // while (true) {
-                            //     if (msgobjparent.msgobjparent !== null) {
-                            //         msgobjparent = msgobjparent.msgobjparent;
-                            //     } else {
-                            //         return msgobjparent;
-                            //     }
-                            // }
-                            return this.msgattrparents.at(-1).msgobj;
-                        }
-
-                        append_child(msgobj) {
-                            // if (this.msgobjchildren.length > 0) {
-                            //     msgobj.msgobjparent = this.msgobjchildren.at(-1);
-                            // } else {
-                            //     msgobj.msgobjparent = this;
-                            // }
-                            this.msgobjchildren.push(msgobj);
-                            this.msgelement_li.append(msgobj.msgelement);
-                        }
-
-                        remove_child(msgobj_child) {
-                            const index = this.msgobjchildren.indexOf(msgobj_child);
-                            if (index > -1) {
-                                this.msgobjchildren.splice(index, 1);
-                                msgobj_child.remove_from_group();
-                            }
-                        }
-
-                        remove_all_children() {
-                            for (const msgchild of this.msgobjchildren) {
-                                msgchild.remove_from_group();
-                            }
-                            this.msgobjchildren.length = 0;
-                        }
-
-                        remove_from_flow() {
-                            this.msgelement.remove();
-                        }
-
-                        remove_from_group() {
-                            this.msgelement.remove();
-                        }
-
-                        on_send_failed(error) {
-                            this.e_send_status_text.classList.add("hidden");
-                            this.e_send_status_btn_retry.classList.remove("hidden");
-                        }
-
-                        on_resend_started() {
-                            this.e_send_status_text.classList.remove("hidden");
-                            this.e_send_status_btn_retry.classList.add("hidden");
+                        if (msgattrseniors.length === 0) {
+                            this.is_different_day = true;
                         }
                     }
 
-                    class TextMsg extends _ {
-                        constructor(contentpage, msgattr, msgattrseniors,) {
-                            super(contentpage, msgattr, msgattrseniors,);
+                    is_sys_msg() {
+                        return dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_sys(this.msgattr.type);
+                    }
+
+                    is_header() {
+                        return this.msgattrparents.length === 0;
+                    }
+
+                    header() {
+                        // if (this.msgobjparent === null) return this;
+                        // let msgobjparent = this.msgobjparent;
+                        // while (true) {
+                        //     if (msgobjparent.msgobjparent !== null) {
+                        //         msgobjparent = msgobjparent.msgobjparent;
+                        //     } else {
+                        //         return msgobjparent;
+                        //     }
+                        // }
+                        return this.msgattrparents.at(-1).msgobj;
+                    }
+
+                    append_child(msgobj) {
+                        // if (this.msgobjchildren.length > 0) {
+                        //     msgobj.msgobjparent = this.msgobjchildren.at(-1);
+                        // } else {
+                        //     msgobj.msgobjparent = this;
+                        // }
+                        this.msgobjchildren.push(msgobj);
+                        this.msgelement_li.append(msgobj.msgelement);
+                    }
+
+                    remove_child(msgobj_child) {
+                        const index = this.msgobjchildren.indexOf(msgobj_child);
+                        if (index > -1) {
+                            this.msgobjchildren.splice(index, 1);
+                            msgobj_child.remove_from_group();
                         }
+                    }
 
-                        init() {
-                            super.init();
+                    remove_all_children() {
+                        for (const msgchild of this.msgobjchildren) {
+                            msgchild.remove_from_group();
+                        }
+                        this.msgobjchildren.length = 0;
+                    }
 
-                            let html = `
+                    remove_from_flow() {
+                        this.msgelement.remove();
+                    }
+
+                    remove_from_group() {
+                        this.msgelement.remove();
+                    }
+
+                    on_send_failed(error) {
+                        this.e_send_status_text.classList.add("hidden");
+                        this.e_send_status_btn_retry.classList.remove("hidden");
+                    }
+
+                    on_resend_started() {
+                        this.e_send_status_text.classList.remove("hidden");
+                        this.e_send_status_btn_retry.classList.add("hidden");
+                    }
+                }
+
+                class TextMsg extends _ {
+                    constructor(panel, contentpage, msgattr, msgattrseniors,) {
+                        super(panel, contentpage, msgattr, msgattrseniors,);
+                    }
+
+                    init() {
+                        super.init();
+
+                        let html = `
 <div class="chat-message-content-rect chat-mcr-text">
-<span></span>
+<div></div>
 </div>
 `;
-                            this.e_container.insertAdjacentHTML("beforeend", html);
-                            this.e_mcr = this.e_container.querySelector(":scope .chat-message-content-rect");
-                            this.e_mcr.style.background = this.palette.rect_bg;
+                        this.e_container.insertAdjacentHTML("beforeend", html);
+                        this.e_mcr = this.e_container.querySelector(":scope .chat-message-content-rect");
+                        this.e_mcr.style.background = this.palette.rect_bg;
 
-                            this.e_mcr_span = this.e_mcr.querySelector(":scope span");
+                        this.e_mcr_span = this.e_mcr.querySelector(":scope div");
 
-                        }
+                    }
 
-                        update() {
-                            super.update();
+                    update() {
+                        super.update();
 
-                            if (!this.msgattr.is_sent && this.msgattr.plain_text) {
-                                this.e_mcr_span.textContent = this.msgattr.plain_text;
+                        if (!this.msgattr.is_sent && this.msgattr.plain_text) {
+                            // this.e_mcr_span.textContent = this.msgattr.plain_text;
+                            this.e_mcr_span.innerHTML = MarkdownResolver.to_html(this.msgattr.plain_text);
+                            this.init_md();
+                        } else {
+                            if (this.msgattr.plain_data_text) {
+                                // this.e_mcr_span.textContent = this.msgattr.id + " | " + this.msgattr.plain_data_text;
+                                if (!this.msgattr.plain_data_markdown) this.msgattr.plain_data_markdown = MarkdownResolver.to_html(this.msgattr.plain_data_text);
+                                this.e_mcr_span.innerHTML = this.msgattr.plain_data_markdown;
+                                this.init_md();
                             } else {
-                                if (this.msgattr.plain_data_text) {
-                                    this.e_mcr_span.textContent = this.msgattr.id + " | " + this.msgattr.plain_data_text;
+                                if (this.msgattr.status & dashboardwrappers.ChatDashboardWrapper.message_status.encrypted) {
+                                    encryptors.decrypt2string(this.msgattr.data_text).then(result => {
+                                        // this.e_mcr_span.textContent = this.msgattr.id + " | " + result;
+                                        this.msgattr.plain_data_markdown = MarkdownResolver.to_html(result);
+                                        this.e_mcr_span.innerHTML = this.msgattr.plain_data_markdown;
+                                        this.init_md();
+                                        this.msgattr.plain_data_text = result;
+                                    }).catch(error => {
+                                        this.e_mcr_span.classList.add("red");
+                                        this.e_mcr_span.textContent = decrypt_error_string;
+                                    });
                                 } else {
-                                    if (this.msgattr.status & dashboardwrappers.ChatDashboardWrapper.message_status.encrypted) {
-                                        encryptors.decrypt2string(this.msgattr.data_text).then(result => {
-                                            this.e_mcr_span.textContent = this.msgattr.id + " | " + result;
-                                            this.msgattr.plain_data_text = result;
-                                        }).catch(error => {
-                                            this.e_mcr_span.classList.add("red");
-                                            this.e_mcr_span.textContent = decrypt_error_string;
-                                        });
-                                    } else {
-                                        this.e_mcr_span.textContent = this.msgattr.data_text;
-                                        this.msgattr.plain_data_text = this.msgattr.data_text;
-                                    }
-
+                                    // this.e_mcr_span.textContent = this.msgattr.data_text;
+                                    this.msgattr.plain_data_markdown = MarkdownResolver.to_html(this.msgattr.data_text);
+                                    this.e_mcr_span.innerHTML = this.msgattr.plain_data_markdown;
+                                    this.init_md();
+                                    this.msgattr.plain_data_text = this.msgattr.data_text;
                                 }
+
                             }
-
-
                         }
 
                     }
 
-                    class ImageMsg extends _ {
-                        constructor(contentpage, msgattr, msgattrseniors,) {
-                            super(contentpage, msgattr, msgattrseniors,);
+                    init_md() {
+                        {
+                            const code_areas = this.e_mcr_span.querySelectorAll(":scope .md-area-code");
+                            for (const codeArea of code_areas) {
+                                const code_area_btn_copy = codeArea.closest(".md-area-code-wrap").querySelector(":scope .md-area-code-btn-copy");
+                                code_area_btn_copy.addEventListener("click", (event) => navigator.clipboard.writeText(codeArea.textContent));
+                            }
+                        }
+                        {
+                            const tokens = this.e_mcr_span.querySelectorAll(":scope .md-text-at");
+                            for (const token of tokens) {
+                                let id = token.dataset.userId;
+                                if (id === "all") id = "所有人";
+                                if (id === "所有人") {
+                                    token.textContent = "@" + id;
+                                    this.at_attr.at_all = true;
+                                } else {
+                                    if (!this.at_attr.at_users.includes(id) && id !== this.msgattr.sender) {
+                                        this.at_attr.at_users.push(id);
+                                    }
+                                }
+                                token.palette = contentpages._chat.get_message_palette(id);
+                                // token.style.color = "white";
+                                token.style.color = token.palette.name_bg;
+                                // token.style.background = token.palette.name_bg;
+                            }
+                        }
+                        {
+                            const tokens = this.e_mcr_span.querySelectorAll(":scope .md-text-cite");
+                            for (const token of tokens) {
+                                const id = parseInt(token.dataset.messageId);
+                                if (form_field_checker.ffc_int(id)) {
+                                    if (id === this.msgattr.id)
+                                        continue;
+                                    const msg = this.contentpage.li.bindmap.msgs.findLast(i => i.id === id);
+                                    if (msg) {
+                                        if (!this.at_attr.at_users.includes(msg.sender) && msg.sender !== this.msgattr.sender) {
+                                            this.at_attr.at_users.push(msg.sender);
+                                        }
+                                        if (msg.plain_data_text) {
+                                            if (msg.plain_data_text.length > 15) {
+                                                token.textContent = "&" + msg.plain_data_text.slice(0, 15) + "...";
+                                            } else {
+                                                token.textContent = "&" + msg.plain_data_text;
+                                            }
+                                        } //
+                                        else if (msg.plain_file_name) {
+                                            if (msg.plain_file_name.length > 15) {
+                                                token.textContent = "&" + msg.plain_file_name.slice(0, 15) + "...";
+                                            } else {
+                                                token.textContent = "&" + msg.plain_file_name;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
 
-                        init() {
-                            super.init();
+                        super.update();
 
-                            let html = `
+                    }
+                }
+
+                class ImageMsg extends _ {
+                    constructor(panel, contentpage, msgattr, msgattrseniors,) {
+                        super(panel, contentpage, msgattr, msgattrseniors,);
+                    }
+
+                    init() {
+                        super.init();
+
+                        let html = `
 <div class="chat-message-content-rect chat-mcr-image">
 <img src="" alt="" draggable="false">
 <span>[图片]</span>
 </div>
 `;
-                            this.e_container.insertAdjacentHTML("beforeend", html);
-                            this.e_mcr = this.e_container.querySelector(":scope .chat-message-content-rect");
-                            this.e_mcr.style.background = this.palette.rect_bg;
+                        this.e_container.insertAdjacentHTML("beforeend", html);
+                        this.e_mcr = this.e_container.querySelector(":scope .chat-message-content-rect");
+                        this.e_mcr.style.background = this.palette.rect_bg;
 
-                            this.e_mcr_img = this.e_mcr.querySelector(":scope img");
+                        this.e_mcr_img = this.e_mcr.querySelector(":scope img");
 
-                            const width = this.msgattr.image_attr.width;
-                            const height = this.msgattr.image_attr.height;
-                            if (width * 0.5 > height) {
-                                this.e_mcr_img.style.width = "140px";
-                                this.e_mcr_img.style.height = "auto";
-                            }
-                            this.e_mcr_img.addEventListener("click", (event) => {
-                                const im = new ImageMark(document.body);
-                                im.show();
-                                // getImgData(this.e_mcr_img, (blob) => { // 需要canvas权限
-                                //     const url = URL.createObjectURL(blob);
-                                //     if (im.is_visible()) {
-                                //         im.load_from_tempurl(url, this.msgattr.plain_file_name);
-                                //     } else {
-                                //         URL.revokeObjectURL(url);
-                                //     }
-                                // });
-                                im.load_from_uint8array(this.msgattr.plain_file_name, this.msgattr.plain_file_data);
-                            });
-
-                            this.e_mcr_span = this.e_mcr.querySelector(":scope span"); // 点击开始下载
-                            elements_can_select_text_when_alt_pressed.add(this.e_mcr_span);
-                            this.e_mcr_span.addEventListener("click", (event) => {
-                                if (!this.msgattr.is_sent) return
-                                if (this.msgattr.upload_task && this.msgattr.upload_task.status !== FloatBall.taskstatus.finished) return;
-                                if (!this.msgattr.plain_file_name) return;
-                                if (this.msgattr.download_task) {
-                                    floatball.look_download_tasks(this.msgattr.download_task);
-                                    return;
-                                }
-
-                                const t = new FloatBall.tasktypes.Download_ChatMessage(floatball.dialog.tab_content_backtasks, {
-                                    onfinished: () => {
-                                        this.update();
-                                    },
-                                    onprogress: () => {
-                                        this.update();
-                                    },
-                                    onfailed: () => {
-                                        this.update();
-                                    }
-                                });
-                                floatball.dialog.addTask(t);
-                                t.set_name(this.msgattr.plain_file_name);
-                                t.set_args({
-                                    msg: this.msgattr,
-                                });
-
-                                this.msgattr.download_task = t;
-
-                                floatball.dialog.checkToStartTask();
-                                floatball.dialog.checkToHide(t);
-
-                                // floatball.look_download_tasks(t);
-                            });
-
+                        const width = this.msgattr.image_attr.width;
+                        const height = this.msgattr.image_attr.height;
+                        if (width * 0.5 > height) {
+                            this.e_mcr_img.style.width = "140px";
+                            this.e_mcr_img.style.height = "auto";
                         }
+                        this.e_mcr_img.addEventListener("click", (event) => {
+                            const im = new ImageMark(document.body);
+                            im.show();
+                            // getImgData(this.e_mcr_img, (blob) => { // 需要canvas权限
+                            //     const url = URL.createObjectURL(blob);
+                            //     if (im.is_visible()) {
+                            //         im.load_from_tempurl(url, this.msgattr.plain_file_name);
+                            //     } else {
+                            //         URL.revokeObjectURL(url);
+                            //     }
+                            // });
+                            im.load_from_uint8array(this.msgattr.plain_file_name, this.msgattr.plain_file_data);
+                        });
 
-                        update() {
-                            super.update();
+                        this.e_mcr_span = this.e_mcr.querySelector(":scope span"); // 点击开始下载
+                        // elements_can_select_text_when_alt_pressed.add(this.e_mcr_span);
+                        this.e_mcr_span.addEventListener("click", (event) => {
+                            if (!this.msgattr.is_sent) return
+                            if (this.msgattr.upload_task && this.msgattr.upload_task.status !== FloatBall.taskstatus.finished) return;
+                            if (!this.msgattr.plain_file_name) return;
+                            if (this.msgattr.download_task) {
+                                floatball.look_download_tasks(this.msgattr.download_task);
+                                return;
+                            }
 
-                            if (!this.msgattr.is_sent) {
+                            const t = new FloatBall.tasktypes.Download_ChatMessage(floatball.dialog.tab_content_backtasks, {
+                                onfinished: () => {
+                                    this.update();
+                                },
+                                onwaiting: () => {
+                                    this.update();
+                                },
+                                onprogress: () => {
+                                    this.update();
+                                },
+                                onfailed: () => {
+                                    this.update();
+                                }
+                            });
+
+                            this.msgattr.download_task = t;
+
+                            floatball.dialog.addTask(t);
+                            t.set_name(this.msgattr.plain_file_name);
+                            t.set_args({
+                                msg: this.msgattr,
+                            });
+
+                            floatball.dialog.checkToStartTask();
+                            floatball.dialog.checkToHide(t);
+
+                            // floatball.look_download_tasks(t);
+                        });
+
+                    }
+
+                    update() {
+                        super.update();
+
+                        if (!this.msgattr.is_sent) {
+                            this.e_mcr_img.classList.add("hidden");
+                            if (this.msgattr.upload_task) {
+                                set_textContent_if_different(this.e_mcr_span, `[图片] ${this.msgattr.file_name} ${this.panel.wrapper.format_text_for_msgview(this.msgattr.upload_task.backtask_status_text.textContent)}`);
+                            } else {
+                                set_textContent_if_different(this.e_mcr_span, `[图片] ${this.msgattr.file_name} 正在上传...`);
+                            }
+                        } else {
+                            if (!this.msgattr.download_task) { // 未下载
                                 this.e_mcr_img.classList.add("hidden");
-                                if (this.msgattr.upload_task) {
-                                    set_textContent_if_different(this.e_mcr_span, `[图片] ${this.msgattr.file_name} ${this.contentpage.panel.wrapper.format_text_for_msgview(this.msgattr.upload_task.backtask_status_text.textContent)}`);
+                                if (this.msgattr.status & dashboardwrappers.ChatDashboardWrapper.message_status.encrypted) {
+                                    encryptors.decrypt2string(this.msgattr.file_attr.name).then(result => {
+                                        set_textContent_if_different(this.e_mcr_span, `[图片] ${result} 点击下载`);
+                                        this.msgattr.plain_file_name = result;
+                                    }).catch(error => {
+                                        this.e_mcr_span.classList.add("red");
+                                        set_textContent_if_different(this.e_mcr_span, `[图片] ${decrypt_error_string}`);
+                                    });
                                 } else {
-                                    set_textContent_if_different(this.e_mcr_span, `[图片] ${this.msgattr.file_name} 正在上传...`);
+                                    set_textContent_if_different(this.e_mcr_span, `[图片] ${this.msgattr.file_attr.name} 点击下载`);
+                                    this.msgattr.plain_file_name = this.msgattr.file_attr.name;
                                 }
                             } else {
-                                if (!this.msgattr.download_task) { // 未下载
-                                    this.e_mcr_img.classList.add("hidden");
-                                    if (this.msgattr.status & dashboardwrappers.ChatDashboardWrapper.message_status.encrypted) {
-                                        encryptors.decrypt2string(this.msgattr.file_attr.name).then(result => {
-                                            set_textContent_if_different(this.e_mcr_span, `[图片] ${result} 点击下载`);
-                                            this.msgattr.plain_file_name = result;
-                                        }).catch(error => {
-                                            this.e_mcr_span.classList.add("red");
-                                            set_textContent_if_different(this.e_mcr_span, `[图片] ${decrypt_error_string}`);
-                                        });
-                                    } else {
-                                        set_textContent_if_different(this.e_mcr_span, `[图片] ${this.msgattr.file_attr.name} 点击下载`);
-                                        this.msgattr.plain_file_name = this.msgattr.file_attr.name;
+                                // task的状态变化时，会调用msgobj的update
+                                // if (this.msgattr.download_task.status === floatball.taskstatus.finished) {
+                                // }
+
+                                if (this.msgattr.plain_file_data) {
+                                    this.e_mcr_img.classList.remove("hidden");
+                                    this.e_mcr_span.classList.add("hidden");
+
+                                    if (!this.e_mcr_img.src.startsWith("blob")) {
+                                        this.set_img_src(this.msgattr.plain_file_data);
                                     }
+
                                 } else {
-                                    // task的状态变化时，会调用msgobj的update
-                                    // if (this.msgattr.download_task.status === floatball.taskstatus.finished) {
-                                    // }
+                                    set_textContent_if_different(this.e_mcr_span, `[图片] ${this.msgattr.plain_file_name} ${this.panel.wrapper.format_text_for_msgview(this.msgattr.download_task.backtask_status_text.textContent)}`);
 
-                                    if (this.msgattr.plain_file_data) {
-                                    } else {
-                                        set_textContent_if_different(this.e_mcr_span, `[图片] ${this.msgattr.plain_file_name} ${this.contentpage.panel.wrapper.format_text_for_msgview(this.msgattr.download_task.backtask_status_text.textContent)}`);
+                                    if (this.msgattr.download_task.args.plain_file_data) {
+                                        this.e_mcr_img.classList.remove("hidden");
+                                        this.e_mcr_span.classList.add("hidden");
 
-                                        if (this.msgattr.download_task.args.plain_file_data) {
-                                            this.e_mcr_img.classList.remove("hidden");
-                                            this.e_mcr_span.classList.add("hidden");
+                                        this.msgattr.plain_file_data = this.msgattr.download_task.args.plain_file_data; // 在全屏查看时用到
+                                        this.msgattr.download_task.args.plain_file_data = null;
 
-                                            const blob = new Blob([this.msgattr.download_task.args.plain_file_data]); // blob不能指定名称
-                                            // const file = new File([this.msgattr.download_task.args.plain_file_data], // img也不读取file的name
-                                            //     this.msgattr.plain_file_name, {type: "image/png"});
+                                        this.set_img_src(this.msgattr.plain_file_data);
 
-                                            this.msgattr.plain_file_data = this.msgattr.download_task.args.plain_file_data; // 在全屏查看时用到
-                                            this.msgattr.download_task.args.plain_file_data = null;
-
-                                            this.e_mcr_img__urlobj = URL.createObjectURL(blob);
-                                            this.e_mcr_img.src = this.e_mcr_img__urlobj;
-                                            this.e_mcr_img.onload = () => {
-                                                if (this.e_mcr_img__urlobj) { // 先不删，不然不能右键另存为了。由于不能指定另存为的名称，删吧
-                                                    URL.revokeObjectURL(this.e_mcr_img__urlobj);
-                                                    this.e_mcr_img__urlobj = null;
-                                                }
-                                            };
-
-                                        }
                                     }
                                 }
-
                             }
 
-                        }
-
-                        remove_from_group() {
-                            super.remove_from_group();
-                            elements_can_select_text_when_alt_pressed.remove(this.e_mcr_span);
-                            if (this.e_mcr_img__urlobj) {
-                                URL.revokeObjectURL(this.e_mcr_img__urlobj);
-                                this.e_mcr_img__urlobj = null;
-                            }
                         }
 
                     }
 
-                    class FileMsg extends _ {
-                        constructor(contentpage, msgattr, msgattrseniors,) {
-                            super(contentpage, msgattr, msgattrseniors,);
+                    remove_from_group() {
+                        super.remove_from_group();
+                        // elements_can_select_text_when_alt_pressed.remove(this.e_mcr_span);
+                        if (this.e_mcr_img__urlobj) {
+                            URL.revokeObjectURL(this.e_mcr_img__urlobj);
+                            this.e_mcr_img__urlobj = null;
                         }
+                    }
 
-                        init() {
-                            super.init();
+                    set_img_src(plain_file_data) {
+                        const blob = new Blob([plain_file_data]); // blob不能指定名称
+                        // const file = new File([this.msgattr.download_task.args.plain_file_data], // img也不读取file的name
+                        //     this.msgattr.plain_file_name, {type: "image/png"});
 
-                            let html = `
+                        this.e_mcr_img__urlobj = URL.createObjectURL(blob);
+                        this.e_mcr_img.src = this.e_mcr_img__urlobj;
+                        this.e_mcr_img.onload = () => {
+                            if (this.e_mcr_img__urlobj) { // 先不删，不然不能右键另存为了。由于不能指定另存为的名称，删吧
+                                URL.revokeObjectURL(this.e_mcr_img__urlobj);
+                                this.e_mcr_img__urlobj = null;
+                            }
+                        };
+                    }
+
+                }
+
+                class FileMsg extends _ {
+                    constructor(panel, contentpage, msgattr, msgattrseniors,) {
+                        super(panel, contentpage, msgattr, msgattrseniors,);
+                    }
+
+                    init() {
+                        super.init();
+
+                        let html = `
 <div class="chat-message-content-rect chat-mcr-file">
 <span class="chat-mcr-file-icon">🗳️</span>
 <div class="chat-mcr-file-info">
@@ -8094,145 +9132,147 @@
 </div>
 </div>
 `;
-                            this.e_container.insertAdjacentHTML("beforeend", html);
-                            this.e_mcr = this.e_container.querySelector(":scope .chat-message-content-rect");
-                            this.e_mcr.style.background = this.palette.rect_bg;
+                        this.e_container.insertAdjacentHTML("beforeend", html);
+                        this.e_mcr = this.e_container.querySelector(":scope .chat-message-content-rect");
+                        this.e_mcr.style.background = this.palette.rect_bg;
 
-                            this.e_mcr_icon = this.e_mcr.querySelector(":scope .chat-mcr-file-icon");
-                            this.e_mcr_info_name = this.e_mcr.querySelector(":scope .chat-mcr-file-info-name");
-                            this.e_mcr_info_size = this.e_mcr.querySelector(":scope .chat-mcr-file-info-size");
-                            this.e_mcr_status = this.e_mcr.querySelector(":scope .chat-mcr-file-status");
+                        this.e_mcr_icon = this.e_mcr.querySelector(":scope .chat-mcr-file-icon");
+                        this.e_mcr_info_name = this.e_mcr.querySelector(":scope .chat-mcr-file-info-name");
+                        this.e_mcr_info_size = this.e_mcr.querySelector(":scope .chat-mcr-file-info-size");
+                        this.e_mcr_status = this.e_mcr.querySelector(":scope .chat-mcr-file-status");
 
-                            this.e_mcr_info_size.textContent = format_bytes(this.msgattr.file_attr.size);
+                        this.e_mcr_info_size.textContent = format_bytes(this.msgattr.file_attr.size);
 
-                            this.e_mcr_icon = this.e_mcr.querySelector(":scope span"); // 点击开始下载
-                            this.e_mcr_icon.addEventListener("click", (event) => {
-                                if (!this.msgattr.is_sent) return
-                                if (this.msgattr.upload_task && this.msgattr.upload_task.status !== FloatBall.taskstatus.finished) return;
-                                if (!this.msgattr.plain_file_name) return;
-                                if (this.msgattr.download_task && this.msgattr.download_task.status !== FloatBall.taskstatus.finished) {
-                                    floatball.look_download_tasks(this.msgattr.download_task);
-                                    return;
+                        this.e_mcr_icon = this.e_mcr.querySelector(":scope span"); // 点击开始下载
+                        this.e_mcr_icon.addEventListener("click", (event) => {
+                            if (!this.msgattr.is_sent) return
+                            if (this.msgattr.upload_task && this.msgattr.upload_task.status !== FloatBall.taskstatus.finished) return;
+                            if (!this.msgattr.plain_file_name) return;
+                            if (this.msgattr.download_task && this.msgattr.download_task.status !== FloatBall.taskstatus.finished) {
+                                floatball.look_download_tasks(this.msgattr.download_task);
+                                return;
+                            }
+
+                            const t = new FloatBall.tasktypes.Download_ChatMessage(floatball.dialog.tab_content_backtasks, {
+                                onfinished: () => {
+                                    this.update();
+                                },
+                                onwaiting: () => {
+                                    this.update();
+                                },
+                                onprogress: () => {
+                                    this.update();
+                                },
+                                onfailed: () => {
+                                    this.update();
                                 }
-
-                                const t = new FloatBall.tasktypes.Download_ChatMessage(floatball.dialog.tab_content_backtasks, {
-                                    onfinished: () => {
-                                        this.update();
-                                    },
-                                    onprogress: () => {
-                                        this.update();
-                                    },
-                                    onfailed: () => {
-                                        this.update();
-                                    }
-                                });
-                                floatball.dialog.addTask(t);
-                                t.set_name(this.msgattr.plain_file_name);
-                                t.set_args({
-                                    msg: this.msgattr,
-                                });
-
-                                this.msgattr.download_task = t;
-
-                                floatball.dialog.checkToStartTask();
-                                floatball.dialog.checkToHide(t);
-
-                                // floatball.look_download_tasks(t);
                             });
 
-                        }
+                            this.msgattr.download_task = t;
 
-                        update() {
-                            super.update();
+                            floatball.dialog.addTask(t);
+                            t.set_name(this.msgattr.plain_file_name);
+                            t.set_args({
+                                msg: this.msgattr,
+                            });
 
-                            if (!this.msgattr.is_sent) {
-                                if (this.msgattr.upload_task) {
-                                    set_textContent_if_different(this.e_mcr_info_name, `${this.msgattr.file_name}`);
-                                    set_textContent_if_different(this.e_mcr_status, `${this.contentpage.panel.wrapper.format_text_for_msgview(this.msgattr.upload_task.backtask_status_text.textContent)}`);
+                            floatball.dialog.checkToStartTask();
+                            floatball.dialog.checkToHide(t);
+
+                            // floatball.look_download_tasks(t);
+                        });
+
+                    }
+
+                    update() {
+                        super.update();
+
+                        if (!this.msgattr.is_sent) {
+                            if (this.msgattr.upload_task) {
+                                set_textContent_if_different(this.e_mcr_info_name, `${this.msgattr.file_name}`);
+                                set_textContent_if_different(this.e_mcr_status, `${this.panel.wrapper.format_text_for_msgview(this.msgattr.upload_task.backtask_status_text.textContent)}`);
+                            } else {
+                                set_textContent_if_different(this.e_mcr_info_name, `${this.msgattr.file_name}`);
+                                set_textContent_if_different(this.e_mcr_status, `正在上传...`);
+                            }
+                        } else {
+                            if (!this.msgattr.download_task) { // 未下载
+                                if (this.msgattr.status & dashboardwrappers.ChatDashboardWrapper.message_status.encrypted) {
+                                    encryptors.decrypt2string(this.msgattr.file_attr.name).then(result => {
+                                        set_textContent_if_different(this.e_mcr_info_name, `${result}`);
+                                        this.msgattr.plain_file_name = result;
+                                    }).catch(error => {
+                                        this.e_mcr_info_name.classList.add("red");
+                                        this.e_mcr_icon.classList.add("red");
+                                        set_textContent_if_different(this.e_mcr_info_name, `${decrypt_error_string}`);
+                                    });
                                 } else {
-                                    set_textContent_if_different(this.e_mcr_info_name, `${this.msgattr.file_name}`);
-                                    set_textContent_if_different(this.e_mcr_status, `正在上传...`);
+                                    set_textContent_if_different(this.e_mcr_info_name, `${this.msgattr.file_attr.name}`);
+                                    this.msgattr.plain_file_name = this.msgattr.file_attr.name;
                                 }
                             } else {
-                                if (!this.msgattr.download_task) { // 未下载
-                                    if (this.msgattr.status & dashboardwrappers.ChatDashboardWrapper.message_status.encrypted) {
-                                        encryptors.decrypt2string(this.msgattr.file_attr.name).then(result => {
-                                            set_textContent_if_different(this.e_mcr_info_name, `${result}`);
-                                            this.msgattr.plain_file_name = result;
-                                        }).catch(error => {
-                                            this.e_mcr_info_name.classList.add("red");
-                                            set_textContent_if_different(this.e_mcr_info_name, `${decrypt_error_string}`);
-                                        });
-                                    } else {
-                                        set_textContent_if_different(this.e_mcr_info_name, `${this.msgattr.file_attr.name}`);
-                                        this.msgattr.plain_file_name = this.msgattr.file_attr.name;
-                                    }
-                                } else {
-                                    set_textContent_if_different(this.e_mcr_info_name, `${this.msgattr.plain_file_name}`);
-                                    set_textContent_if_different(this.e_mcr_status, `${this.contentpage.panel.wrapper.format_text_for_msgview(this.msgattr.download_task.backtask_status_text.textContent)}`);
+                                set_textContent_if_different(this.e_mcr_info_name, `${this.msgattr.plain_file_name}`);
+                                set_textContent_if_different(this.e_mcr_status, `${this.panel.wrapper.format_text_for_msgview(this.msgattr.download_task.backtask_status_text.textContent)}`);
 
-                                    if (this.msgattr.download_task.args.plain_file_data) {
-                                        // this.e_mcr_status.classList.add("hidden");
+                                if (this.msgattr.download_task.args.plain_file_data) {
+                                    // this.e_mcr_status.classList.add("hidden");
 
-                                        saveFile_from_uint8array(this.msgattr.download_task.args.plain_file_data, this.msgattr.plain_file_name);
-                                        this.msgattr.download_task.args.plain_file_data = null;
+                                    saveFile_from_uint8array(this.msgattr.download_task.args.plain_file_data, this.msgattr.plain_file_name);
+                                    this.msgattr.download_task.args.plain_file_data = null;
 
-                                    }
                                 }
-
                             }
 
                         }
 
                     }
 
-                    return {TextMsg, ImageMsg, FileMsg,};
-                })(),
+                }
 
-
-                add_element: (msgattr, msgseniors, noappend = false) => {
-                    if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_text(msgattr.type)) {
-                        const msgobj = new this.msgflow_manage.msgtypes.TextMsg(this, msgattr, msgseniors);
-                        msgattr.msgobj = msgobj;
-                        if (msgobj.is_header()) {
-                            if (!noappend) this.e_msgflow.append(msgobj.msgelement);
-                        } else {
-                            msgobj.header().append_child(msgobj);
-                        }
-                        return msgobj;
-                    } else if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_image(msgattr.type)) {
-                        const msgobj = new this.msgflow_manage.msgtypes.ImageMsg(this, msgattr, msgseniors);
-                        msgattr.msgobj = msgobj;
-                        if (msgobj.is_header()) {
-                            if (!noappend) this.e_msgflow.append(msgobj.msgelement);
-                        } else {
-                            msgobj.header().append_child(msgobj);
-                        }
-                        return msgobj;
-                    } else if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_file(msgattr.type)) {
-                        const msgobj = new this.msgflow_manage.msgtypes.FileMsg(this, msgattr, msgseniors);
-                        msgattr.msgobj = msgobj;
-                        if (msgobj.is_header()) {
-                            if (!noappend) this.e_msgflow.append(msgobj.msgelement);
-                        } else {
-                            msgobj.header().append_child(msgobj);
-                        }
-                        return msgobj;
+                class SysMsg extends _ {
+                    constructor(panel, contentpage, msgattr, msgattrseniors,) {
+                        super(panel, contentpage, msgattr, msgattrseniors,);
                     }
-                },
 
-                remove_element: (msgattr) => {
-                    if (msgattr.msgobj.is_header()) {
-                        msgattr.msgobj.remove_all_children();
-                        msgattr.msgobj.remove_from_flow();
-                    } else {
-                        msgattr.msgobj.header().remove_child(msgattr.msgobj);
+                    init() {
+                        super.init();
+
+                        let html = `
+<div class="chat-message-content-rect chat-mcr-sys">
+<span></span>
+</div>
+`;
+                        this.e_container.insertAdjacentHTML("beforeend", html);
+                        this.e_mcr = this.e_container.querySelector(":scope .chat-message-content-rect");
+                        this.e_mcr.style.background = this.palette.rect_bg;
+
+                        this.e_mcr_span = this.e_mcr.querySelector(":scope span");
+
                     }
-                    msgattr.msgobj = null;
-                },
-            }
 
-            static get_message_palette(name) {
+                    update() {
+                        super.update();
+
+                        if (!this.msgattr.is_sent) {
+                            this.e_mcr_span.textContent = "系统消息未发送？";
+                        } else {
+                            if (!this.msgattr.formated_sys_msg) this.msgattr.formated_sys_msg = this.panel.wrapper.format_sys_msg(this.msgattr);
+                            this.e_mcr_span.textContent = this.msgattr.formated_sys_msg;
+
+                        }
+
+                    }
+
+                }
+
+                return {TextMsg, ImageMsg, FileMsg, SysMsg,};
+            })()
+
+
+            static get_message_palette(name, need_gray = false) {
+                if (need_gray) {
+                    return {name_bg: "rgb(169,169,169)", rect_bg: "rgba(169,169,169,15%)",};
+                }
                 const colors = [
                     {name_bg: "rgb(26,173,25)", rect_bg: "rgba(26,173,25,15%)",}, //
                     {name_bg: "rgb(28,137,173)", rect_bg: "rgba(28,137,173,15%)",}, //
@@ -8260,6 +9300,7 @@
             * 草稿
             * */
             save_draft_text() {
+                if (this.is_editing_msg) return;
                 this.li.bindmap.draft_text = this.e_inputarea_textarea.value;
                 this.e_inputarea_textarea.value = "";
                 this.client.dashboard_chat.wrapper._update_contact_item_status(this.li.bindmap, this.li.bindmap.status_attr, true);
@@ -8280,7 +9321,7 @@
                     this.e_msgflow_mark_onlineusers.simple_loading_mark.show();
 
                     const {xxid, contact_type} = this.current_contact_xxid();
-                    checkin.subviews.chat.members(contact_type, xxid)
+                    checkin.subviews.chat.members(contact_type, xxid,)
                         .then(result => {
                             if (this.closed) return;
                             this.load_online_users(result.users);
@@ -8363,8 +9404,17 @@
             * 文本输入框
             * */
             add_textarea_element__at(uid) {
-                const textarea = this.e_inputarea_textarea;
                 const textToInsert = `@${uid} `;
+                this.add_textarea_element(textToInsert);
+            }
+
+            add_textarea_element__cite(message_id) {
+                const textToInsert = `&${message_id} `;
+                this.add_textarea_element(textToInsert);
+            }
+
+            add_textarea_element(textToInsert) {
+                const textarea = this.e_inputarea_textarea;
 
                 // 获取光标位置
                 const startPos = textarea.selectionStart;
@@ -8390,8 +9440,8 @@
                 this.previous_activity_attr.sent_time = current_time;
 
                 // this.previous_activity_attr.is_sending = true;
-                const {xxid, contact_type} = this.current_contact_xxid();
-                this.client.subviews.chat.act(contact_type, xxid, type)
+                const {xxid, contact_type, ceid} = this.current_contact_xxid();
+                this.client.subviews.chat.act(contact_type, xxid, ceid, type)
                     .then(result => {
                         // if (this.closed) return;
                         // this.previous_activity_attr.is_sending = false;
@@ -8416,8 +9466,8 @@
 
                 const first_msgattr = this.li.bindmap.msgs.length > 0 ? this.li.bindmap.msgs.at(0) : null;
 
-                const {xxid, contact_type} = this.current_contact_xxid();
-                checkin.subviews.chat.load_history(contact_type, xxid, first_msgattr)
+                const {xxid, contact_type, ceid} = this.current_contact_xxid();
+                checkin.subviews.chat.load_history(contact_type, xxid, ceid, first_msgattr)
                     .then(result => {
                         // if (this.closed) return;
                         this.is_processing__load_history = false;
@@ -9319,6 +10369,323 @@
     }
 
     /*
+    * md解析
+    * */
+    const MarkdownResolver = {
+        line_object_types: {
+            plain_line: "plain_line",
+            code_area: "code_area",
+        },
+
+        resolve_line: (line_object, line_text) => {
+            // line_object will be mutated: set .tokens (AST), .raw, .is_blockquote
+            line_object.raw = line_text;
+
+            // detect blockquote (leading '>' with optional spaces)
+            const bqMatch = line_text.match(/^\s*>\s?(.*)$/);
+            if (bqMatch) {
+                line_object.is_blockquote = true;
+                line_text = bqMatch[1];
+            } else {
+                line_object.is_blockquote = false;
+            }
+
+            // Tokenize: split into text tokens and marker tokens.
+            // Markers we support (priority order): '~~', '**', '__', '`', '*'
+            const markers = ['~~', '**', '__', '`', '*',];
+
+            const atings = ["@", "&",];
+            let previous_ating;
+            const marker_atings_end = " ";
+
+            const tokens = []; // each token: {type: 'text'|'marker', text: string, marker?: string}
+            let buf = '';
+            for (let i = 0; i < line_text.length;) {
+                let matched = false;
+                let matched_ating = false;
+                for (const m of markers) {
+                    if (line_text.startsWith(m, i)) {
+                        // flush buffer
+                        if (buf.length) {
+                            tokens.push({type: 'text', text: buf});
+                            buf = '';
+                        }
+                        tokens.push({type: 'marker', marker: m});
+                        i += m.length;
+                        matched = true;
+                        break;
+                    }
+                }
+                for (const m of atings) {
+                    if (line_text.startsWith(m, i)) {
+                        // flush buffer
+                        if (buf.length) {
+                            tokens.push({type: 'text', text: buf});
+                            buf = '';
+                        }
+                        tokens.push({type: 'marker', marker: m});
+                        i += m.length;
+                        matched_ating = true;
+                        previous_ating = m;
+                        buf = m;
+                        break;
+                    }
+                }
+                if (previous_ating && line_text.startsWith(marker_atings_end, i)) {
+                    // flush buffer
+                    if (buf.length) {
+                        tokens.push({type: 'text', text: buf});
+                        buf = '';
+                    }
+                    tokens.push({type: 'marker', marker: previous_ating});
+                    i += marker_atings_end.length;
+                    matched_ating = false;
+                    previous_ating = null;
+                    continue;
+                }
+
+                if (!matched && !matched_ating) {
+                    buf += line_text[i];
+                    i++;
+                }
+            }
+            if (buf.length) tokens.push({type: 'text', text: buf});
+
+            // Recursive parser on tokens -> returns array of AST nodes
+            // node forms:
+            // {type: 'text', text: '...'}
+            // {type: 'code', text: '...'}
+            // {type: 'bold'|'italic'|'underline'|'del', children: [...]}
+            function parseRange(tokArr, start = 0, end = tokArr.length) {
+                const out = [];
+                let i = start;
+                while (i < end) {
+                    const t = tokArr[i];
+                    if (t.type === 'text') {
+                        out.push({type: 'text', text: t.text});
+                        i++;
+                        continue;
+                    }
+
+                    // marker handling
+                    const m = t.marker;
+                    // Inline code `...` : treat interior as raw text (no further parsing)
+                    const m_attr_map = {
+                        '`': {type: "code",},
+                        "@": {type: "at", padded: true,},
+                        "&": {type: "cite", padded: true,},
+                    }
+                    if (Object.keys(m_attr_map).includes(m)) {
+                        // find next backtick marker
+                        let j = i + 1;
+                        while (j < end) {
+                            if (tokArr[j].type === 'marker' && tokArr[j].marker === m) break;
+                            j++;
+                        }
+                        if (j < end) {
+                            // gather raw text between i+1 .. j-1
+                            let codeText = '';
+                            for (let k = i + 1; k < j; k++) {
+                                codeText += (tokArr[k].type === 'text' ? tokArr[k].text : tokArr[k].marker);
+                            }
+                            out.push({type: m_attr_map[m].type, text: codeText});
+                            i = j + 1;
+                        } else {
+                            // no closing backtick -> treat marker as literal text
+                            if (m_attr_map[m].padded) {
+                                out.push({type: 'text', text: m.slice(1)});
+                            } else {
+                                out.push({type: 'text', text: m});
+                            }
+                            i++;
+                        }
+                        continue;
+                    }
+
+                    // For other markers, find matching closing marker of same kind
+                    // supported mappings:
+                    // '**' -> bold
+                    // '*'  -> italic
+                    // '__' -> underline
+                    // '~~' -> del
+                    let nodeType = null;
+                    if (m === '**') nodeType = 'bold';
+                    else if (m === '*') nodeType = 'italic';
+                    else if (m === '__') nodeType = 'underline';
+                    else if (m === '~~') nodeType = 'del';
+
+                    if (nodeType) {
+                        // find a matching marker later (allow nesting)
+                        let j = i + 1;
+                        while (j < end) {
+                            if (tokArr[j].type === 'marker' && tokArr[j].marker === m) break;
+                            j++;
+                        }
+                        if (j < end) {
+                            // recursively parse interior tokens
+                            const children = parseRange(tokArr, i + 1, j);
+                            out.push({type: nodeType, children});
+                            i = j + 1;
+                        } else {
+                            // no matching closer -> treat marker as literal text
+                            out.push({type: 'text', text: m});
+                            i++;
+                        }
+                        continue;
+                    }
+
+                    // fallback: unknown marker -> literal
+                    out.push({type: 'text', text: t.marker});
+                    i++;
+                }
+                return out;
+            }
+
+            const ast = parseRange(tokens, 0, tokens.length);
+            line_object.tokens = ast;
+        },
+
+        resolve: (text) => {
+            const lines = text.split(/\r?\n/g);
+
+            const line_statuses = {
+                PLAIN_LINE: 0,
+                CODE_AREA_BEGIN: 1, // in fenced code block
+            }
+            let line_status = line_statuses.PLAIN_LINE;
+
+            const line_regexps = {
+                code_area_begin: /^\s*(`{3,})([A-Za-z0-9]*)\s*$/,
+                code_area_end: "^\\s*([`]{__count__})\\s*$",
+            };
+
+            const line_objects = [];
+
+            const line_object_template = {
+                type: MarkdownResolver.line_object_types.plain_line,
+            }
+
+            const line_args = {
+                code_area_backtick_count: null,
+                code_area_end_regexp: null,
+            };
+
+            for (const rawLine of lines) {
+                const line = rawLine; // keep name consistent
+                if (line_status === line_statuses.PLAIN_LINE) {
+
+                    const r = line_regexps.code_area_begin.exec(line); // 检测代码块开始
+                    if (r) {
+                        line_args.code_area_backtick_count = r[1].length;
+                        line_args.code_area_end_regexp = new RegExp(line_regexps.code_area_end.replace("__count__", line_args.code_area_backtick_count));
+                        line_status = line_statuses.CODE_AREA_BEGIN;
+
+                        const line_object = {
+                            ...line_object_template,
+                            type: MarkdownResolver.line_object_types.code_area,
+                            language: r[2] || '',
+                            data: [],
+                        };
+                        line_objects.push(line_object);
+
+                        continue;
+                    }
+
+                    // 普通行：解析为 tokens AST
+                    const line_object = {...line_object_template, type: MarkdownResolver.line_object_types.plain_line,};
+                    MarkdownResolver.resolve_line(line_object, line);
+                    line_objects.push(line_object);
+                } //
+                else if (line_status === line_statuses.CODE_AREA_BEGIN) {
+                    const r = line_args.code_area_end_regexp.exec(line);
+                    if (r) {
+                        // end of fenced code block
+                        line_status = line_statuses.PLAIN_LINE;
+                        // consume end line and continue
+                        continue;
+                    }
+
+                    const line_object = line_objects.at(-1);
+                    line_object.data.push(line);
+                }
+            }
+
+            return line_objects;
+        },
+
+        to_html: (text) => {
+            const line_objects = MarkdownResolver.resolve(text);
+
+            const parts = [];
+
+            function resolve_tokens(tokens) {
+                for (const token of tokens) {
+                    if (token.type === "text") {
+                        parts.push(`<span class="md-text">`);
+                        if (token.children) resolve_tokens(token.children);
+                        parts.push(token.text);
+                        parts.push(`</span>`);
+                    } //
+                    else if (token.type === "bold") {
+                        parts.push(`<span class="md-text-bold">`);
+                        if (token.children) resolve_tokens(token.children);
+                        parts.push(`</span>`);
+                    } //
+                    else if (token.type === "italic") {
+                        parts.push(`<span class="md-text-italic">`);
+                        if (token.children) resolve_tokens(token.children);
+                        parts.push(`</span>`);
+                    } //
+                    else if (token.type === "underline") {
+                        parts.push(`<span class="md-text-underline">`);
+                        if (token.children) resolve_tokens(token.children);
+                        parts.push(`</span>`);
+                    } //
+                    else if (token.type === "del") {
+                        parts.push(`<span class="md-text-del">`);
+                        if (token.children) resolve_tokens(token.children);
+                        parts.push(`</span>`);
+                    } //
+                    else if (token.type === "code") {
+                        parts.push(`<span class="md-text-code">`);
+                        if (token.children) resolve_tokens(token.children);
+                        parts.push(token.text);
+                        parts.push(`</span>`);
+                    } //
+
+                    else if (token.type === "at") {
+                        parts.push(`<span class="md-text-at" data-user-id="${token.text.slice(1)}">`);
+                        if (token.children) resolve_tokens(token.children);
+                        parts.push(token.text);
+                        parts.push(`</span>`);
+                    } //
+                    else if (token.type === "cite") {
+                        parts.push(`<span class="md-text-cite" data-message-id="${token.text.slice(1)}">`);
+                        if (token.children) resolve_tokens(token.children);
+                        parts.push(token.text);
+                        parts.push(`</span>`);
+                    } //
+                }
+            }
+
+            for (const lineObject of line_objects) {
+                if (lineObject.type === MarkdownResolver.line_object_types.plain_line) {
+                    if (lineObject.is_blockquote) parts.push(`<div class="md-line-blockquote">`);
+                    parts.push(`<p class="md-line">`);
+                    resolve_tokens(lineObject.tokens);
+                    parts.push(`</p>`);
+                    if (lineObject.is_blockquote) parts.push(`</div>`);
+                } else if (lineObject.type === MarkdownResolver.line_object_types.code_area) {
+                    parts.push(`<div class="md-area-code-wrap"><pre class="md-area-code">${lineObject.data.join("\n")}</pre><button class="md-area-code-btn-copy">复制</button></div>`);
+                }
+            }
+
+            return parts.join("\n");
+        },
+    }
+
+
+    /*
     * 应用元素包装层
     * */
     const dashboardwrappers = (() => {
@@ -9353,6 +10720,10 @@
                 this.timer__sync = null;
                 this.interval__sync = 10000;
                 this.is_processing__sync = false;
+
+                this.mark_syncing = this.dashboard_element.querySelector(':scope .chat-contacts-mark-syncing');
+                this.change_loading_status__syncing();
+
             }
 
             leave() {
@@ -9437,7 +10808,15 @@
             async _update_contact_item_status(item, status_attr, for_refresh = false) {
                 if (for_refresh && item.status_attr !== status_attr) return;
                 item.status_attr = status_attr;
-                item.ceid = status_attr.edition_id;
+
+                if (status_attr.edition_id !== null) { // 有未同步的二编消息
+                    const former_ceid = item.ceid;
+                    // item.ceid = status_attr.edition_id; // 由于http并发时收到响应的顺序不确定，判断下是否大于再赋值
+                    if (former_ceid === null || former_ceid < status_attr.edition_id) {
+                        item.ceid = status_attr.edition_id;
+                        this.sync_edited_messages(item, former_ceid, status_attr, status_attr.editions);
+                    }
+                }
 
                 if (status_attr.type === subviews.Chat.receiver_type.group) {
                     item.e_online_status.dataset.onlineStatus = status_attr.online_count > 0 ? "online" : "offline";
@@ -9482,7 +10861,229 @@
                             set_textContent_if_different(checkin.current_content_page.e_header_info_status, status_attr.online_status === ChatDashboardWrapper.online_status.online ? "在线" : "离线");
                         }
                     }
+                    // if (status_attr.unread_count > 0) {
+                    //     checkin.current_content_page.start_timer__fetch_unread_msgs();
+                    // }
+
                 }
+
+            }
+
+            sync_edited_messages(item, former_ceid, status_attr, message_ids) {
+                const local_msg_ids = [];
+                item.msgs.forEach(i => local_msg_ids.push(i.id));
+                // item.sending_msgs.forEach(i => local_msg_ids.push(i.id)); // sending_msgs里的都没有id
+                message_ids = message_ids.filter(i => local_msg_ids.includes(i)); // TODO 自己发送消息后立即编辑，会不会出现问题？是不是不能过滤？
+
+                if (message_ids.length === 0) {
+                    // console.log("同步二编消息（跳过）", former_ceid, status_attr.edition_id, status_attr, message_ids);
+                    return;
+                }
+                // console.log("同步二编消息", former_ceid, status_attr.edition_id, status_attr, message_ids);
+
+                item.msgs.filter(i => message_ids.includes(i.id)).forEach((msg) => {
+                    msg.msgobj.blur_content();
+                });
+                // item.sending_msgs.filter(i => message_ids.includes(i.id)).forEach((msg) => {
+                //     msg.msgobj.blur_content();
+                // });
+
+                this._sync_edited_messages(item, former_ceid, message_ids);
+            }
+
+            _sync_edited_messages(item, former_ceid, message_ids) {
+                const xxid = item.contact_attr.type === subviews.Chat.receiver_type.group ? item.contact_attr.gid : item.contact_attr.uid;
+                checkin.subviews.chat.sync_message(item.contact_attr.type, xxid, item.ceid, message_ids)
+                    .then(result => {
+                        // if (this.closed) return;
+                        this.update_contact_item_status(result.sync);
+                        this.handle_response__sync_edited_messages(item, former_ceid, message_ids, result);
+                    }).catch(error => {
+                    // if (this.closed) return;
+                    MessageMark.report(error, null, () => {
+                        this._sync_edited_messages(item, former_ceid, message_ids);
+                    });
+                });
+            }
+
+            handle_response__sync_edited_messages(item, former_ceid, message_ids, result) {
+                // console.log(result)
+
+                // result.message_attrs.forEach(i => { // 因只会检查item.msgs里的消息是否被二编，不必再次设置is_sent
+                //     i.is_sent = true;
+                // });
+
+                // const new_msgattrs = this.msgflow_manage.store_msgs(last_msgattr, result.messages);
+                // if (new_msgattrs.length > 0) {
+                //     const msg = new_msgattrs.find(i => i.sender !== logged_user.uid);
+                //     if (msg) {
+                //         msg.msgobj.highlight();
+                //         if (!is_background) msg.msgobj.scroll_to_view(true);
+                //     }
+                // }
+
+                if (checkin.current_content_page && checkin.current_content_page.li.bindmap === item) {
+                    for (const messageAttr of result.message_attrs) {
+                        const msgattr = item.msgs.findLast(i => i.id === messageAttr.id);
+                        if (!msgattr) continue;
+                        checkin.current_content_page.msgflow_manage.update_msg(msgattr, messageAttr,);
+                    }
+                } else {
+                    for (const messageAttr of result.message_attrs) {
+                        const msgattr = item.msgs.findLast(i => i.id === messageAttr.id);
+                        if (!msgattr) continue;
+                        this.msgflow_manage.update_msg(null, msgattr, messageAttr);
+                    }
+                }
+
+            }
+
+            /*
+             * 管理缓存的消息和渲染，可能与contentpage无关的部分
+             * */
+            msgflow_manage = { // this=dashboardwrapper
+
+                _assign_new_message_attr: (this_msgattr, new_message_attr) => {
+                    Object.assign(this_msgattr, new_message_attr);
+                    this_msgattr.plain_data_text = undefined;
+                    this_msgattr.plain_data_markdown = undefined;
+                    this_msgattr.formated_lastmsgview = undefined;
+                },
+
+                update_msg: (contentpage, this_msgattr, new_message_attr) => {
+                    if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_text(this_msgattr.type) && // 编辑
+                        dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_text(new_message_attr.type)) {
+                        this.msgflow_manage._assign_new_message_attr(this_msgattr, new_message_attr);
+                        this_msgattr.msgobj.unblur_content();
+                        this_msgattr.msgobj.update();
+
+                    } else if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_sys(new_message_attr.type)) { // 被撤回/删除了的话，类型就变了
+                        if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_sys(this_msgattr.type)) { // 例如从 被用户撤回 到 自动删除
+                            this.msgflow_manage._assign_new_message_attr(this_msgattr, new_message_attr);
+                            this_msgattr.formated_sys_msg = undefined;
+                            this_msgattr.formated_lastmsgview = undefined;
+                            this_msgattr.msgobj.unblur_content();
+                            this_msgattr.msgobj.update();
+                        } else {
+                            // const affected_msgobjs = [];
+                            // affected_msgobjs.push(msgattr.msgobj);
+                            // if (msgattr.msgobj.is_header()) {
+                            //     affected_msgobjs.push(...msgattr.msgobj.msgobjchildren);
+                            // } else {
+                            // }
+                            if (this_msgattr.msgobj.is_header()) {
+                                this.msgflow_manage._assign_new_message_attr(this_msgattr, new_message_attr);
+                                const header = this_msgattr.msgobj;
+                                const affected_msgobjs = []; // part2
+                                for (const msgobjchild of header.msgobjchildren) {
+                                    affected_msgobjs.push(msgobjchild);
+                                }
+                                // header.remove_from_flow(); // 先不删，等group消息移到flow里后再删
+                                for (const affectedMsgobj of affected_msgobjs) header.remove_child(affectedMsgobj);
+
+                                const new_header_msgobjs = [];
+                                for (const msgobjchild of [this_msgattr.msgobj, ...affected_msgobjs]) {
+                                    const msgseniors = [...msgobjchild.msgattrseniors];
+                                    const msgobj = this.msgflow_manage.add_element(contentpage, msgobjchild.msgattr, msgseniors, false);
+                                    msgobjchild.msgattr.msgobj = msgobj;
+                                    if (msgobj.is_header()) {
+                                        new_header_msgobjs.push(msgobj);
+                                    }
+                                }
+                                if (contentpage) {
+                                    header.msgelement.insertAdjacentElement("afterend", this_msgattr.msgobj.msgelement);
+                                    let previous_header = this_msgattr.msgobj.msgelement;
+                                    for (const affectedMsgobj of new_header_msgobjs.slice(1)) {
+                                        if (affectedMsgobj.is_header()) {
+                                            previous_header.insertAdjacentElement("afterend", affectedMsgobj.msgelement);
+                                            previous_header = affectedMsgobj.msgelement;
+                                        }
+                                    }
+                                    header.remove_from_flow();
+                                }
+
+                            } else {
+                                this.msgflow_manage._assign_new_message_attr(this_msgattr, new_message_attr);
+                                const header = this_msgattr.msgobj.header();
+                                const affected_msgobjs = []; // part2
+                                let found = false;
+                                for (const msgobjchild of header.msgobjchildren) {
+                                    if (found) {
+                                        affected_msgobjs.push(msgobjchild);
+                                    } else {
+                                        if (msgobjchild === this_msgattr.msgobj) found = true;
+                                    }
+                                }
+                                header.remove_child(this_msgattr.msgobj);
+                                for (const affectedMsgobj of affected_msgobjs) header.remove_child(affectedMsgobj);
+
+                                const new_header_msgobjs = [];
+                                for (const msgobjchild of [this_msgattr.msgobj, ...affected_msgobjs]) {
+                                    const msgseniors = [...msgobjchild.msgattrseniors];
+                                    const msgobj = this.msgflow_manage.add_element(contentpage, msgobjchild.msgattr, msgseniors, false);
+                                    msgobjchild.msgattr.msgobj = msgobj;
+                                    if (msgobj.is_header()) {
+                                        new_header_msgobjs.push(msgobj);
+                                    }
+                                }
+
+                                header.msgelement.insertAdjacentElement("afterend", this_msgattr.msgobj.msgelement);
+                                let previous_header = this_msgattr.msgobj.msgelement;
+                                for (const affectedMsgobj of new_header_msgobjs.slice(1)) {
+                                    if (affectedMsgobj.is_header()) {
+                                        previous_header.insertAdjacentElement("afterend", affectedMsgobj.msgelement);
+                                        previous_header = affectedMsgobj.msgelement;
+                                    }
+                                }
+                            }
+                        }
+                    } else { // 标记已读
+                        this.msgflow_manage._assign_new_message_attr(this_msgattr, new_message_attr);
+                        this_msgattr.msgobj.unblur_content();
+                        this_msgattr.msgobj.update();
+                    }
+                },
+
+                add_element: (contentpage, msgattr, msgseniors, noappend = false) => {
+                    if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_text(msgattr.type)) {
+                        const msgobj = new contentpages._chat.msgtypes.TextMsg(this.dashboard_element, contentpage, msgattr, msgseniors);
+                        msgattr.msgobj = msgobj;
+                        if (msgobj.is_header()) {
+                            if (!noappend) contentpage.e_msgflow.append(msgobj.msgelement);
+                        } else {
+                            msgobj.header().append_child(msgobj);
+                        }
+                        return msgobj;
+                    } else if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_image(msgattr.type)) {
+                        const msgobj = new contentpages._chat.msgtypes.ImageMsg(this.dashboard_element, contentpage, msgattr, msgseniors);
+                        msgattr.msgobj = msgobj;
+                        if (msgobj.is_header()) {
+                            if (!noappend) contentpage.e_msgflow.append(msgobj.msgelement);
+                        } else {
+                            msgobj.header().append_child(msgobj);
+                        }
+                        return msgobj;
+                    } else if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_file(msgattr.type)) {
+                        const msgobj = new contentpages._chat.msgtypes.FileMsg(this.dashboard_element, contentpage, msgattr, msgseniors);
+                        msgattr.msgobj = msgobj;
+                        if (msgobj.is_header()) {
+                            if (!noappend) contentpage.e_msgflow.append(msgobj.msgelement);
+                        } else {
+                            msgobj.header().append_child(msgobj);
+                        }
+                        return msgobj;
+                    } else if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_sys(msgattr.type)) {
+                        const msgobj = new contentpages._chat.msgtypes.SysMsg(this.dashboard_element, contentpage, msgattr, msgseniors);
+                        msgattr.msgobj = msgobj;
+                        if (msgobj.is_header()) {
+                            if (!noappend && contentpage) contentpage.e_msgflow.append(msgobj.msgelement);
+                        } else {
+                            msgobj.header().append_child(msgobj);
+                        }
+                        return msgobj;
+                    }
+                },
+
 
             }
 
@@ -9506,6 +11107,40 @@
                     string = `正在输入...(${users__typing.map(i => i.sender).join(", ")})`
                 }
 
+                return string;
+            }
+
+            format_sys_msg(msgattr) {
+                let string = "未知系统消息";
+                const sys_attr = msgattr.sys_attr;
+                if (sys_attr.type === dashboardwrappers.ChatDashboardWrapper.data_spec_action_type.revoke_message || sys_attr.type === dashboardwrappers.ChatDashboardWrapper.data_spec_action_type.delete_message) {
+                    const action_name = sys_attr.type === dashboardwrappers.ChatDashboardWrapper.data_spec_action_type.revoke_message ? "撤回" : "删除";
+                    if (msgattr.sender === logged_user.uid) {
+                        if (sys_attr.a1_uid === logged_user.uid) {
+                            string = `你${action_name}了一条消息`;
+                        } else {
+                            string = `${sys_attr.a1_uid}${action_name}了你的一条消息`;
+                        }
+                    } else if (msgattr.sender === sys_attr.a1_uid) {
+                        string = `${sys_attr.a1_uid}${action_name}了一条消息`;
+                    } else {
+                        if (sys_attr.a1_uid === logged_user.uid) {
+                            string = `你${action_name}了${msgattr.sender}的一条消息`;
+                        } else {
+                            string = `${sys_attr.a1_uid}${action_name}了${msgattr.sender}的一条消息`;
+                        }
+                    }
+                } //
+                else if (sys_attr.type === dashboardwrappers.ChatDashboardWrapper.data_spec_action_type.clear_message) {
+                    if (sys_attr.a1_uid === logged_user.uid) {
+                        string = `你清理了${sys_attr.a3_number}小时前的消息`;
+                    } else {
+                        string = `${sys_attr.a1_uid}清理了${sys_attr.a3_number}小时前的消息`;
+                    }
+                } //
+                else if (sys_attr.type === dashboardwrappers.ChatDashboardWrapper.data_spec_action_type.auto_delete_message) {
+                    string = `已删除的消息`;
+                }
                 return string;
             }
 
@@ -9562,7 +11197,8 @@
                         }
 
                     } else if (newest_msg.type === ChatDashboardWrapper.message_type.sys) {
-                        string = `[系统] xxxx`;
+                        if (!newest_msg.formated_sys_msg) newest_msg.formated_sys_msg = this.format_sys_msg(newest_msg);
+                        string = `[系统] ${newest_msg.formated_sys_msg}`;
                     }
                 }
                 if (!string) return full_width_space;
@@ -9639,6 +11275,7 @@
                 }
 
                 this.is_processing__sync = true;
+                this.change_loading_status__syncing();
 
                 const gid_args = {};
                 const uid_args = {};
@@ -9655,6 +11292,7 @@
                         // if (this.closed) return;
 
                         this.is_processing__sync = false;
+                        this.change_loading_status__syncing();
 
                         // this.remove_loading_mark();
                         remove_simple_loading_mark(this.aside_left_wrap);
@@ -9665,6 +11303,7 @@
                     // if (this.closed) return;
 
                     this.is_processing__sync = false;
+                    this.change_loading_status__syncing();
 
                     // this.remove_loading_mark();
                     remove_simple_loading_mark(this.aside_left_wrap);
@@ -9707,6 +11346,13 @@
                 await this._update_contact_item_status(item, status_attr);
             }
 
+            change_loading_status__syncing() {
+                if (this.is_processing__sync) {
+                    this.mark_syncing.classList.remove("hidden");
+                } else {
+                    this.mark_syncing.classList.add("hidden");
+                }
+            }
 
         }
 
