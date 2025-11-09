@@ -2296,7 +2296,7 @@
             color: #000000dd;
         }
 
-        .chat-mcr-text span.red, .chat-mcr-image span.red, .chat-mcr-file-info-name.red {
+        .chat-mcr-text span.red, .chat-mcr-text div.red, .chat-mcr-image span.red, .chat-mcr-file-info-name.red {
             color: red;
         }
 
@@ -2368,7 +2368,7 @@
             min-width: 100px;
             font-size: 12px;
             background-color: rgba(0, 0, 0, 0.05);
-            border: 1px rgba(0, 0, 0, 0.2) solid;
+            border: 1px rgba(0, 0, 0, 0.15) solid;
             border-radius: 2px;
             margin: 0;
             padding: 1px;
@@ -2403,56 +2403,80 @@
 
         span.md-text {
             white-space: normal;
-            word-wrap: normal;
-            word-break: normal;
-            overflow-wrap: normal;
+            /*word-wrap: normal;*/
+            /*word-break: normal;*/
+            /*overflow-wrap: normal;*/
             /*display: inline;*/
             /*white-space: initial;*/
+
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow-wrap: anywhere;
         }
 
         span.md-text-bold {
             white-space: normal;
-            word-wrap: normal;
-            word-break: normal;
-            overflow-wrap: normal;
+            /*word-wrap: normal;*/
+            /*word-break: normal;*/
+            /*overflow-wrap: normal;*/
+
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow-wrap: anywhere;
 
             font-weight: bold;
         }
 
         span.md-text-italic {
             white-space: normal;
-            word-wrap: normal;
-            word-break: normal;
-            overflow-wrap: normal;
+            /*word-wrap: normal;*/
+            /*word-break: normal;*/
+            /*overflow-wrap: normal;*/
+
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow-wrap: anywhere;
 
             font-style: italic;
         }
 
         span.md-text-underline {
             white-space: normal;
-            word-wrap: normal;
-            word-break: normal;
-            overflow-wrap: normal;
+            /*word-wrap: normal;*/
+            /*word-break: normal;*/
+            /*overflow-wrap: normal;*/
+
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow-wrap: anywhere;
 
             text-decoration: underline;
         }
 
         span.md-text-del {
             white-space: normal;
-            word-wrap: normal;
-            word-break: normal;
-            overflow-wrap: normal;
+            /*word-wrap: normal;*/
+            /*word-break: normal;*/
+            /*overflow-wrap: normal;*/
+
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow-wrap: anywhere;
 
             text-decoration: line-through;
         }
 
         span.md-text-code {
             white-space: normal;
-            word-wrap: normal;
-            word-break: normal;
-            overflow-wrap: normal;
+            /*word-wrap: normal;*/
+            /*word-break: normal;*/
+            /*overflow-wrap: normal;*/
             /*display: inline;*/
             /*white-space: initial;*/
+
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow-wrap: anywhere;
 
             background: rgba(255, 255, 255, 0.7);
             color: rgba(0, 0, 0, 0.9);
@@ -2465,17 +2489,21 @@
 
         span.md-text-at {
             white-space: normal;
-            word-wrap: normal;
-            word-break: normal;
-            overflow-wrap: normal;
+            /*word-wrap: normal;*/
+            /*word-break: normal;*/
+            /*overflow-wrap: normal;*/
             /*display: inline;*/
             /*white-space: initial;*/
+
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow-wrap: anywhere;
 
             /*background: rgba(0, 0, 0, 0.7);*/
             color: white;
             font-size: 14px;
             border-radius: 3px;
-            padding: 2px 4px 2px 3px;
+            padding: 2px 0 2px 0;
             margin-left: 0;
             /*margin-right: 2px;*/
 
@@ -2484,11 +2512,15 @@
 
         span.md-text-cite {
             white-space: normal;
-            word-wrap: normal;
-            word-break: normal;
-            overflow-wrap: normal;
+            /*word-wrap: normal;*/
+            /*word-break: normal;*/
+            /*overflow-wrap: normal;*/
             /*display: inline;*/
             /*white-space: initial;*/
+
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow-wrap: anywhere;
 
             background: rgba(255, 255, 255, 0.7);
             color: rgba(0, 0, 0, 0.7);
@@ -2643,8 +2675,9 @@
     const checkin_version_number = null;
     const checkin_version_is_beta = null;
     const top_level_path = null;
+    const appnames = null;
+    const jumpto = null;
     const disallowed_upload = null;
-    const backend_panel = false;
     let logged_admin = false;
     let logged_user = null;
 
@@ -2741,6 +2774,7 @@
     }
 
     function pickBucket(str, arr) {
+        str = str.toString();
         let hash = 0x811c9dc5
         for (let i = 0; i < str.length; i++) {
             hash ^= str.charCodeAt(i)
@@ -2837,7 +2871,7 @@
     }
 
     function format_uploader(uploader) {
-        return uploader === logged_user.uid ? "你" : uploader;
+        return uploader === logged_user.uid ? "你" : uploader.toString();
     }
 
     function format_shared(attr) {
@@ -8891,6 +8925,7 @@
                                 code_area_btn_copy.addEventListener("click", (event) => navigator.clipboard.writeText(codeArea.textContent));
                             }
                         }
+
                         {
                             const tokens = this.e_mcr_span.querySelectorAll(":scope .md-text-at");
                             for (const token of tokens) {
@@ -8910,6 +8945,7 @@
                                 // token.style.background = token.palette.name_bg;
                             }
                         }
+
                         {
                             const tokens = this.e_mcr_span.querySelectorAll(":scope .md-text-cite");
                             for (const token of tokens) {
@@ -8934,6 +8970,13 @@
                                                 token.textContent = "&" + msg.plain_file_name.slice(0, 15) + "...";
                                             } else {
                                                 token.textContent = "&" + msg.plain_file_name;
+                                            }
+                                        } //
+                                        else if (msg.formated_sys_msg) {
+                                            if (msg.formated_sys_msg.length > 15) {
+                                                token.textContent = "&" + msg.formated_sys_msg.slice(0, 15) + "...";
+                                            } else {
+                                                token.textContent = "&" + msg.formated_sys_msg;
                                             }
                                         }
                                     }
@@ -10613,6 +10656,14 @@
             return line_objects;
         },
 
+        escapeHTML: (str) => {
+            const div = document.createElement('div');
+            div.textContent = str; // 或使用 div.innerText
+            const r = div.innerHTML;
+            div.remove();
+            return r;
+        },
+
         to_html: (text) => {
             const line_objects = MarkdownResolver.resolve(text);
 
@@ -10676,7 +10727,7 @@
                     parts.push(`</p>`);
                     if (lineObject.is_blockquote) parts.push(`</div>`);
                 } else if (lineObject.type === MarkdownResolver.line_object_types.code_area) {
-                    parts.push(`<div class="md-area-code-wrap"><pre class="md-area-code">${lineObject.data.join("\n")}</pre><button class="md-area-code-btn-copy">复制</button></div>`);
+                    parts.push(`<div class="md-area-code-wrap"><pre class="md-area-code">${MarkdownResolver.escapeHTML(lineObject.data.join("\n"))}</pre><button class="md-area-code-btn-copy">复制</button></div>`);
                 }
             }
 
@@ -11112,22 +11163,23 @@
 
             format_sys_msg(msgattr) {
                 let string = "未知系统消息";
+                const sender = msgattr.sender ? msgattr.sender : "未知";
                 const sys_attr = msgattr.sys_attr;
                 if (sys_attr.type === dashboardwrappers.ChatDashboardWrapper.data_spec_action_type.revoke_message || sys_attr.type === dashboardwrappers.ChatDashboardWrapper.data_spec_action_type.delete_message) {
                     const action_name = sys_attr.type === dashboardwrappers.ChatDashboardWrapper.data_spec_action_type.revoke_message ? "撤回" : "删除";
-                    if (msgattr.sender === logged_user.uid) {
+                    if (sender === logged_user.uid) {
                         if (sys_attr.a1_uid === logged_user.uid) {
                             string = `你${action_name}了一条消息`;
                         } else {
                             string = `${sys_attr.a1_uid}${action_name}了你的一条消息`;
                         }
-                    } else if (msgattr.sender === sys_attr.a1_uid) {
+                    } else if (sender === sys_attr.a1_uid) {
                         string = `${sys_attr.a1_uid}${action_name}了一条消息`;
                     } else {
                         if (sys_attr.a1_uid === logged_user.uid) {
-                            string = `你${action_name}了${msgattr.sender}的一条消息`;
+                            string = `你${action_name}了${sender}的一条消息`;
                         } else {
-                            string = `${sys_attr.a1_uid}${action_name}了${msgattr.sender}的一条消息`;
+                            string = `${sys_attr.a1_uid}${action_name}了${sender}的一条消息`;
                         }
                     }
                 } //
@@ -11407,13 +11459,13 @@
             this.header_btn_more_right.addEventListener("click", (event) => {
                 const rect = event.target.getBoundingClientRect();
                 const items = [];
-                if (!backend_panel) {
+                if (!jumpto.backend_panel) {
                     items.push(
                         {type: "button", text: "进入后台", callback: event => this.open_admin_page(event, true),},
                         {type: "section", text: "",},
                     );
                 }
-                if ((backend_panel && logged_admin) || (!backend_panel && logged_user)) {
+                if ((jumpto.backend_panel && logged_admin) || (!jumpto.backend_panel && logged_user)) {
                     items.push(
                         {type: "button", text: "登出", callback: this.logout.bind(this),},
                     );
@@ -11465,6 +11517,15 @@
                 this.login(event)
             });
 
+            const enter2focus = (a, b) => {
+                a.addEventListener('keydown', function (event) {
+                    if (event.key === 'Enter') b.focus();
+                });
+            }
+            enter2focus(this.login_input_account, this.login_input_password);
+            enter2focus(this.login_input_password, this.login_btn);
+
+
             this.#setup_divider(this.dashboard_mail) // 面板的左右布局
             this.#setup_divider(this.dashboard_drive)
             this.#setup_divider(this.dashboard_chat)
@@ -11504,7 +11565,7 @@
         }
 
         set_title(header_btn) {
-            if (backend_panel) return;
+            if (jumpto.backend_panel) return;
             let app_name = "";
             if (!logged_user) {
             } else {
@@ -11570,14 +11631,14 @@
             let account = this.login_input_account.value;
             let password = this.login_input_password.value;
 
-            if ((!backend_panel && account.length === 0) || password.length === 0) {
+            if ((!jumpto.backend_panel && account.length === 0) || password.length === 0) {
                 return;
             }
 
             const lm = new LoadingMark(this.login_rect);
             lm.show();
 
-            if (backend_panel) {
+            if (jumpto.backend_panel) {
                 this.subviews.admin.auth(password)
                     .then(result => {
                         lm.remove()
@@ -11610,7 +11671,7 @@
         }
 
         logout(event) {
-            if (backend_panel) {
+            if (jumpto.backend_panel) {
                 delete_cookie("admin_session_id");
                 this.open_admin_page(null, true);
             } else {
@@ -11674,7 +11735,7 @@
         }
 
         restore_selected_panel_id() {
-            // if (backend_panel) return;
+            // if (jumpto.backend_panel) return;
             // const id = localStorage.getItem("selected_panel_id");
             // for (const headerBtn of this.header_btns) {
             //     if (headerBtn.id === id) {
@@ -11688,7 +11749,7 @@
         }
 
         switch_panel_btn(event) {
-            if (backend_panel)
+            if (jumpto.backend_panel)
                 return;
             for (const headerBtn of this.header_btns) {
                 headerBtn.classList.remove("selected")
@@ -11712,7 +11773,7 @@
         }
 
         switch_panel(event) {
-            if (backend_panel) return;
+            if (jumpto.backend_panel) return;
             const btn = this.current_panel_btn();
             this.set_title(btn);
             const current_panel = this.current_panel();
@@ -11725,10 +11786,12 @@
             } else if (btn === this.header_btn_drive) {
                 if (!logged_user) return this.switch_panel_to_login();
                 this.dashboard_drive.classList.add("active");
+                history.replaceState(history.state, null, join_path(root_url(), appnames.drive).toString());
                 this._switch_panel_to_drive();
             } else if (btn === this.header_btn_chat) {
                 if (!logged_user) return this.switch_panel_to_login();
                 this.dashboard_chat.classList.add("active");
+                history.replaceState(history.state, null, join_path(root_url(), appnames.chat).toString());
                 this._switch_panel_to_chat();
             } else if (btn === this.header_btn_forum) {
                 if (!logged_user) return this.switch_panel_to_login();
@@ -11737,6 +11800,7 @@
             } else if (btn === this.header_btn_startpage) {
                 if (!logged_user) return this.switch_panel_to_login();
                 this.apps_panel.classList.add("active");
+                history.replaceState(history.state, null, root_url().toString());
                 this._switch_panel_to_apps();
             } else {
                 this.login_panel.classList.add("active");
@@ -11750,7 +11814,7 @@
         }
 
         switch_panel_to_login() {
-            if (backend_panel) {
+            if (jumpto.backend_panel) {
                 this.login_panel.classList.add("active");
             } else {
                 this.switch_panel_btn(null);
@@ -11825,7 +11889,7 @@
         }
 
         switch_panel_to_backend() {
-            if (backend_panel) {
+            if (jumpto.backend_panel) {
                 this.login_panel.classList.remove("active");
                 this.backend_panel.classList.add("active");
                 this.header_btn_more_right.textContent = `服务管理员`;
@@ -11868,19 +11932,28 @@
 
     }
 
+    function handlejumpto() {
+        if (jumpto.appname === appnames.drive) {
+            checkin.apps_item_drive.click();
+        } else if (jumpto.appname === appnames.chat) {
+            checkin.apps_item_chat.click();
+        }
+        window.addEventListener('popstate', (event) => {
+            console.log('state:', event.state);
+        });
+
+    }
 
     function initialize() {
         // 访问的是admin路径
-        if (backend_panel) {
+        if (jumpto.backend_panel) {
             document.title = `${document.title} - 管理`;
             // checkin.header_btn_backend.classList.remove("hidden");
             // checkin.header_btn_backend.classList.add("transparent");
             // checkin.header_btn_backend.classList.add("no-width");
             // checkin.header_btn_backend.classList.add("no-height");
             // checkin.header_btn_backend.innerHTML = "";
-            for (const headerBtn of checkin.header_btns) {
-                headerBtn.classList.add("hidden");
-            }
+            for (const headerBtn of checkin.header_btns) headerBtn.classList.add("hidden");
 
             checkin.header_btn_more_left.classList.add("hidden");
             // checkin.header_btn_more_right.classList.add("hidden");
@@ -11897,7 +11970,7 @@
 
         // 切换到默认面板
         let switched = false;
-        if (backend_panel) {
+        if (jumpto.backend_panel) {
             if (logged_admin) {
                 switched = true;
                 checkin.switch_panel_to_backend();
@@ -11915,6 +11988,8 @@
                 floatball.show();
 
                 checkin.restore_selected_panel_id();
+
+                handlejumpto();
             }
         }
         if (!switched)
