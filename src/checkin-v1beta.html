@@ -2774,7 +2774,7 @@
     }
 
     function pickBucket(str, arr) {
-        str = str.toString();
+        if (!str) str = ""
         let hash = 0x811c9dc5
         for (let i = 0; i < str.length; i++) {
             hash ^= str.charCodeAt(i)
@@ -2871,7 +2871,7 @@
     }
 
     function format_uploader(uploader) {
-        return uploader === logged_user.uid ? "你" : uploader.toString();
+        return uploader === logged_user.uid ? "你" : `${uploader}`;
     }
 
     function format_shared(attr) {
@@ -8766,7 +8766,6 @@
                     #resolve_relations(msgattrseniors) {
                         for (let i = 0; i < msgattrseniors.length; i++) {
                             const msgattrsenior = msgattrseniors[i];
-                            if (msgattrsenior.sender !== this.msgattr.sender) return;
                             if (!msgattrsenior.is_sent || !this.msgattr.is_sent) return;
 
                             if (i === 0) {
@@ -8777,6 +8776,8 @@
                                 if (this.is_different_day) return;
                                 if (this.msgattr.sent_time - msgattrsenior.sent_time > seconds_of_minutes(30)) return;
                             }
+
+                            if (msgattrsenior.sender !== this.msgattr.sender) return;
 
                             if (this.is_sys_msg() || msgattrsenior.msgobj.is_sys_msg()) {
                                 return;
@@ -11163,31 +11164,32 @@
 
             format_sys_msg(msgattr) {
                 let string = "未知系统消息";
-                const sender = msgattr.sender ? msgattr.sender : "未知";
                 const sys_attr = msgattr.sys_attr;
+                const sender = msgattr.sender ? msgattr.sender : "null";
+                const a1_uid = sys_attr.a1_uid ? sys_attr.a1_uid : "null";
                 if (sys_attr.type === dashboardwrappers.ChatDashboardWrapper.data_spec_action_type.revoke_message || sys_attr.type === dashboardwrappers.ChatDashboardWrapper.data_spec_action_type.delete_message) {
                     const action_name = sys_attr.type === dashboardwrappers.ChatDashboardWrapper.data_spec_action_type.revoke_message ? "撤回" : "删除";
                     if (sender === logged_user.uid) {
-                        if (sys_attr.a1_uid === logged_user.uid) {
+                        if (a1_uid === logged_user.uid) {
                             string = `你${action_name}了一条消息`;
                         } else {
-                            string = `${sys_attr.a1_uid}${action_name}了你的一条消息`;
+                            string = `${a1_uid}${action_name}了你的一条消息`;
                         }
-                    } else if (sender === sys_attr.a1_uid) {
-                        string = `${sys_attr.a1_uid}${action_name}了一条消息`;
+                    } else if (sender === a1_uid) {
+                        string = `${a1_uid}${action_name}了一条消息`;
                     } else {
-                        if (sys_attr.a1_uid === logged_user.uid) {
+                        if (a1_uid === logged_user.uid) {
                             string = `你${action_name}了${sender}的一条消息`;
                         } else {
-                            string = `${sys_attr.a1_uid}${action_name}了${sender}的一条消息`;
+                            string = `${a1_uid}${action_name}了${sender}的一条消息`;
                         }
                     }
                 } //
                 else if (sys_attr.type === dashboardwrappers.ChatDashboardWrapper.data_spec_action_type.clear_message) {
-                    if (sys_attr.a1_uid === logged_user.uid) {
+                    if (a1_uid === logged_user.uid) {
                         string = `你清理了${sys_attr.a3_number}小时前的消息`;
                     } else {
-                        string = `${sys_attr.a1_uid}清理了${sys_attr.a3_number}小时前的消息`;
+                        string = `${a1_uid}清理了${sys_attr.a3_number}小时前的消息`;
                     }
                 } //
                 else if (sys_attr.type === dashboardwrappers.ChatDashboardWrapper.data_spec_action_type.auto_delete_message) {
