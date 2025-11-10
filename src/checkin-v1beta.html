@@ -4690,8 +4690,8 @@
 
 <!--设置-->
 <div class="floatball-mark-tabcontent-settings">
-<label>当前密钥：<input type="text" id="fbm-settings-currentkey" style="width:200px;" placeholder="用于加密，留空使用默认"></label>
-<label>历史密钥：<textarea id="fbm-settings-legacykeys" style="width:200px;height:100px;" placeholder="曾经用过的密钥，每行一个"></textarea></label>
+<label>当前密钥：<input type="text" id="fbm-settings-currentkey" style="width:200px;" placeholder="用于加解密，留空使用默认"></label>
+<label>历史密钥：<textarea id="fbm-settings-legacykeys" style="width:200px;height:100px;" placeholder="曾经用过的密钥，每行一个，用于解密历史消息"></textarea></label>
 </div>
 
 <!--后台任务-->
@@ -5554,12 +5554,18 @@
                 throw new Error(await format_error_response(r));
             }
 
-            async sync(gid_args, uid_args) {
+            async sync(ws_send, gid_args, uid_args) {
                 let url = join_path(this.api_url(), "sync");
                 let body = {
                     gids: gid_args,
                     uids: uid_args,
                 };
+
+                if (ws_send) {
+                    body.action = dashboardwrappers.ChatDashboardWrapper.ws_action_type.sync;
+                    return ws_send({url, body});
+                }
+
                 let r = await net_fetcher.nf_post_json(url, body,);
                 if (r.status === 200) {
                     let d = await r.json();
@@ -5586,7 +5592,7 @@
                 throw new Error(await format_error_response(r));
             }
 
-            async act(contact_type, xxid, ceid, activity_type,) {
+            async act(ws_send, contact_type, xxid, ceid, activity_type,) {
                 let url = join_path(this.api_url(), "act");
                 let body = {
                     contact_type, ceid,
@@ -5597,6 +5603,12 @@
                 } else if (contact_type === subviews.Chat.receiver_type.user) {
                     body.uid = xxid;
                 }
+
+                if (ws_send) {
+                    body.action = dashboardwrappers.ChatDashboardWrapper.ws_action_type.act;
+                    return ws_send({url, body});
+                }
+
                 let r = await net_fetcher.nf_post_json(url, body,);
                 if (r.status === 200) {
                     let d = await r.json();
@@ -5621,7 +5633,7 @@
                 throw new Error(await format_error_response(r));
             }
 
-            async send_text(contact_type, xxid, ceid, sender_rand, plain_text,) {
+            async send_text(ws_send, contact_type, xxid, ceid, sender_rand, plain_text,) {
                 let url = join_path(this.api_url(), "send");
                 let body = {
                     contact_type, ceid,
@@ -5635,6 +5647,12 @@
                 } else if (contact_type === subviews.Chat.receiver_type.user) {
                     body.uid = xxid;
                 }
+
+                if (ws_send) {
+                    body.action = dashboardwrappers.ChatDashboardWrapper.ws_action_type.send;
+                    return ws_send({url, body});
+                }
+
                 let r = await net_fetcher.nf_post_json(url, body,);
                 if (r.status === 200) {
                     let d = await r.json();
@@ -5643,7 +5661,7 @@
                 throw new Error(await format_error_response(r));
             }
 
-            async edit_text(contact_type, xxid, ceid, message_id, plain_text,) {
+            async edit_text(ws_send, contact_type, xxid, ceid, message_id, plain_text,) {
                 let url = join_path(this.api_url(), "edit");
                 let body = {
                     contact_type, ceid,
@@ -5656,6 +5674,12 @@
                 } else if (contact_type === subviews.Chat.receiver_type.user) {
                     body.uid = xxid;
                 }
+
+                if (ws_send) {
+                    body.action = dashboardwrappers.ChatDashboardWrapper.ws_action_type.edit;
+                    return ws_send({url, body});
+                }
+
                 let r = await net_fetcher.nf_post_json(url, body,);
                 if (r.status === 200) {
                     let d = await r.json();
@@ -5664,7 +5688,7 @@
                 throw new Error(await format_error_response(r));
             }
 
-            async revoke_message(contact_type, xxid, ceid, message_id,) {
+            async revoke_message(ws_send, contact_type, xxid, ceid, message_id,) {
                 let url = join_path(this.api_url(), "revoke");
                 let body = {
                     contact_type, ceid,
@@ -5676,6 +5700,12 @@
                 } else if (contact_type === subviews.Chat.receiver_type.user) {
                     body.uid = xxid;
                 }
+
+                if (ws_send) {
+                    body.action = dashboardwrappers.ChatDashboardWrapper.ws_action_type.revoke;
+                    return ws_send({url, body});
+                }
+
                 let r = await net_fetcher.nf_post_json(url, body,);
                 if (r.status === 200) {
                     let d = await r.json();
@@ -5684,7 +5714,7 @@
                 throw new Error(await format_error_response(r));
             }
 
-            async mark_read(contact_type, xxid, ceid, message_ids,) {
+            async mark_read(ws_send, contact_type, xxid, ceid, message_ids,) {
                 let url = join_path(this.api_url(), "mark_read");
                 let body = {
                     contact_type, ceid,
@@ -5696,6 +5726,12 @@
                 } else if (contact_type === subviews.Chat.receiver_type.user) {
                     body.uid = xxid;
                 }
+
+                if (ws_send) {
+                    body.action = dashboardwrappers.ChatDashboardWrapper.ws_action_type.mark_read;
+                    return ws_send({url, body});
+                }
+
                 let r = await net_fetcher.nf_post_json(url, body,);
                 if (r.status === 200) {
                     let d = await r.json();
@@ -5816,7 +5852,7 @@
 
             }
 
-            async load(contact_type, xxid, ceid, last_msgattr) {
+            async load(ws_send, contact_type, xxid, ceid, last_msgattr) {
                 let url = join_path(this.api_url(), "load");
                 let body = {
                     contact_type, ceid,
@@ -5827,6 +5863,12 @@
                 } else if (contact_type === subviews.Chat.receiver_type.user) {
                     body.uid = xxid;
                 }
+
+                if (ws_send) {
+                    body.action = dashboardwrappers.ChatDashboardWrapper.ws_action_type.load;
+                    return ws_send({url, body});
+                }
+
                 let r = await net_fetcher.nf_post_json(url, body,);
                 if (r.status === 200) {
                     let d = await r.json();
@@ -5835,7 +5877,7 @@
                 throw new Error(await format_error_response(r));
             }
 
-            async load_history(contact_type, xxid, ceid, first_msgattr) {
+            async load_history(ws_send, contact_type, xxid, ceid, first_msgattr) {
                 let url = join_path(this.api_url(), "load_history");
                 let body = {
                     contact_type, ceid,
@@ -5846,6 +5888,12 @@
                 } else if (contact_type === subviews.Chat.receiver_type.user) {
                     body.uid = xxid;
                 }
+
+                if (ws_send) {
+                    body.action = dashboardwrappers.ChatDashboardWrapper.ws_action_type.load_history;
+                    return ws_send({url, body});
+                }
+
                 let r = await net_fetcher.nf_post_json(url, body,);
                 if (r.status === 200) {
                     let d = await r.json();
@@ -5854,7 +5902,7 @@
                 throw new Error(await format_error_response(r));
             }
 
-            async read(contact_type, xxid, ceid, visible_msgattr) {
+            async read(ws_send, contact_type, xxid, ceid, visible_msgattr) {
                 let url = join_path(this.api_url(), "read");
                 let body = {
                     contact_type, ceid,
@@ -5865,6 +5913,12 @@
                 } else if (contact_type === subviews.Chat.receiver_type.user) {
                     body.uid = xxid;
                 }
+
+                if (ws_send) {
+                    body.action = dashboardwrappers.ChatDashboardWrapper.ws_action_type.read;
+                    return ws_send({url, body});
+                }
+
                 let r = await net_fetcher.nf_post_json(url, body,);
                 if (r.status === 200) {
                     let d = await r.json();
@@ -5873,7 +5927,7 @@
                 throw new Error(await format_error_response(r));
             }
 
-            async sync_message(contact_type, xxid, ceid, message_ids) {
+            async sync_message(ws_send, contact_type, xxid, ceid, message_ids) {
                 let url = join_path(this.api_url(), "sync_message");
                 let body = {
                     contact_type, ceid,
@@ -5884,6 +5938,12 @@
                 } else if (contact_type === subviews.Chat.receiver_type.user) {
                     body.uid = xxid;
                 }
+
+                if (ws_send) {
+                    body.action = dashboardwrappers.ChatDashboardWrapper.ws_action_type.sync_message;
+                    return ws_send({url, body});
+                }
+
                 let r = await net_fetcher.nf_post_json(url, body,);
                 if (r.status === 200) {
                     let d = await r.json();
@@ -7213,6 +7273,7 @@
 
                 this.timer__fetch_unread_msgs = null;
                 this.interval__fetch_unread_msgs = 7500;
+                this.interval__fetch_unread_msgs__ws = 3000;
                 this.is_processing__fetch_unread_msgs = false;
 
                 this.timer__update_read_progress = null;
@@ -7659,17 +7720,18 @@
                 const last_msgattr = this.li.bindmap.msgs.length > 0 ? this.li.bindmap.msgs.at(-1) : null;
 
                 const {xxid, contact_type, ceid} = this.current_contact_xxid();
-                checkin.subviews.chat.load(contact_type, xxid, ceid, last_msgattr)
-                    .then(result => {
-                        // if (this.closed) return;
-                        this.is_processing__fetch_unread_msgs = false;
-                        this.change_loading_status__checknew();
-                        this.remove_loading_mark();
-                        this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
-                        this.stop_timer__fetch_unread_msgs();
-                        this.handle_response__fetch_unread_msgs(last_msgattr, result, is_background);
-                        this.client.dashboard_chat.wrapper._update_contact_item_status(this.li.bindmap, this.li.bindmap.status_attr, true);
-                    }).catch(error => {
+
+                const onfetchload = (result) => {
+                    // if (this.closed) return;
+                    this.is_processing__fetch_unread_msgs = false;
+                    this.change_loading_status__checknew();
+                    this.remove_loading_mark();
+                    this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
+                    this.stop_timer__fetch_unread_msgs();
+                    this.handle_response__fetch_unread_msgs(last_msgattr, result, is_background);
+                    this.client.dashboard_chat.wrapper._update_contact_item_status(this.li.bindmap, this.li.bindmap.status_attr, true);
+                };
+                const onfetcherror = (error) => {
                     // if (this.closed) return;
                     this.is_processing__fetch_unread_msgs = false;
                     this.change_loading_status__checknew();
@@ -7679,6 +7741,16 @@
                         if (this.closed) return;
                         if (this.client.dashboard_chat.wrapper.is_active()) this.fetch_unread_msgs();
                     });
+                };
+                const ws_isopen = this.panel.wrapper.ws_isopen();
+                checkin.subviews.chat.load(ws_isopen ? (args) => {
+                    this.panel.wrapper.ws_send(args.body, {onfetchload, onfetcherror});
+                } : null, contact_type, xxid, ceid, last_msgattr,)
+                    .then(result => {
+                        if (ws_isopen) return;
+                        onfetchload(result);
+                    }).catch(error => {
+                    onfetcherror(error);
                 });
 
             }
@@ -7741,7 +7813,7 @@
                 if (this.closed) return;
                 if (this.client.dashboard_chat.wrapper.is_active()) this.timer__fetch_unread_msgs = setTimeout(() => {
                     this.fetch_unread_msgs()
-                }, this.interval__fetch_unread_msgs);
+                }, this.panel.wrapper.ws_isopen() ? this.interval__fetch_unread_msgs__ws : this.interval__fetch_unread_msgs);
 
                 this.e_msgflow__checknew_timer__enabled = true;
             }
@@ -7779,19 +7851,30 @@
                 this.check_and_auto_mark_as_read();
 
                 const {xxid, contact_type, ceid} = this.current_contact_xxid();
-                checkin.subviews.chat.read(contact_type, xxid, ceid, visible_msgattr)
-                    .then(result => {
-                        // if (this.closed) return;
-                        this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
-                        this.stop_timer__update_read_progress();
-                        this.handle_response__update_read_progress(visible_msgattr, result, is_background);
-                    }).catch(error => {
+
+                const onfetchload = (result) => {
+                    // if (this.closed) return;
+                    this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
+                    this.stop_timer__update_read_progress();
+                    this.handle_response__update_read_progress(visible_msgattr, result, is_background);
+                };
+                const onfetcherror = (error) => {
                     // if (this.closed) return;
                     MessageMark.report(error, null, () => {
                         this.stop_timer__update_read_progress();
                         if (this.closed) return;
                         if (this.client.dashboard_chat.wrapper.is_active()) this.update_read_progress();
                     });
+                };
+                const ws_isopen = this.panel.wrapper.ws_isopen();
+                checkin.subviews.chat.read(ws_isopen ? (args) => {
+                    this.panel.wrapper.ws_send(args.body, {onfetchload, onfetcherror});
+                } : null, contact_type, xxid, ceid, visible_msgattr,)
+                    .then(result => {
+                        if (ws_isopen) return;
+                        onfetchload(result);
+                    }).catch(error => {
+                    onfetcherror(error);
                 });
             }
 
@@ -7838,15 +7921,26 @@
 
             _send_msg_text(msg) {
                 const {xxid, contact_type, ceid} = this.current_contact_xxid();
-                checkin.subviews.chat.send_text(contact_type, xxid, ceid, msg.sender_rand, msg.plain_text,)
-                    .then(result => {
-                        // if (this.closed) return;
-                        this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
-                        this.msgflow_manage.update_sending_msg(msg.sender_rand, result.message_attr, result.previous_message_id);
-                    }).catch(error => {
+
+                const onfetchload = (result) => {
+                    // if (this.closed) return;
+                    this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
+                    this.msgflow_manage.update_sending_msg(msg.sender_rand, result.message_attr, result.previous_message_id);
+                };
+                const onfetcherror = (error) => {
                     msg.msgobj.on_send_failed(error);
                     // if (this.closed) return;
                     // MessageMark.report(error);
+                };
+                const ws_isopen = this.panel.wrapper.ws_isopen();
+                checkin.subviews.chat.send_text(ws_isopen ? (args) => {
+                    this.panel.wrapper.ws_send(args.body, {onfetchload, onfetcherror});
+                } : null, contact_type, xxid, ceid, msg.sender_rand, msg.plain_text,)
+                    .then(result => {
+                        if (ws_isopen) return;
+                        onfetchload(result);
+                    }).catch(error => {
+                    onfetcherror(error);
                 });
             }
 
@@ -7982,19 +8076,30 @@
                 msgattr.msgobj.blur_content();
 
                 const {xxid, contact_type, ceid} = this.current_contact_xxid();
-                checkin.subviews.chat.edit_text(contact_type, xxid, ceid, msgattr.id, new_text,)
-                    .then(result => {
-                        // if (this.closed) return;
-                        if (result.sync.editions.length === 1 && result.sync.editions[0] === result.message_attr.id) {
-                            result.sync.editions.splice(0, 1); // 自己编辑后免了再次同步
-                            // console.log("免了重复同步二编消息", result.sync.edition_id, result.sync.editions);
-                        }
-                        this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
-                        this.msgflow_manage.update_msg(msgattr, result.message_attr,);
-                    }).catch(error => {
+
+                const onfetchload = (result) => {
+                    // if (this.closed) return;
+                    if (result.sync.editions.length === 1 && result.sync.editions[0] === result.message_attr.id) {
+                        result.sync.editions.splice(0, 1); // 自己编辑后免了再次同步
+                        // console.log("免了重复同步二编消息", result.sync.edition_id, result.sync.editions);
+                    }
+                    this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
+                    this.msgflow_manage.update_msg(msgattr, result.message_attr,);
+                };
+                const onfetcherror = (error) => {
                     // if (this.closed) return;
                     MessageMark.report(error);
                     msgattr.msgobj.unblur_content();
+                };
+                const ws_isopen = this.panel.wrapper.ws_isopen();
+                checkin.subviews.chat.edit_text(ws_isopen ? (args) => {
+                    this.panel.wrapper.ws_send(args.body, {onfetchload, onfetcherror});
+                } : null, contact_type, xxid, ceid, msgattr.id, new_text,)
+                    .then(result => {
+                        if (ws_isopen) return;
+                        onfetchload(result);
+                    }).catch(error => {
+                    onfetcherror(error);
                 });
             }
 
@@ -8002,18 +8107,29 @@
                 msgattr.msgobj.blur_content();
 
                 const {xxid, contact_type, ceid} = this.current_contact_xxid();
-                checkin.subviews.chat.revoke_message(contact_type, xxid, ceid, msgattr.id,)
-                    .then(result => {
-                        // if (this.closed) return;
-                        if (result.sync.editions.length === 1 && result.sync.editions[0] === result.message_attr.id) {
-                            result.sync.editions.splice(0, 1);
-                        }
-                        this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
-                        this.msgflow_manage.update_msg(msgattr, result.message_attr,);
-                    }).catch(error => {
+
+                const onfetchload = (result) => {
+                    // if (this.closed) return;
+                    if (result.sync.editions.length === 1 && result.sync.editions[0] === result.message_attr.id) {
+                        result.sync.editions.splice(0, 1);
+                    }
+                    this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
+                    this.msgflow_manage.update_msg(msgattr, result.message_attr,);
+                };
+                const onfetcherror = (error) => {
                     // if (this.closed) return;
                     MessageMark.report(error);
                     msgattr.msgobj.unblur_content();
+                };
+                const ws_isopen = this.panel.wrapper.ws_isopen();
+                checkin.subviews.chat.revoke_message(ws_isopen ? (args) => {
+                    this.panel.wrapper.ws_send(args.body, {onfetchload, onfetcherror});
+                } : null, contact_type, xxid, ceid, msgattr.id,)
+                    .then(result => {
+                        if (ws_isopen) return;
+                        onfetchload(result);
+                    }).catch(error => {
+                    onfetcherror(error);
                 });
             }
 
@@ -8022,18 +8138,29 @@
             * */
             mark_as_read(msgattr) {
                 const {xxid, contact_type, ceid} = this.current_contact_xxid();
-                checkin.subviews.chat.mark_read(contact_type, xxid, ceid, [msgattr.id,],)
-                    .then(result => {
-                        // if (this.closed) return;
 
-                        if (result.sync.editions.length === 1 && result.message_attrs.length === 1 && result.sync.editions[0] === result.message_attrs[0].id) {
-                            result.sync.editions.splice(0, 1);
-                        }
-                        this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
-                        if (result.message_attrs.length > 0) this.msgflow_manage.update_msg(msgattr, result.message_attrs[0],);
-                    }).catch(error => {
+                const onfetchload = (result) => {
+                    // if (this.closed) return;
+
+                    if (result.sync.editions.length === 1 && result.message_attrs.length === 1 && result.sync.editions[0] === result.message_attrs[0].id) {
+                        result.sync.editions.splice(0, 1);
+                    }
+                    this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
+                    if (result.message_attrs.length > 0) this.msgflow_manage.update_msg(msgattr, result.message_attrs[0],);
+                };
+                const onfetcherror = (error) => {
                     // if (this.closed) return;
                     MessageMark.report(error);
+                };
+                const ws_isopen = this.panel.wrapper.ws_isopen();
+                checkin.subviews.chat.mark_read(ws_isopen ? (args) => {
+                    this.panel.wrapper.ws_send(args.body, {onfetchload, onfetcherror});
+                } : null, contact_type, xxid, ceid, [msgattr.id,],)
+                    .then(result => {
+                        if (ws_isopen) return;
+                        onfetchload(result);
+                    }).catch(error => {
+                    onfetcherror(error);
                 });
             }
 
@@ -8062,28 +8189,39 @@
                     unreadIds.push(msgattr.id);
                 }
                 const {xxid, contact_type, ceid} = this.current_contact_xxid();
-                checkin.subviews.chat.mark_read(contact_type, xxid, ceid, unreadIds,)
-                    .then(result => {
-                        // if (this.closed) return;
 
-                        if (result.sync.editions.length === result.message_attrs.length) {
-                            let is_same = true;
-                            for (let i = 0; i < result.sync.editions.length; i++) {
-                                if (i !== result.message_attrs.findIndex(j => j.id === result.sync.editions[i])) {
-                                    is_same = false;
-                                    break;
-                                }
+                const onfetchload = (result) => {
+                    // if (this.closed) return;
+
+                    if (result.sync.editions.length === result.message_attrs.length) {
+                        let is_same = true;
+                        for (let i = 0; i < result.sync.editions.length; i++) {
+                            if (i !== result.message_attrs.findIndex(j => j.id === result.sync.editions[i])) {
+                                is_same = false;
+                                break;
                             }
-                            if (is_same) result.sync.editions.splice(0, result.sync.editions.length);
                         }
-                        this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
-                        for (const message_attr of result.message_attrs) this.msgflow_manage.update_msg(unread_msgobjs.find(i => i.msgattr.id === message_attr.id).msgattr, message_attr,);
+                        if (is_same) result.sync.editions.splice(0, result.sync.editions.length);
+                    }
+                    this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
+                    for (const message_attr of result.message_attrs) this.msgflow_manage.update_msg(unread_msgobjs.find(i => i.msgattr.id === message_attr.id).msgattr, message_attr,);
 
-                    }).catch(error => {
+                };
+                const onfetcherror = (error) => {
                     // if (this.closed) return;
                     MessageMark.report(error, null, () => {
                         for (const unreadMsgobj of unread_msgobjs) unreadMsgobj.at_attr.is_marking = false;
                     });
+                };
+                const ws_isopen = this.panel.wrapper.ws_isopen();
+                checkin.subviews.chat.mark_read(ws_isopen ? (args) => {
+                    this.panel.wrapper.ws_send(args.body, {onfetchload, onfetcherror});
+                } : null, contact_type, xxid, ceid, unreadIds,)
+                    .then(result => {
+                        if (ws_isopen) return;
+                        onfetchload(result);
+                    }).catch(error => {
+                    onfetcherror(error);
                 });
             }
 
@@ -9485,15 +9623,26 @@
 
                 // this.previous_activity_attr.is_sending = true;
                 const {xxid, contact_type, ceid} = this.current_contact_xxid();
-                this.client.subviews.chat.act(contact_type, xxid, ceid, type)
-                    .then(result => {
-                        // if (this.closed) return;
-                        // this.previous_activity_attr.is_sending = false;
-                        this.client.dashboard_chat.wrapper.update_contact_item_status(result);
-                    }).catch(error => {
+
+                const onfetchload = (result) => {
+                    // if (this.closed) return;
+                    // this.previous_activity_attr.is_sending = false;
+                    this.client.dashboard_chat.wrapper.update_contact_item_status(result);
+                };
+                const onfetcherror = (error) => {
                     // if (this.closed) return;
                     // this.previous_activity_attr.is_sending = false;
                     MessageMark.report(error);
+                };
+                const ws_isopen = this.panel.wrapper.ws_isopen();
+                checkin.subviews.chat.act(ws_isopen ? (args) => {
+                    this.panel.wrapper.ws_send(args.body, {onfetchload, onfetcherror});
+                } : null, contact_type, xxid, ceid, type)
+                    .then(result => {
+                        if (ws_isopen) return;
+                        onfetchload(result);
+                    }).catch(error => {
+                    onfetcherror(error);
                 });
 
             }
@@ -9511,19 +9660,30 @@
                 const first_msgattr = this.li.bindmap.msgs.length > 0 ? this.li.bindmap.msgs.at(0) : null;
 
                 const {xxid, contact_type, ceid} = this.current_contact_xxid();
-                checkin.subviews.chat.load_history(contact_type, xxid, ceid, first_msgattr)
-                    .then(result => {
-                        // if (this.closed) return;
-                        this.is_processing__load_history = false;
-                        this.change_loading_status__loadhistory();
-                        this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
-                        this.handle_response__load_history(first_msgattr, result, false);
-                        this.client.dashboard_chat.wrapper._update_contact_item_status(this.li.bindmap, this.li.bindmap.status_attr, true);
-                    }).catch(error => {
+
+                const onfetchload = (result) => {
+                    // if (this.closed) return;
+                    this.is_processing__load_history = false;
+                    this.change_loading_status__loadhistory();
+                    this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
+                    this.handle_response__load_history(first_msgattr, result, false);
+                    this.client.dashboard_chat.wrapper._update_contact_item_status(this.li.bindmap, this.li.bindmap.status_attr, true);
+                };
+                const onfetcherror = (error) => {
                     // if (this.closed) return;
                     this.is_processing__load_history = false;
                     this.change_loading_status__loadhistory();
                     MessageMark.report(error);
+                };
+                const ws_isopen = this.panel.wrapper.ws_isopen();
+                checkin.subviews.chat.load_history(ws_isopen ? (args) => {
+                    this.panel.wrapper.ws_send(args.body, {onfetchload, onfetcherror});
+                } : null, contact_type, xxid, ceid, first_msgattr,)
+                    .then(result => {
+                        if (ws_isopen) return;
+                        onfetchload(result);
+                    }).catch(error => {
+                    onfetcherror(error);
                 });
 
             }
@@ -10771,14 +10931,20 @@
 
                 this.timer__sync = null;
                 this.interval__sync = 10000;
+                this.interval__sync__ws = 5000;
                 this.is_processing__sync = false;
 
                 this.mark_syncing = this.dashboard_element.querySelector(':scope .chat-contacts-mark-syncing');
                 this.change_loading_status__syncing();
 
+                this.ws_client = null;
+                this.ws_counter = 0;
+                this.ws_callbacks = {};
+
             }
 
             leave() {
+                this.ws_close();
                 this.stop_timer__sync();
                 for (const mainaction of this.contact_items()) {
                     mainaction.e_online_status.dataset.onlineStatus = "offline";
@@ -10945,16 +11111,27 @@
 
             _sync_edited_messages(item, former_ceid, message_ids) {
                 const xxid = item.contact_attr.type === subviews.Chat.receiver_type.group ? item.contact_attr.gid : item.contact_attr.uid;
-                checkin.subviews.chat.sync_message(item.contact_attr.type, xxid, item.ceid, message_ids)
-                    .then(result => {
-                        // if (this.closed) return;
-                        this.update_contact_item_status(result.sync);
-                        this.handle_response__sync_edited_messages(item, former_ceid, message_ids, result);
-                    }).catch(error => {
+
+                const onfetchload = (result) => {
+                    // if (this.closed) return;
+                    this.update_contact_item_status(result.sync);
+                    this.handle_response__sync_edited_messages(item, former_ceid, message_ids, result);
+                };
+                const onfetcherror = (error) => {
                     // if (this.closed) return;
                     MessageMark.report(error, null, () => {
                         this._sync_edited_messages(item, former_ceid, message_ids);
                     });
+                };
+                const ws_isopen = this.panel.wrapper.ws_isopen();
+                checkin.subviews.chat.sync_message(ws_isopen ? (args) => {
+                    this.panel.wrapper.ws_send(args.body, {onfetchload, onfetcherror});
+                } : null, item.contact_attr.type, xxid, item.ceid, message_ids,)
+                    .then(result => {
+                        if (ws_isopen) return;
+                        onfetchload(result);
+                    }).catch(error => {
+                    onfetcherror(error);
                 });
             }
 
@@ -11284,6 +11461,8 @@
             static message_type = "chat";
             static message_status = "chat";
             static data_spec_action_type = "chat";
+            static ws_action_type = "chat";
+
             static message_type_checker = {
                 is_drive_item: (type) => {
                     return type === dashboardwrappers.ChatDashboardWrapper.message_type.image || type === dashboardwrappers.ChatDashboardWrapper.message_type.file;
@@ -11311,6 +11490,7 @@
                 }
                 this.stop_timer__sync();
                 this.sync();
+                this.ws_connect();
             }
 
             stop_timer__sync() {
@@ -11324,7 +11504,7 @@
                 if (items.length === 0) {
                     if (this.is_active()) this.timer__sync = setTimeout(() => {
                         this.sync()
-                    }, this.interval__sync);
+                    }, this.ws_isopen() ? this.interval__sync__ws : this.interval__sync);
                     return;
                 }
 
@@ -11341,19 +11521,20 @@
                     }
                 });
 
-                checkin.subviews.chat.sync(gid_args, uid_args)
-                    .then(result => {
-                        // if (this.closed) return;
 
-                        this.is_processing__sync = false;
-                        this.change_loading_status__syncing();
+                const onfetchload = (result) => {
+                    // if (this.closed) return;
 
-                        // this.remove_loading_mark();
-                        remove_simple_loading_mark(this.aside_left_wrap);
+                    this.is_processing__sync = false;
+                    this.change_loading_status__syncing();
 
-                        this.stop_timer__sync();
-                        this.handle_response__sync(result);
-                    }).catch(error => {
+                    // this.remove_loading_mark();
+                    remove_simple_loading_mark(this.aside_left_wrap);
+
+                    this.stop_timer__sync();
+                    this.handle_response__sync(result);
+                };
+                const onfetcherror = (error) => {
                     // if (this.closed) return;
 
                     this.is_processing__sync = false;
@@ -11366,6 +11547,18 @@
                         this.stop_timer__sync();
                         if (this.is_active()) this.sync();
                     });
+                    throw error;
+                };
+
+                const ws_isopen = this.ws_isopen();
+                checkin.subviews.chat.sync(ws_isopen ? (args) => {
+                    this.ws_send(args.body, {onfetchload, onfetcherror});
+                } : null, gid_args, uid_args)
+                    .then(result => {
+                        if (ws_isopen) return;
+                        onfetchload(result);
+                    }).catch(error => {
+                    onfetcherror(error);
                 });
 
             }
@@ -11385,7 +11578,7 @@
                 this.stop_timer__sync();
                 if (this.is_active()) this.timer__sync = setTimeout(() => {
                     this.sync()
-                }, this.interval__sync);
+                }, this.ws_isopen() ? this.interval__sync__ws : this.interval__sync);
             }
 
             async update_contact_item_status(status_attr) {
@@ -11408,6 +11601,79 @@
                 }
             }
 
+            /*
+            * websocket
+            * */
+            ws_connect() {
+                this.ws_close();
+                const url = join_path(checkin.subviews.chat.api_url(), "ws",);
+                if (url.protocol === 'https:') url.protocol = 'wss:';
+                else if (url.protocol === 'http:') url.protocol = 'ws:';
+                this.ws_client = new WebSocket(url);
+                this.ws_client.addEventListener("open", (event) => {
+                    console.log("websocket 已连接", event);
+                });
+                this.ws_client.addEventListener("close", (event) => {
+                    console.log("websocket 已关闭", event);
+                });
+                this.ws_client.addEventListener("error", (event) => {
+                    this.ws_onerror(event);
+                });
+                this.ws_client.addEventListener("message", (event) => {
+                    // console.log("websocket 收到消息", event.data);
+                    let json;
+                    try {
+                        json = JSON.parse(event.data);
+                    } catch (e) {
+                        return;
+                    }
+                    this.ws_receive(json);
+                });
+            }
+
+            ws_close() {
+                if (this.ws_client) {
+                    this.ws_client.close();
+                    this.ws_client = null;
+                }
+                for (let key in this.ws_callbacks) {
+                    if (this.ws_callbacks.hasOwnProperty(key)) delete this.ws_callbacks[key];
+                }
+            }
+
+            ws_onerror(event) {
+                console.log("websocket 发生错误", event);
+                for (let key in this.ws_callbacks) {
+                    if (this.ws_callbacks.hasOwnProperty(key)) this.ws_callbacks[key].onfetcherror(new Error(`Websocket连接异常关闭：${event}`));
+                }
+            }
+
+            ws_isopen() {
+                return this.ws_client && this.ws_client.readyState === WebSocket.OPEN;
+            }
+
+            ws_send(json, callback) {
+                json.counter = this.ws_counter;
+                this.ws_callbacks[json.counter.toString()] = callback;
+                this.ws_counter++;
+                // console.log("websocket 发送消息", json);
+                this.ws_client.send(JSON.stringify(json));
+            }
+
+            ws_receive(json) {
+                const counter = json.counter?.toString();
+                if (Object.keys(this.ws_callbacks).includes(counter)) {
+                    const callback = this.ws_callbacks[counter];
+                    delete this.ws_callbacks[counter];
+                    if (json.error) {
+                        callback.onfetcherror(new Error(JSON.stringify(json)));
+                    } else {
+                        callback.onfetchload(json.result);
+                    }
+                } else {
+                    console.log("websocket 没有注册回调的消息。");
+                }
+            }
         }
 
         return {DashboardWrapper, ChatDashboardWrapper,}
