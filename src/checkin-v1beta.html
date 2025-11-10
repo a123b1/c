@@ -7878,7 +7878,7 @@
                         });
                     }
                 };
-                const ws_isopen = this.panel.wrapper.ws_isopen();
+                const ws_isopen = false;
                 checkin.subviews.chat.read(ws_isopen ? (args) => {
                     this.panel.wrapper.ws_send(args.body, {onfetchload, onfetcherror});
                 } : null, contact_type, xxid, ceid, visible_msgattr,)
@@ -7944,7 +7944,7 @@
                     // if (this.closed) return;
                     // MessageMark.report(error);
                 };
-                const ws_isopen = this.panel.wrapper.ws_isopen();
+                const ws_isopen = false;
                 checkin.subviews.chat.send_text(ws_isopen ? (args) => {
                     this.panel.wrapper.ws_send(args.body, {onfetchload, onfetcherror});
                 } : null, contact_type, xxid, ceid, msg.sender_rand, msg.plain_text,)
@@ -8103,7 +8103,7 @@
                     MessageMark.report(error);
                     msgattr.msgobj.unblur_content();
                 };
-                const ws_isopen = this.panel.wrapper.ws_isopen();
+                const ws_isopen = false;
                 checkin.subviews.chat.edit_text(ws_isopen ? (args) => {
                     this.panel.wrapper.ws_send(args.body, {onfetchload, onfetcherror});
                 } : null, contact_type, xxid, ceid, msgattr.id, new_text,)
@@ -8133,7 +8133,7 @@
                     MessageMark.report(error);
                     msgattr.msgobj.unblur_content();
                 };
-                const ws_isopen = this.panel.wrapper.ws_isopen();
+                const ws_isopen = false;
                 checkin.subviews.chat.revoke_message(ws_isopen ? (args) => {
                     this.panel.wrapper.ws_send(args.body, {onfetchload, onfetcherror});
                 } : null, contact_type, xxid, ceid, msgattr.id,)
@@ -8164,7 +8164,7 @@
                     // if (this.closed) return;
                     MessageMark.report(error);
                 };
-                const ws_isopen = this.panel.wrapper.ws_isopen();
+                const ws_isopen = false;
                 checkin.subviews.chat.mark_read(ws_isopen ? (args) => {
                     this.panel.wrapper.ws_send(args.body, {onfetchload, onfetcherror});
                 } : null, contact_type, xxid, ceid, [msgattr.id,],)
@@ -8230,7 +8230,7 @@
                     }
 
                 };
-                const ws_isopen = this.panel.wrapper.ws_isopen();
+                const ws_isopen = false;
                 checkin.subviews.chat.mark_read(ws_isopen ? (args) => {
                     this.panel.wrapper.ws_send(args.body, {onfetchload, onfetcherror});
                 } : null, contact_type, xxid, ceid, unreadIds,)
@@ -9647,6 +9647,10 @@
                     this.client.dashboard_chat.wrapper.update_contact_item_status(result);
                 };
                 const onfetcherror = (error) => {
+                    if (error.auto_retry) {
+                        return;
+                    }
+
                     // if (this.closed) return;
                     // this.previous_activity_attr.is_sending = false;
                     MessageMark.report(error);
