@@ -7273,7 +7273,7 @@
 
                 this.timer__fetch_unread_msgs = null;
                 this.interval__fetch_unread_msgs = 7500;
-                this.interval__fetch_unread_msgs__ws = 3000;
+                this.interval__fetch_unread_msgs__ws = 4500;
                 this.is_processing__fetch_unread_msgs = false;
 
                 this.timer__update_read_progress = null;
@@ -10931,7 +10931,7 @@
 
                 this.timer__sync = null;
                 this.interval__sync = 10000;
-                this.interval__sync__ws = 5000;
+                this.interval__sync__ws = 7000;
                 this.is_processing__sync = false;
 
                 this.mark_syncing = this.dashboard_element.querySelector(':scope .chat-contacts-mark-syncing');
@@ -11123,9 +11123,9 @@
                         this._sync_edited_messages(item, former_ceid, message_ids);
                     });
                 };
-                const ws_isopen = this.panel.wrapper.ws_isopen();
+                const ws_isopen = this.ws_isopen();
                 checkin.subviews.chat.sync_message(ws_isopen ? (args) => {
-                    this.panel.wrapper.ws_send(args.body, {onfetchload, onfetcherror});
+                    this.ws_send(args.body, {onfetchload, onfetcherror});
                 } : null, item.contact_attr.type, xxid, item.ceid, message_ids,)
                     .then(result => {
                         if (ws_isopen) return;
@@ -11666,6 +11666,9 @@
                     const callback = this.ws_callbacks[counter];
                     delete this.ws_callbacks[counter];
                     if (json.error) {
+                        if (json.error.message.includes("Too many API requests by single worker invocation")) {
+                            this.ws_close();
+                        }
                         callback.onfetcherror(new Error(JSON.stringify(json)));
                     } else {
                         callback.onfetchload(json.result);
