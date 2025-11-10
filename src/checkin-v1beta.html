@@ -10940,6 +10940,7 @@
                 this.ws_client = null;
                 this.ws_counter = 0;
                 this.ws_callbacks = {};
+                this.ws_lasttime_connecting = Date.now();
 
             }
 
@@ -11490,7 +11491,6 @@
                 }
                 this.stop_timer__sync();
                 this.sync();
-                this.ws_connect();
             }
 
             stop_timer__sync() {
@@ -11551,6 +11551,9 @@
                 };
 
                 const ws_isopen = this.ws_isopen();
+
+                if (!this.ws_client && Date.now() - this.ws_lasttime_connecting > 10 * 1000) this.ws_connect();
+
                 checkin.subviews.chat.sync(ws_isopen ? (args) => {
                     this.ws_send(args.body, {onfetchload, onfetcherror});
                 } : null, gid_args, uid_args)
@@ -11605,6 +11608,7 @@
             * websocket
             * */
             ws_connect() {
+                this.ws_lasttime_connecting = Date.now();
                 this.ws_close();
                 const url = join_path(checkin.subviews.chat.api_url(), "ws",);
                 if (url.protocol === 'https:') url.protocol = 'wss:';
@@ -11646,6 +11650,7 @@
                         delete this.ws_callbacks[key];
                     }
                 }
+                this.ws_client = null;
             }
 
             ws_onerror(event) {
