@@ -7736,11 +7736,17 @@
                     this.is_processing__fetch_unread_msgs = false;
                     this.change_loading_status__checknew();
                     this.remove_loading_mark();
-                    MessageMark.report(error, null, () => {
+                    if (error.auto_retry) {
                         this.stop_timer__fetch_unread_msgs();
                         if (this.closed) return;
                         if (this.client.dashboard_chat.wrapper.is_active()) this.fetch_unread_msgs();
-                    });
+                    } else {
+                        MessageMark.report(error, null, () => {
+                            this.stop_timer__fetch_unread_msgs();
+                            if (this.closed) return;
+                            if (this.client.dashboard_chat.wrapper.is_active()) this.fetch_unread_msgs();
+                        });
+                    }
                 };
                 const ws_isopen = this.panel.wrapper.ws_isopen();
                 checkin.subviews.chat.load(ws_isopen ? (args) => {
@@ -7860,11 +7866,17 @@
                 };
                 const onfetcherror = (error) => {
                     // if (this.closed) return;
-                    MessageMark.report(error, null, () => {
+                    if (error.auto_retry) {
                         this.stop_timer__update_read_progress();
                         if (this.closed) return;
                         if (this.client.dashboard_chat.wrapper.is_active()) this.update_read_progress();
-                    });
+                    } else {
+                        MessageMark.report(error, null, () => {
+                            this.stop_timer__update_read_progress();
+                            if (this.closed) return;
+                            if (this.client.dashboard_chat.wrapper.is_active()) this.update_read_progress();
+                        });
+                    }
                 };
                 const ws_isopen = this.panel.wrapper.ws_isopen();
                 checkin.subviews.chat.read(ws_isopen ? (args) => {
@@ -8209,9 +8221,14 @@
                 };
                 const onfetcherror = (error) => {
                     // if (this.closed) return;
-                    MessageMark.report(error, null, () => {
+                    if (error.auto_retry) {
                         for (const unreadMsgobj of unread_msgobjs) unreadMsgobj.at_attr.is_marking = false;
-                    });
+                    } else {
+                        MessageMark.report(error, null, () => {
+                            for (const unreadMsgobj of unread_msgobjs) unreadMsgobj.at_attr.is_marking = false;
+                        });
+                    }
+
                 };
                 const ws_isopen = this.panel.wrapper.ws_isopen();
                 checkin.subviews.chat.mark_read(ws_isopen ? (args) => {
@@ -11120,9 +11137,15 @@
                 };
                 const onfetcherror = (error) => {
                     // if (this.closed) return;
-                    MessageMark.report(error, null, () => {
+
+                    if (error.auto_retry) {
                         this._sync_edited_messages(item, former_ceid, message_ids);
-                    });
+                    } else {
+                        MessageMark.report(error, null, () => {
+                            this._sync_edited_messages(item, former_ceid, message_ids);
+                        });
+                    }
+
                 };
                 const ws_isopen = this.ws_isopen();
                 checkin.subviews.chat.sync_message(ws_isopen ? (args) => {
@@ -11543,16 +11566,21 @@
                     // this.remove_loading_mark();
                     remove_simple_loading_mark(this.aside_left_wrap);
 
-                    MessageMark.report(error, null, () => {
+                    if (error.auto_retry) {
                         this.stop_timer__sync();
                         if (this.is_active()) this.sync();
-                    });
-                    throw error;
+                    } else {
+                        MessageMark.report(error, null, () => {
+                            this.stop_timer__sync();
+                            if (this.is_active()) this.sync();
+                        });
+                    }
+
                 };
 
                 const ws_isopen = this.ws_isopen();
 
-                if (!this.ws_client && Date.now() - this.ws_lasttime_connecting > 10 * 1000) this.ws_connect();
+                if (!this.ws_client && Date.now() - this.ws_lasttime_connecting > 30 * 1000) this.ws_connect();
 
                 checkin.subviews.chat.sync(ws_isopen ? (args) => {
                     this.ws_send(args.body, {onfetchload, onfetcherror});
@@ -11681,10 +11709,12 @@
                     const callback = this.ws_callbacks[counter];
                     delete this.ws_callbacks[counter];
                     if (json.error) {
+                        const error = new Error(JSON.stringify(json));
                         if (json.error.message.includes("Too many API requests by single worker invocation")) {
                             this.ws_close();
+                            error.auto_retry = true;
                         }
-                        callback.onfetcherror(new Error(JSON.stringify(json)));
+                        callback.onfetcherror(error);
                     } else {
                         callback.onfetchload(json.result);
                     }
