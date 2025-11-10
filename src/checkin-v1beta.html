@@ -11674,7 +11674,9 @@
                 console.log("websocket 已关闭", event);
                 for (let key in this.ws_callbacks) {
                     if (this.ws_callbacks.hasOwnProperty(key)) {
-                        this.ws_callbacks[key].onfetcherror(new Error(`Websocket连接关闭：${event.code}，${event.reason}`));
+                        const error = new Error(`Websocket连接关闭：${event.code}，${event.reason}`);
+                        error.auto_retry = true;
+                        this.ws_callbacks[key].onfetcherror(error);
                         delete this.ws_callbacks[key];
                     }
                 }
@@ -11685,7 +11687,9 @@
                 console.log("websocket 发生错误", event);
                 for (let key in this.ws_callbacks) {
                     if (this.ws_callbacks.hasOwnProperty(key)) {
-                        this.ws_callbacks[key].onfetcherror(new Error(`Websocket连接异常关闭：${event.code}，${event.reason}，${event}`));
+                        const error = new Error(`Websocket连接异常关闭：${event.code}，${event.reason}，${event}`);
+                        error.auto_retry = true;
+                        this.ws_callbacks[key].onfetcherror(error);
                         delete this.ws_callbacks[key];
                     }
                 }
