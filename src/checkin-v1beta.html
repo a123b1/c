@@ -670,6 +670,11 @@
             margin-left: 4px;
         }
 
+        span.form-mark-input-noticing {
+            font-size: 14px;
+            color: rgba(253, 25, 25, 0.9);
+        }
+
     </style>
 
     <!--遮罩内容 图片查看-->
@@ -1410,6 +1415,51 @@
 
     </style>
 
+    <!--管理页面 服务状态-->
+    <style>
+        .service-status-rect {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            gap: 4px;
+        }
+
+    </style>
+
+    <!--管理页面 备份恢复-->
+    <style>
+        .backup-rect {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            gap: 4px;
+        }
+
+        .backup-rect > hr {
+            border: none;
+            height: 1px;
+            background-color: #00000055;
+            margin: 8px 0;
+        }
+
+        .backup-row {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .backup-row > button {
+            padding: 4px;
+        }
+
+        .backup-row > span {
+            font-size: 14px;
+            color: rgba(253, 25, 25, 0.9);
+        }
+
+    </style>
+
     <!--复选框-->
     <style>
         .checkbox {
@@ -1760,6 +1810,32 @@
         .chat-session-header-actions {
             display: flex;
             flex-direction: row;
+            align-items: center;
+
+            margin-right: 8px;
+        }
+
+        .chat-session-header-actions > button {
+            display: inline-block;
+            background: transparent;
+            transition: all 0.1s ease-in-out;
+            border: 0 solid #3498db;
+            border-radius: 0;
+            cursor: pointer;
+
+            width: 38px;
+            height: 32px;
+
+            font-size: 22px;
+            color: #1c1c1c;
+        }
+
+        .chat-session-header-actions > button:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-session-header-actions > button:active {
+            background: rgba(0, 0, 0, 0.24);
         }
 
         .chat-session-onlineusers-item:first-child {
@@ -2796,6 +2872,20 @@
         URL.revokeObjectURL(a.href);
     }
 
+    function saveFile_from_text(result, fileName) {
+        const encoder = new TextEncoder();
+        const uint8Array = encoder.encode(result);
+        saveFile_from_uint8array(uint8Array, fileName);
+    }
+
+    function saveFile_from_json(result, fileName) {
+        saveFile_from_text(JSON.stringify(result), fileName);
+    }
+
+    function date_string_for_fileName() {
+        return format_timestamp_utc8(parseInt(Date.now() / 1000), 'YYYY-MM-DD_HH-mm');
+    }
+
     function getImgData(img, callback) {
         console.log(img.width, img.height)
         const canvas = document.createElement('canvas');
@@ -2894,12 +2984,24 @@
         return p;
     }
 
-    function readFileAsync(file) {
+    function readFileAsync(file, type = "bytes") {
+        // let text = new TextDecoder("utf-8", {fatal: true}).decode(data);
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onload = () => resolve(reader.result); // arrayBuffer
+            reader.onload = () => {
+                if (type === "bytes") {
+                    resolve(reader.result); // arrayBuffer
+                } else if (type === "text") {
+                    let text = reader.result.replace(/^[\uFEFF\u200B\u0000-\u001F]+/, '');
+                    resolve(text);
+                }
+            };
             reader.onerror = () => reject(reader.error);
-            reader.readAsArrayBuffer(file);
+            if (type === "bytes") {
+                reader.readAsArrayBuffer(file);
+            } else if (type === "text") {
+                reader.readAsText(file);
+            }
         });
     }
 
@@ -3398,22 +3500,36 @@
         #add_input_element(row, input_group) {
             if (row.type === "title") {
                 this.#add_input_element_title(row, input_group);
-            } else if (row.type === "textarea") {
+            } //
+            else if (row.type === "textarea") {
                 this.#add_input_element_textarea(row, input_group);
-            } else if (row.type === "linetext") {
+            } //
+            else if (row.type === "linetext") {
                 this.#add_input_element_linetext(row, input_group);
-            } else if (row.type === "combobox") {
+            } //
+            else if (row.type === "combobox") {
                 this.#add_input_element_combobox(row, input_group);
-            } else if (row.type === "groupbox") {
+            } //
+            else if (row.type === "groupbox") {
                 this.#add_input_element_groupbox(row, input_group);
-            } else if (row.type === "multiselectbutton") {
+            } //
+            else if (row.type === "multiselectbutton") {
                 this.#add_input_element_multiselectbutton(row, input_group);
-            } else if (row.type === "date") {
+            } //
+            else if (row.type === "date") {
                 this.#add_input_element_date(row, input_group);
-            } else if (row.type === "button") {
+            } //
+            else if (row.type === "button") {
                 this.#add_input_element_button(row, input_group);
-            } else if (row.type === "custom") {
+            } //
+            else if (row.type === "custom") {
                 this.#add_input_element_custom(row, input_group);
+            } //
+            else if (row.type === "number") {
+                this.#add_input_element_number(row, input_group);
+            }//
+            else if (row.type === "noticing") {
+                this.#add_input_element_noticing(row, input_group);
             }
         }
 
@@ -3534,6 +3650,30 @@
             row.add_element(this, row);
         }
 
+        #add_input_element_number(row, input_group) {
+            let html = `
+<label>${row.label}<input type="number"></label>
+`;
+            input_group.insertAdjacentHTML("beforeend", html);
+            row.label_element = input_group.querySelector(":scope > label:last-of-type");
+            row.input_element = row.label_element.querySelector(":scope > input");
+
+            row.input_element.value = row.value.toString();
+            row.input_element.min = row.min.toString();
+            row.input_element.max = row.max.toString();
+
+            row.input_element.style.width = `30ch`;
+        }
+
+        #add_input_element_noticing(row, input_group) {
+            let html = `
+<label>${row.label}<span class="form-mark-input-noticing">${row.text}</span></label>
+`;
+            input_group.insertAdjacentHTML("beforeend", html);
+            row.label_element = input_group.querySelector(":scope > label:last-of-type");
+            row.input_element = row.label_element.querySelector(":scope > span");
+        }
+
         collect_data(form = undefined) {
             if (!form) form = this.form;
             for (const row of form) {
@@ -3555,6 +3695,8 @@
                     }
                 } else if (row.type === "custom") {
                     row.collect_data(this, row);
+                } else if (row.type === "number") {
+                    row.value = parseInt(row.input_element.value);
                 }
             }
 
@@ -5193,6 +5335,49 @@
                 throw new Error(await format_error_response(r));
             }
 
+            async drop_tables() {
+                let url = join_path(this.api_url(), "service", "drop_tables",);
+                let r = await net_fetcher.nf_get(url,);
+                if (r.status === 200) {
+                    // let d = await r.json();
+                    // return d;
+                    return true;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async clear_drive() {
+                let url = join_path(this.api_url(), "service", "clear_drive",);
+                let r = await net_fetcher.nf_get(url,);
+                if (r.status === 200) {
+                    // let d = await r.json();
+                    // return d;
+                    return true;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async backup() {
+                let url = join_path(this.api_url(), "service", "backup",);
+                let r = await net_fetcher.nf_get(url,);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async restore(json) {
+                let url = join_path(this.api_url(), "service", "restore",);
+                let body = {...json,};
+                let r = await net_fetcher.nf_post_json(url, body);
+                if (r.status === 200) {
+                    // let d = await r.json();
+                    // return d;
+                    return true;
+                }
+                throw new Error(await format_error_response(r));
+            }
 
         }
 
@@ -5941,6 +6126,32 @@
 
                 if (ws_send) {
                     body.action = dashboardwrappers.ChatDashboardWrapper.ws_action_type.sync_message;
+                    return ws_send({url, body});
+                }
+
+                let r = await net_fetcher.nf_post_json(url, body,);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async clear(ws_send, contact_type, xxid, ceid, old_than_hours,) {
+                let url = join_path(this.api_url(), "clear");
+                let body = {
+                    contact_type, ceid,
+
+                    hours: old_than_hours,
+                };
+                if (contact_type === subviews.Chat.receiver_type.group) {
+                    body.gid = xxid;
+                } else if (contact_type === subviews.Chat.receiver_type.user) {
+                    body.uid = xxid;
+                }
+
+                if (ws_send) {
+                    body.action = dashboardwrappers.ChatDashboardWrapper.ws_action_type.clear;
                     return ws_send({url, body});
                 }
 
@@ -7322,6 +7533,7 @@
         <div class="chat-session-header-info-clickmark"></div>
     </div>
     <div class="chat-session-header-actions">
+        <button class="chat-session-header-action-more">⋯</button>
     </div>
 </div>
 
@@ -7357,6 +7569,8 @@
                 this.e_header_info_name = this.container.querySelector(":scope span.chat-session-header-info-name");
                 this.e_header_info_status = this.container.querySelector(":scope span.chat-session-header-info-status");
 
+                this.e_header_actions = this.container.querySelector(":scope div.chat-session-header-actions");
+
                 this.e_msgflow = this.container.querySelector(":scope div.chat-session-msgflow");
                 this.e_msgflow_wrap = this.container.querySelector(":scope div.chat-session-msgflow-wrap");
 
@@ -7380,6 +7594,29 @@
                     this.e_msgflow_mark_onlineusers.classList.add("hidden");
                 });
 
+                // header右侧按钮
+                this.e_header_action_more = this.e_header_actions.querySelector(":scope button.chat-session-header-action-more");
+                this.e_header_action_more.addEventListener("click", (event) => {
+                    const rect = this.e_header_action_more.getBoundingClientRect();
+                    const items = [];
+
+                    items.push(
+                        {
+                            type: "button", text: "导出聊天记录", callback: event => {
+                                this.output_msgs();
+                            },
+                        },
+                        {type: "section", text: "",},
+                        {
+                            type: "button", text: "清理消息", callback: event => {
+                                this.clear_msgs();
+                            },
+                        },
+                    );
+
+                    MenuMark.exec({x: rect.left, y: rect.top + rect.height,}, items, () => {
+                    });
+                });
 
                 // 视口首条消息日期
                 this.e_msgflow_mark_currentday = this.container.querySelector(":scope div.chat-session-msgflow-mark-currentday");
@@ -7652,6 +7889,11 @@
                     xxid: this.is_group() ? this.li.bindmap.contact_attr.gid : this.li.bindmap.contact_attr.uid,
                     ceid: this.li.bindmap.ceid,
                 }
+            }
+
+            current_contact_name() {
+                const {xxid, contact_type, ceid} = this.current_contact_xxid();
+                return xxid;
             }
 
             refresh() {
@@ -8604,16 +8846,18 @@
                                     }
 
                                     if (!this.sent_by_me && !(this.msgattr.status & dashboardwrappers.ChatDashboardWrapper.message_status.i_read)) {
-                                        if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_text(this.msgattr.type) ||
-                                            dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_drive_item(this.msgattr.type)) {
-                                            items.push(
-                                                {
-                                                    type: "button", text: "标记已读", callback: event => {
-                                                        this.contentpage.mark_as_read(this.msgattr)
+                                        if (!this.contentpage.is_group() || this.at_attr.at_all || this.at_attr.at_users.includes(logged_user.uid)) {
+                                            if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_text(this.msgattr.type) ||
+                                                dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_drive_item(this.msgattr.type)) {
+                                                items.push(
+                                                    {
+                                                        type: "button", text: "标记已读", callback: event => {
+                                                            this.contentpage.mark_as_read(this.msgattr)
+                                                        },
                                                     },
-                                                },
-                                                {type: "section", text: "",},
-                                            );
+                                                    {type: "section", text: "",},
+                                                );
+                                            }
                                         }
                                     }
 
@@ -8726,7 +8970,9 @@
                             this.msgelement_li.append(this.e_container);
 
                             if (this.is_sys_msg()) {
-                                this.e_tree_item.summary.classList.add("hidden");
+                                // this.e_tree_item.summary.classList.add("hidden");
+                                const group_header_row2 = this.e_tree_item.raw_header.querySelector(":scope div.chat-message-group-header-row2");
+                                group_header_row2.classList.add("hidden");
                             }
                         } else {
                             this.msgelement.append(this.e_container);
@@ -9509,6 +9755,7 @@
                 this.e_inputarea_textarea.value = this.li.bindmap.draft_text;
             }
 
+
             /*
             * 在线成员
             * */
@@ -9579,6 +9826,7 @@
                 });
             }
 
+
             /*
             * 当前日期
             * */
@@ -9598,6 +9846,7 @@
                     this.e_msgflow_mark_currentday.style.opacity = "0";
                 }, 3000);
             }
+
 
             /*
             * 文本输入框
@@ -9742,6 +9991,97 @@
                 } else {
                     this.e_msgflow_mark_checknew.classList.add("hidden");
                 }
+            }
+
+
+            /*
+            * 导出聊天记录
+            * */
+            output_msgs() {
+                const contact_name = this.current_contact_name();
+                const data_string = date_string_for_fileName();
+                const name = `01_${contact_name}聊天记录_${data_string}.md`;
+
+                const strings = [];
+
+                strings.push(`### ${name}`);
+
+                this.li.bindmap.msgs.forEach(msgattr => {
+                    let s = `[未知消息类型]`;
+
+                    if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_sys(msgattr.type)) {
+                        s = `[${format_timestamp_utc8(msgattr.sent_time)}] ${msgattr.formated_sys_msg}`;
+                    } else {
+                        if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_text(msgattr.type)) {
+                            s = `[${format_timestamp_utc8(msgattr.sent_time)} ${msgattr.sender}]\n${msgattr.plain_data_text}`;
+                        } else if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_drive_item(msgattr.type)) {
+                            if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_image(msgattr.type)) {
+                                s = `[${format_timestamp_utc8(msgattr.sent_time)} ${msgattr.sender}] [图片] ${msgattr.plain_file_name}`;
+                            } else if (dashboardwrappers.ChatDashboardWrapper.message_type_checker.is_file(msgattr.type)) {
+                                s = `[${format_timestamp_utc8(msgattr.sent_time)} ${msgattr.sender}] [文件] ${msgattr.plain_file_name}`;
+                            }
+                        }
+                    }
+
+                    strings.push(s);
+                });
+
+                saveFile_from_text(strings.join("\n\n"), name);
+
+            }
+
+
+            /*
+            * 清理消息
+            * */
+            clear_msgs() {
+
+                let form = [
+                    {type: "title", label: "删除消息："},
+                    {type: "number", label: "多少小时前的", value: 24, min: 0, max: 24 * 30,},
+                    {type: "noticing", label: "", text: "确保他人已读。"},
+                ];
+
+                const confirm_callback = (fm,) => {
+                    fm.collect_data();
+
+                    try {
+                        let old_than_hours = JSON.parse(form[1].value);
+                        if (!form_field_checker.ffc_int(old_than_hours)) throw new Error("number");
+
+                        fm.remove();
+                        this._clear_msgs(old_than_hours);
+
+                    } catch (e) {
+                        MessageMark.report(e, fm.rect)
+                    }
+
+                }
+
+                FormMark.get_global_input(form, confirm_callback)
+            }
+
+            _clear_msgs(old_than_hours) {
+                const {xxid, contact_type, ceid} = this.current_contact_xxid();
+
+                const onfetchload = (result) => {
+                    // if (this.closed) return;
+                    this.client.dashboard_chat.wrapper.update_contact_item_status(result.sync);
+                };
+                const onfetcherror = (error) => {
+                    // if (this.closed) return;
+                    MessageMark.report(error);
+                };
+                const ws_isopen = false;
+                checkin.subviews.chat.clear(ws_isopen ? (args) => {
+                    this.panel.wrapper.ws_send(args.body, {onfetchload, onfetcherror});
+                } : null, contact_type, xxid, ceid, old_than_hours,)
+                    .then(result => {
+                        if (ws_isopen) return;
+                        onfetchload(result);
+                    }).catch(error => {
+                    onfetcherror(error);
+                });
             }
 
         }
@@ -10581,6 +10921,174 @@
                 }
 
             },
+
+            status: class extends _ {
+                constructor(client, panel, li) {
+                    super(client, panel, li);
+                }
+
+                close_page() {
+                    super.close_page();
+                }
+
+                open_page() {
+                    super.open_page();
+                    let html = `
+<div class="service-status-rect">
+
+</div>
+`;
+                    this.container.insertAdjacentHTML("beforeend", html);
+                    this.service_status_rect = this.container.querySelector(":scope div.service-status-rect");
+
+                }
+
+            },
+
+            backup: class extends _ {
+                constructor(client, panel, li) {
+                    super(client, panel, li);
+                }
+
+                close_page() {
+                    super.close_page();
+                }
+
+                open_page() {
+                    super.open_page();
+                    let html = `
+<div class="backup-rect">
+
+<div class="backup-row backup-row1">
+<button class="backup-btn-clear-drive">清空网盘</button>
+<button class="backup-btn-reset">重置服务</button>
+</div>
+
+<hr>
+
+<div class="backup-row backup-row2">
+<button class="backup-btn-backup">备份用户和组</button>
+<button class="backup-btn-restore">恢复<input type="file" class="hidden"></button>
+<span>恢复前删除所有用户和组，避免名称冲突。</span>
+</div>
+
+</div>
+`;
+                    this.container.insertAdjacentHTML("beforeend", html);
+                    this.backup_rect = this.container.querySelector(":scope div.backup-rect");
+
+                    this.e_btn_clear_drive = this.backup_rect.querySelector(":scope button.backup-btn-clear-drive");
+                    this.e_btn_clear_drive.addEventListener("click", (event) => {
+                        MessageMark.confirm(`确定清空网盘？\n（确保需要保留的文件都已下载。）`, null, null, () => {
+                            this.clear_drive();
+                        },)
+                    });
+
+                    this.e_btn_reset = this.backup_rect.querySelector(":scope button.backup-btn-reset");
+                    this.e_btn_reset.addEventListener("click", (event) => {
+                        MessageMark.confirm(`确定重置服务？\n（将删除所有用户、组、聊天记录、网盘文件等。）`, null, null, () => {
+                            this.reset();
+                        },)
+                    });
+
+                    this.e_btn_backup = this.backup_rect.querySelector(":scope button.backup-btn-backup");
+                    this.e_btn_backup.addEventListener("click", (event) => {
+                        this.backup();
+                    });
+
+                    this.e_btn_restore = this.backup_rect.querySelector(":scope button.backup-btn-restore");
+                    this.e_btn_restore__input = this.e_btn_restore.querySelector(":scope input");
+                    this.e_btn_restore.addEventListener("click", (event) => {
+                        this.e_btn_restore__input.click();
+                    });
+                    this.e_btn_restore__input.addEventListener('change', (event) => {
+                        const file = event.target.files[0];
+                        if (file) {
+                            this.restore(file);
+                        }
+                    });
+
+                }
+
+
+                clear_drive() {
+                    this.loading_mark.show();
+                    this.client.subviews.admin.clear_drive()
+                        .then(result => {
+                            if (this.closed) return;
+                            this.remove_loading_mark();
+                        }).catch(error => {
+                        if (this.closed) return;
+                        this.remove_loading_mark()
+                        MessageMark.report(error);
+                    });
+                }
+
+                reset() {
+                    this.loading_mark.show();
+                    this.client.subviews.admin.drop_tables()
+                        .then(result => {
+                            if (this.closed) return;
+                            this.remove_loading_mark();
+                            this.client.logout();
+                        }).catch(error => {
+                        if (this.closed) return;
+                        this.remove_loading_mark()
+                        MessageMark.report(error);
+                    });
+                }
+
+                static backup_types = [
+                    {
+                        type: "checkin-users-and-groups", name: "01_Checkin备份_用户和组_{date}.json"
+                    },
+                ];
+
+                backup() {
+                    this.loading_mark.show();
+                    this.client.subviews.admin.backup()
+                        .then(result => {
+                            if (this.closed) return;
+
+                            result.type = backend_panel.backup.backup_types[0].type;
+                            const name = backend_panel.backup.backup_types[0].name.replace("{date}", date_string_for_fileName());
+
+                            saveFile_from_json(result, name);
+
+                            this.remove_loading_mark();
+                        }).catch(error => {
+                        if (this.closed) return;
+                        this.remove_loading_mark()
+                        MessageMark.report(error);
+                    });
+                }
+
+                restore(file) {
+                    this.loading_mark.show();
+                    this._restore(file);
+                }
+
+                async _restore(file) {
+                    if (this.closed) return;
+                    try {
+                        const data = await readFileAsync(file, "text");
+                        const json = JSON.parse(data);
+                        if (!form_field_checker.ffc_object(json) || json.type !== backend_panel.backup.backup_types[0].type) {
+                            throw new Error("无效的用户和组备份文件。");
+                        }
+                        await this.client.subviews.admin.restore(json);
+                        if (this.closed) return;
+                        this.remove_loading_mark();
+                    } catch (error) {
+                        if (this.closed) return;
+                        this.remove_loading_mark()
+                        MessageMark.report(error);
+                        throw error;
+                    }
+                }
+
+            },
+
         }
 
         return {_drive, _chat, dashboard_mail, dashboard_drive, dashboard_chat, dashboard_forum, backend_panel,};
@@ -11391,10 +11899,11 @@
                     }
                 } //
                 else if (sys_attr.type === dashboardwrappers.ChatDashboardWrapper.data_spec_action_type.clear_message) {
+                    const hours = sys_attr.a3_number === 0 ? "全部" : `${sys_attr.a3_number}小时前的`;
                     if (a1_uid === logged_user.uid) {
-                        string = `你清理了${sys_attr.a3_number}小时前的消息`;
+                        string = `你执行了删除${hours}消息`;
                     } else {
-                        string = `${a1_uid}清理了${sys_attr.a3_number}小时前的消息`;
+                        string = `${a1_uid}执行了删除${hours}消息`;
                     }
                 } //
                 else if (sys_attr.type === dashboardwrappers.ChatDashboardWrapper.data_spec_action_type.auto_delete_message) {
@@ -11583,9 +12092,6 @@
                 };
 
                 const ws_isopen = this.ws_isopen();
-
-                if (!this.ws_client && Date.now() - this.ws_lasttime_connecting > 30 * 1000) this.ws_connect();
-
                 checkin.subviews.chat.sync(ws_isopen ? (args) => {
                     this.ws_send(args.body, {onfetchload, onfetcherror});
                 } : null, gid_args, uid_args)
@@ -11595,6 +12101,8 @@
                     }).catch(error => {
                     onfetcherror(error);
                 });
+
+                if (!this.ws_client && Date.now() - this.ws_lasttime_connecting > 30 * 1000) this.ws_connect();
 
             }
 
@@ -11875,6 +12383,7 @@
                 {text: "组列表", pagetype: contentpages.backend_panel.groups,},
                 {text: "储存空间", pagetype: contentpages.backend_panel.disk,},
                 {text: "服务状态", pagetype: contentpages.backend_panel.status,},
+                {text: "备份恢复", pagetype: contentpages.backend_panel.backup,},
             ])
 
             this.#bind_mainactions(this.dashboard_chat, 0, [])
