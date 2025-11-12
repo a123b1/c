@@ -6,6 +6,58 @@
     <link rel="icon" href="data:;base64,=" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!--主题-->
+    <style>
+        /* 默认亮 */
+        :root {
+            --bg-body: white;
+            --fc-body: black;
+            --fc-less: #1c1c1c;
+            --fc-least: #000000aa;
+            --c-thick-blue: #14589a;
+            --c-thick-blue2: #0655b0;
+            --bg-less: rgba(169, 169, 169, 0.15);
+        }
+
+        /* 暗 */
+        .theme-dark {
+            --bg-body: rgb(63, 63, 63);
+            --fc-body: rgb(240, 240, 240);
+            --fc-less: rgb(220, 220, 220);
+            --fc-least: rgb(180, 180, 180);
+            --c-thick-blue: #56acff;
+            --c-thick-blue2: #3293f3;
+            --bg-less: rgba(169, 169, 169, 0.15);
+        }
+
+        .theme-dark button {
+            background-color: rgb(53, 53, 53);
+            color: rgb(240, 240, 240);
+            border: 1px solid #555;
+        }
+
+        .theme-dark button:hover {
+            background-color: rgb(63, 63, 63);
+            border-color: #666;
+        }
+
+        .theme-dark button:active {
+            background-color: rgb(43, 43, 43);
+            border-color: #444;
+        }
+
+        .theme-dark input, .theme-dark select, .theme-dark textarea {
+            background-color: rgb(53, 53, 53);
+            color: rgb(240, 240, 240);
+            border: 1px solid #555;
+        }
+
+        .theme-dark {
+            scrollbar-color: #666 rgb(53, 53, 53);
+        }
+
+    </style>
+
     <!--全局-->
     <style>
         .initiation_hidden {
@@ -45,7 +97,8 @@
         }
 
         body {
-            background: white;
+            background: var(--bg-body);
+            color: var(--fc-body);
             font-family: Arial, sans-serif;
             margin: 0 0 0 0;
             height: 100%;
@@ -58,7 +111,6 @@
             display: inline-block;
             flex-grow: 1;
         }
-
 
     </style>
 
@@ -81,7 +133,7 @@
             height: 0;
             border-left: 5px solid transparent; /* 左边透明 */
             border-right: 5px solid transparent; /* 右边透明 */
-            border-top: 5px solid #000000aa; /* 上边黑色三角 */
+            border-top: 5px solid var(--fc-least); /* 上边黑色三角 */
         }
     </style>
 
@@ -105,36 +157,36 @@
 
         header > button.selected {
             font-weight: bold;
-            color: white;
-            background: #2581d5dd;
+            color: white !important;
+            background: #2581d5dd !important;
         }
 
         header > button.selected:hover {
-            background: #3e8fe7dd;
+            background: #3e8fe7dd !important;
         }
 
         header > button.selected:active {
-            background: #146dbbdd;
+            background: #146dbbdd !important;
         }
 
         header > button {
             display: inline-block;
             padding: 8px 20px;
             font-size: 16px;
-            color: #14589a;
-            background: transparent;
+            color: var(--c-thick-blue) !important;
+            background: transparent !important;
             transition: all 0.1s ease-in-out;
-            border: 0 solid #3498db;
+            border: 0 solid #3498db !important;
             border-radius: 0;
             cursor: pointer;
         }
 
         header > button:hover {
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.1) !important;
         }
 
         header > button:active {
-            background: rgba(0, 0, 0, 0.24);
+            background: rgba(0, 0, 0, 0.24) !important;
         }
 
         header > button:disabled {
@@ -235,7 +287,7 @@
             display: flex;
             padding: 4px 20px;
             font-size: 16px;
-            color: #14589a;
+            color: var(--c-thick-blue);
             transition: all 0.1s ease-in-out;
             border: 0 solid #3498db;
             border-radius: 0;
@@ -301,6 +353,11 @@
             border-radius: 4px;
         }
 
+        .aside-left-wrap.fullscreen {
+            width: 98% !important;
+            max-width: 100%;
+        }
+
         .aside-left {
             flex-grow: 1;
             overflow: auto;
@@ -324,6 +381,7 @@
         .aside-right > div {
             flex-grow: 1;
             display: flex;
+            flex-direction: column;
         }
 
         .aside-divider {
@@ -339,6 +397,34 @@
         .aside-divider:hover {
             background-color: #69696988;
         }
+
+
+        .btn-back-to-left-aside {
+            border: 0;
+            width: 40px;
+            height: 40px;
+            font-size: 16px;
+            background: transparent !important;
+            transition: all 0.1s ease-in-out;
+            cursor: pointer;
+            border: none !important;
+
+            display: none;
+        }
+
+        .btn-back-to-left-aside:hover {
+            background: rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .btn-back-to-left-aside:active {
+            background: rgba(0, 0, 0, 0.24) !important;
+        }
+
+        @media only screen and (max-width: 767px) {
+            .btn-back-to-left-aside {
+                display: block;
+            }
+        }
     </style>
 
     <!--通用 左栏按钮列表-->
@@ -349,6 +435,10 @@
             padding: 4px;
             border-radius: 4px;
             box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .theme-dark .aside-left > nav {
+            background-color: rgb(63, 63, 63);
         }
 
         /* ol 去掉默认序号和 padding */
@@ -457,9 +547,13 @@
             inset: 0; /* 等价于 top:0; right:0; bottom:0; left:0; */
             z-index: 9;
 
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(2px);
             -webkit-backdrop-filter: blur(2px);
+        }
+
+        .theme-dark div.blur-mark {
+            background: rgba(255, 255, 255, 0.1);
         }
 
     </style>
@@ -474,6 +568,10 @@
             border-top-color: #2563eb; /* 动态颜色（可换） */
             /* 为了更圆滑可以用 box-shadow 微调 */
             animation: spin 0.6s linear infinite;
+        }
+
+        .theme-dark .spinner-ring {
+            border-top-color: #3d77ef;
         }
 
         @keyframes spin {
@@ -664,7 +762,7 @@
         span.form-mark-input-multiselectbutton-value {
             margin: 0;
             padding: 0;
-            color: #000000aa;
+            color: var(--fc-least);
             font-size: 12px;
             user-select: none;
             margin-left: 4px;
@@ -796,7 +894,7 @@
             text-align: left;
 
             font-size: 16px;
-            color: #1c1c1c;
+            color: var(--fc-less);
         }
 
         div.floatball-mark-tabbar button:hover {
@@ -863,7 +961,7 @@
         .backtask-status-text {
             margin: 0;
             padding: 0;
-            color: #000000aa;
+            color: var(--fc-least);
             font-size: 12px;
             user-select: none;
         }
@@ -1032,7 +1130,7 @@
         .menu-mark-action-section-text {
             margin: 0;
             padding: 0;
-            color: #000000aa;
+            color: var(--fc-least);
             font-size: 12px;
         }
 
@@ -1073,6 +1171,10 @@
             align-items: center;
             user-select: none;
             transition: transform 0.1s ease;
+        }
+
+        .theme-dark details.tree-widget > summary {
+            background-color: #515c67;
         }
 
         /*details.tree-widget > summary:hover {*/
@@ -1165,6 +1267,32 @@
             gap: 4px;
         }
 
+        .drive-header {
+            display: flex;
+            flex-direction: row;
+            gap: 0;
+            align-items: end;
+        }
+
+        .drive-header-btn-close {
+            border: 0;
+            width: 40px;
+            height: 90%;
+            font-size: 16px;
+            background: transparent !important;
+            transition: all 0.1s ease-in-out;
+            cursor: pointer;
+            border: none !important;
+        }
+
+        .drive-header-btn-close:hover {
+            background: rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .drive-header-btn-close:active {
+            background: rgba(0, 0, 0, 0.24) !important;
+        }
+
         .drive-path {
             display: flex;
             flex-direction: row;
@@ -1183,31 +1311,31 @@
         }
 
         .drive-path-item-slash {
-            color: #14589a;
+            color: var(--c-thick-blue);
             user-select: none;
         }
 
         .drive-path-item-btn {
             display: inline-block;
             padding: 10px 8px 6px 8px;
-            background: transparent;
+            background: transparent !important;
             transition: all 0.1s ease-in-out;
-            border: 0 solid #3498db;
-            border-bottom-width: 1px;
+            border: 0 solid #3498db !important;
+            border-bottom-width: 1px !important;
             border-radius: 3px 3px 6px 6px;
             cursor: pointer;
         }
 
         .drive-path-item-btn:hover {
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.1) !important;
         }
 
         .drive-path-item-btn:active {
-            background: rgba(0, 0, 0, 0.24);
+            background: rgba(0, 0, 0, 0.24) !important;
         }
 
         .drive-path-item-btn.active {
-            background-color: rgba(255, 255, 0, 0.35);
+            background-color: rgba(255, 255, 0, 0.35) !important;
         }
 
         .drive-actions {
@@ -1221,12 +1349,16 @@
             margin-bottom: 2px;
         }
 
+        .theme-dark .drive-actions {
+            background: linear-gradient(to bottom, rgba(93, 108, 119, 0.53), transparent);
+        }
+
         .drive-action-btn {
             display: inline-block;
             padding: 8px 8px;
-            background: transparent;
+            background: transparent !important;
             transition: all 0.1s ease-in-out;
-            border: 0 solid black;
+            border: 0 solid black !important;
             border-radius: 2px;
             cursor: pointer;
         }
@@ -1240,11 +1372,11 @@
         }
 
         .drive-action-btn:hover {
-            background-color: rgba(0, 123, 255, 0.15);
+            background-color: rgba(0, 123, 255, 0.15) !important;
         }
 
         .drive-action-btn:active {
-            background-color: rgba(0, 123, 255, 0.4);
+            background-color: rgba(0, 123, 255, 0.4) !important;
         }
 
         .drive-items-wrap {
@@ -1295,6 +1427,10 @@
             background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23737373' d='M13,9H18.5L13,3.5V9M6,2H14L20,8V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V4C4,2.89 4.89,2 6,2M15,18V16H6V18H15M18,14V12H6V14H18Z'/></svg>")
         }
 
+        .theme-dark .drive-item-icon-file {
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='rgb(220, 220, 220)' d='M13,9H18.5L13,3.5V9M6,2H14L20,8V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V4C4,2.89 4.89,2 6,2M15,18V16H6V18H15M18,14V12H6V14H18Z'/></svg>")
+        }
+
         .drive-item-icon-folder {
             margin-left: 4px;
             background-repeat: no-repeat;
@@ -1303,6 +1439,10 @@
             height: 22px;
             display: inline-block;
             background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23737373' d='M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z'/></svg>")
+        }
+
+        .theme-dark .drive-item-icon-folder {
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='rgb(220, 220, 220)' d='M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z'/></svg>")
         }
 
         .drive-item-info {
@@ -1346,8 +1486,12 @@
         .drive-item-info-others span {
             margin: 0;
             padding: 0;
-            color: #000000aa;
+            color: var(--fc-least);
             font-size: 12px;
+        }
+
+        .theme-dark .drive-item-info-others span {
+            color: var(--fc-least);
         }
 
         .drive-item-actions {
@@ -1359,19 +1503,19 @@
         .drive-item-action {
             display: flex;
             padding: 8px 8px;
-            background: transparent;
+            background: transparent !important;
             transition: all 0.1s ease-in-out;
-            border: 0 solid black;
+            border: 0 solid black !important;
             border-radius: 2px;
             cursor: pointer;
         }
 
         .drive-item-action:hover {
-            background-color: rgba(0, 123, 255, 0.15);
+            background-color: rgba(0, 123, 255, 0.15) !important;
         }
 
         .drive-item-action:active {
-            background-color: rgba(0, 123, 255, 0.4);
+            background-color: rgba(0, 123, 255, 0.4) !important;
         }
 
         .drive-item-action-icon-more {
@@ -1422,6 +1566,13 @@
             flex-direction: column;
             flex-grow: 1;
             gap: 4px;
+        }
+
+        .service-status-row {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            align-items: center;
         }
 
     </style>
@@ -1485,6 +1636,10 @@
             transition: all 0.1s ease;
         }
 
+        .theme-dark .checkbox input[type="checkbox"] {
+            border-color: #FFFFFF99;
+        }
+
         /* 已选中 */
         .checkbox input[type="checkbox"]:checked {
         }
@@ -1499,6 +1654,10 @@
             border: solid black;
             border-width: 0 3px 3px 0;
             transform: rotate(45deg);
+        }
+
+        .theme-dark .checkbox input[type="checkbox"]:checked::after {
+            border-color: #FFFFFFbb;
         }
 
         /* 不确定状态 */
@@ -1601,7 +1760,7 @@
         }
 
         .chat-contacts-mark-syncing p {
-            /*background: #00000011;*/
+            /*background: var(--bg-less);*/
             background: rgba(253, 25, 25, 0.1);
             font-size: 12px;
             margin: 0 0;
@@ -1614,7 +1773,7 @@
             padding: 0 0 0 4px;
             user-select: none;
             background: rgba(0, 0, 0, 0.05);
-            color: #0655b0;
+            color: var(--c-thick-blue2);
             font-size: 14px;
         }
 
@@ -1687,7 +1846,7 @@
         span.chat-contact-session-status-top-lastmsgtime {
             font-weight: normal;
             font-size: 12px;
-            color: #000000aa;
+            color: var(--fc-least);
             white-space: nowrap;
         }
 
@@ -1695,7 +1854,7 @@
             flex-grow: 1;
             font-weight: normal;
             font-size: 12px;
-            color: #000000aa;
+            color: var(--fc-least);
 
             white-space: nowrap;
             overflow: hidden;
@@ -1706,6 +1865,10 @@
 
         span.chat-contact-session-status-bottom-lastmsgview[data-has-activity="true"] {
             color: #006edc;
+        }
+
+        .theme-dark span.chat-contact-session-status-bottom-lastmsgview[data-has-activity="true"] {
+            color: #54a6ff;
         }
 
         span.chat-contact-session-status-bottom-unreadcount {
@@ -1728,12 +1891,14 @@
         .chat-session-rect {
             display: flex;
             flex-direction: column;
-            flex-grow: 1;
+            /*flex-grow: 1;*/
+            height: 100%;
         }
 
         .chat-session-header {
             display: flex;
             flex-direction: row;
+            align-items: end;
             background: #CCE5FF88;
             padding: 4px;
             border-radius: 4px;
@@ -1742,23 +1907,28 @@
             border-bottom-width: 1px;
         }
 
+        .theme-dark .chat-session-header {
+            background: rgba(70, 84, 105, 0.53);
+        }
+
         .chat-session-header-btn-close {
             border: 0;
             width: 40px;
-            height: 100%;
-            font-size: 18px;
-            background: transparent;
+            height: 90%;
+            font-size: 16px;
+            background: transparent !important;
             transition: all 0.1s ease-in-out;
             margin-right: 2px;
             cursor: pointer;
+            border: none !important;
         }
 
         .chat-session-header-btn-close:hover {
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.1) !important;
         }
 
         .chat-session-header-btn-close:active {
-            background: rgba(0, 0, 0, 0.24);
+            background: rgba(0, 0, 0, 0.24) !important;
         }
 
         .chat-session-header-info {
@@ -1803,7 +1973,7 @@
         span.chat-session-header-info-status {
             font-weight: normal;
             font-size: 12px;
-            color: #000000aa;
+            color: var(--fc-least);
             white-space: nowrap;
         }
 
@@ -1827,7 +1997,7 @@
             height: 32px;
 
             font-size: 22px;
-            color: #1c1c1c;
+            color: var(--fc-less);
         }
 
         .chat-session-header-actions > button:hover {
@@ -1899,6 +2069,10 @@
             border-top-width: 1px;
         }
 
+        .theme-dark .chat-session-inputarea {
+            background: rgba(70, 84, 105, 0.53);
+        }
+
         .chat-session-inputarea-othertypes {
             display: flex;
             flex-direction: row;
@@ -1935,7 +2109,7 @@
         .chat-session-inputarea-tip-editing > span {
             font-weight: bold;
             font-size: 14px;
-            color: #0655b0;
+            color: var(--c-thick-blue2);
         }
 
         .chat-session-inputarea-tip-editing > button {
@@ -1951,6 +2125,8 @@
             display: flex;
             position: relative;
             min-height: 10px;
+
+            overflow-y: hidden;
         }
 
         .chat-session-msgflow-wrap.drag-active {
@@ -1986,6 +2162,10 @@
             overflow-x: hidden;
         }
 
+        .theme-dark .chat-session-msgflow-mark-onlineusers {
+            background: rgba(63, 63, 63, 0.95);
+        }
+
         .chat-session-msgflow-mark-currentday {
             user-select: none;
             position: absolute;
@@ -2005,7 +2185,7 @@
         }
 
         .chat-session-msgflow-mark-currentday-layout p {
-            background: #00000011;
+            background: var(--bg-less);
             font-size: 14px;
             margin: 8px 0;
             padding: 4px 8px;
@@ -2030,7 +2210,7 @@
         }
 
         .chat-session-msgflow-mark-loadhistory-layout p {
-            /*background: #00000011;*/
+            /*background: var(--bg-less);*/
             background: rgba(253, 25, 25, 0.1);
             font-size: 12px;
             margin: 0 0;
@@ -2056,7 +2236,7 @@
         }
 
         .chat-session-msgflow-mark-checknew-layout p {
-            /*background: #00000011;*/
+            /*background: var(--bg-less);*/
             background: rgba(253, 25, 25, 0.1);
             font-size: 12px;
             margin: 0 0;
@@ -2089,6 +2269,12 @@
             place-items: center;
         }
 
+        .theme-dark .chat-session-msgflow-mark-droparea-image {
+            border: 2px rgba(80, 114, 255, 0.5) dashed;
+            background: rgba(80, 114, 255, 0.18);
+            color: rgba(80, 114, 255, 0.8);
+        }
+
         .chat-session-msgflow-mark-droparea-file {
             border: 2px rgba(253, 25, 25, 0.4) dashed;
             background: rgba(253, 25, 25, 0.12);
@@ -2098,6 +2284,44 @@
             flex-grow: 1;
             display: grid;
             place-items: center;
+        }
+
+        .theme-dark .chat-session-msgflow-mark-droparea-file {
+            border: 2px rgba(255, 80, 80, 0.4) dashed;
+            background: rgba(255, 80, 80, 0.12);
+            color: rgba(255, 80, 80, 0.7);
+        }
+
+
+        .chat-session-msgflow-btn-scroll2end {
+            position: absolute;
+            bottom: 20px;
+            right: 32px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #69b1fa !important;
+            color: white !important;
+            border: none !important;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: bottom 0.3s ease;
+        }
+
+        .chat-session-msgflow-btn-scroll2end:hover {
+            background-color: #85c1ff !important;
+        }
+
+        .chat-session-msgflow-btn-scroll2end:active {
+            background-color: #65a3e3 !important;
+        }
+
+        .chat-session-msgflow-btn-scroll2end.hide {
+            bottom: -60px;
         }
 
     </style>
@@ -2209,7 +2433,7 @@
         }
 
         .chat-message-group-header-date {
-            background: #00000011;
+            background: var(--bg-less);
             font-size: 14px;
             margin: 8px 0;
             padding: 4px 8px;
@@ -2281,7 +2505,7 @@
             word-break: break-all;
             overflow-wrap: anywhere;
 
-            color: #0655b0;
+            color: var(--c-thick-blue2);
             cursor: pointer;
             user-select: none;
             border: 0 transparent solid;
@@ -2290,7 +2514,7 @@
         }
 
         .chat-mcr-image span:hover {
-            border-bottom-color: #0655b0;
+            border-bottom-color: var(--c-thick-blue2);
         }
 
 
@@ -2336,7 +2560,7 @@
 
         .chat-mcr-file-info-size {
             font-size: 12px;
-            color: #000000aa;
+            color: var(--fc-least);
             white-space: nowrap;
         }
 
@@ -2347,7 +2571,7 @@
             word-break: break-all;
             overflow-wrap: anywhere;
 
-            color: #0655b0;
+            color: var(--c-thick-blue2);
             user-select: none;
             font-size: 14px;
 
@@ -2369,7 +2593,7 @@
             overflow-wrap: anywhere;
 
             font-size: 14px;
-            color: #000000dd;
+            color: var(--fc-less);
         }
 
         .chat-mcr-text span.red, .chat-mcr-text div.red, .chat-mcr-image span.red, .chat-mcr-file-info-name.red {
@@ -2397,7 +2621,7 @@
             align-items: end;
 
             font-size: 12px;
-            color: #000000aa;
+            color: var(--fc-least);
             white-space: nowrap;
 
             margin-bottom: 2px;
@@ -2405,6 +2629,10 @@
 
         .chat-message-content-mark.noticing {
             color: #0650b0;
+        }
+
+        .theme-dark .chat-message-content-mark.noticing {
+            color: #2d85ff;
         }
 
         .chat-mcm-send-status-text {
@@ -2450,6 +2678,11 @@
             padding: 1px;
             flex-grow: 1;
             cursor: text;
+        }
+
+        .theme-dark .md-area-code {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px rgba(255, 255, 255, 0.15) solid;
         }
 
         .md-area-code-btn-copy {
@@ -2610,6 +2843,11 @@
 
         }
 
+        .theme-dark span.md-text-cite {
+            background: rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
     </style>
 
 </head>
@@ -2765,6 +3003,10 @@
     let dragging_item = null;
     const full_width_space = "　";
 
+    function is_theme_dark() {
+        return (localStorage.getItem("theme") === "dark");
+    }
+
     // 按住alt后某些元素设为文本可选 // 没用上
     const elements_can_select_text_when_alt_pressed = [];
     elements_can_select_text_when_alt_pressed.add = (element) => {
@@ -2803,6 +3045,9 @@
         let url = current_url();
         url.hash = "";
         url.pathname = `${top_level_path}`;
+        [...url.searchParams.keys()].forEach(key => {
+            url.searchParams.delete(key);
+        });
         return url;
     }
 
@@ -2901,6 +3146,17 @@
         canvas.toBlob(blob => {
             callback(blob);
         }, 'image/png');
+    }
+
+    function check_if_contains_file_in_drop_event(event) {
+        let contains_file = false;
+        for (let i = 0; i < event.dataTransfer.items.length; i++) {
+            if (event.dataTransfer.items[i].kind === 'file') {
+                contains_file = true;
+                break;
+            }
+        }
+        return contains_file;
     }
 
     const seconds_of_one_hour = 60 * 60;
@@ -3049,6 +3305,27 @@
         }
         return result;
     }
+
+    function isMobileDevice() {
+        const ua = navigator.userAgent || navigator.vendor || window.opera;
+        // 手机判断
+        const isPhone = /Android|iPhone|iPod|Windows Phone/i.test(ua);
+        // 平板判断
+        const isTablet = /iPad|Tablet|PlayBook|Silk/i.test(ua);
+        return isPhone || isTablet;
+    }
+
+    const _isMobileDevice = isMobileDevice();
+
+    function bindMenuForMobile(element, showMenu) {
+        let pressTimer;
+        element.addEventListener('pointerdown', event => {
+            pressTimer = setTimeout(() => showMenu(event), 500);
+        });
+        element.addEventListener('pointerup', () => clearTimeout(pressTimer));
+        element.addEventListener('pointermove', () => clearTimeout(pressTimer));
+    }
+
 
     /*
     * 请求模板
@@ -3360,11 +3637,21 @@
             confirm: 2,
             _: 4,
         }
+
         static colors = {
+            default: "default",
+
             red: "#FCD6D6",
             blue: "#E0F2FF",
             // green: "#DBFFE0",
             yellow: "#FFFCDE",
+        }
+
+        static colors__theme_dark = {
+            red: "#625252",
+            blue: "#555d64",
+            // green: "#DBFFE0",
+            yellow: "#656457",
         }
 
         constructor(element, message, btn_flags, color, close_callback, confirm_callback) {
@@ -3435,14 +3722,25 @@
         }
 
         static get_background_color() {
-            if (Object.values(MessageMark.colors).includes(this.color)) {
-                return this.color;
+            const colors = MessageMark.colors;
+            let color;
+            if (Object.values(colors).includes(this.color)) {
+                color = this.color;
             } else {
-                const cs = Object.keys(MessageMark.colors).filter((i) => {
-                    return !["red", "yellow"].includes(i)
+                const cs = Object.keys(colors).filter((i) => {
+                    return !["default", "red", "yellow"].includes(i)
                 })
-                return MessageMark.colors[random_choice(cs)];
+                color = colors[random_choice(cs)];
             }
+            if (is_theme_dark()) {
+                for (const [key, value] of Object.entries(colors)) {
+                    if (value === color) {
+                        color = MessageMark.colors__theme_dark[key];
+                        break;
+                    }
+                }
+            }
+            return color;
         }
     }
 
@@ -4106,8 +4404,8 @@
                 }
             }
 
-            // 菜单
-            this.parent_element.addEventListener("contextmenu", (event) => {
+
+            const showMenu = (event) => {
                 let items = [];
                 let clicking_info = {};
                 if (this.fill_menu) {
@@ -4150,7 +4448,11 @@
                         clicking_info.tree_item.classList.remove("active");
                     }
                 });
-            });
+            };
+
+            // 菜单
+            this.parent_element.addEventListener("contextmenu", event => showMenu(event));
+            if (_isMobileDevice) bindMenuForMobile(this.parent_element, showMenu);
 
         }
 
@@ -4962,6 +5264,14 @@
             loadSettings() {
                 const uhj = url_hash_json();
 
+
+                let theme = localStorage.getItem("theme") || ""; // 主题
+                if (form_field_checker.ffc_string(uhj.theme)) {
+                    if (theme.length === 0) theme = uhj.theme;
+                }
+                localStorage.setItem("theme", theme);
+
+
                 const legacykeys = JSON.parse(localStorage.getItem("legacykeys")) || [];
                 if (form_field_checker.ffc_array(uhj.legacykeys)) {
                     uhj.legacykeys.forEach(i => {
@@ -5150,7 +5460,12 @@
     }
 
     function format_xhr_error_response(xhr) {
-        return `${xhr.status} ${xhr._url} ${xhr.responseText}`;
+        try {
+            return `${xhr.status} ${xhr._url} ${xhr.responseText}`;
+        } catch (e) {
+            const text = new TextDecoder('utf-8').decode(xhr.response);
+            return `${xhr.status} ${xhr._url} ${text}`;
+        }
     }
 
     /*
@@ -6241,7 +6556,7 @@
 
                 let html = `
 <div class="drive-rect">
-<div class="drive-path"></div>
+<div class="drive-header"><button class="drive-header-btn-close">⮌</button><div class="drive-path"></div></div>
 <div class="drive-actions">
     <label class="checkbox"><input type="checkbox"></label>
     <button class="drive-action-btn no-width">${full_width_space}</button>
@@ -6264,6 +6579,12 @@
                 this.element_drive_items_wrap = this.drive_rect.querySelector(":scope div.drive-items-wrap");
                 this.element_drive_items_nothings_tip = this.drive_rect.querySelector(":scope div.drive-items-wrap > p");
                 this.element_drive_items = this.drive_rect.querySelector(":scope div.drive-items");
+
+                // 返回键
+                this.element_header_btn_close = this.drive_rect.querySelector(":scope button.drive-header-btn-close");
+                this.element_header_btn_close.addEventListener("click", (event) => {
+                    this.client.close_content_page();
+                });
 
                 // 多选框
                 this.selecting_checkbox = this.drive_actions.querySelector(":scope > label.checkbox:first-of-type");
@@ -6654,7 +6975,7 @@
                 item.summary.addEventListener('dragend', (event) => {
                     dragging_item = null;
                     item.summary.classList.remove('hold')
-                })
+                });
 
 
                 // 展示数据
@@ -7547,6 +7868,7 @@
         <div class="chat-session-msgflow-mark-droparea-image">上传图片</div>
         <div class="chat-session-msgflow-mark-droparea-file">上传文件</div>
     </div>
+    <button class="chat-session-msgflow-btn-scroll2end" title="滚动到底部">∨</button>
 </div>
 
 <div class="chat-session-inputarea">
@@ -7640,6 +7962,22 @@
                     this.e_msgflow_mark_droparea.classList.add("hidden");
                 });
 
+                // 滚动到末尾按钮
+                const showThreshold = 200;
+                let is_auto_scrolling = false;
+                this.e_msgflow_btn_scroll2end = this.container.querySelector(":scope button.chat-session-msgflow-btn-scroll2end");
+                this.e_msgflow_btn_scroll2end.addEventListener('click', () => {
+                    is_auto_scrolling = true;
+                    this.e_msgflow_btn_scroll2end.classList.add('hide');
+                    this.e_msgflow.scrollTo({
+                        top: this.e_msgflow.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                    setTimeout(() => {
+                        is_auto_scrolling = false;
+                    }, 500);
+                });
+
 
                 // 滚动条
                 this.e_msgflow__load_history_timer = null;
@@ -7654,8 +7992,22 @@
                     this.check_scroll_position_to_load(event);
 
                     clearTimeout(this.e_msgflow__scroll_timer);
-                    this.e_msgflow__scroll_timer = setTimeout(() => { // 找到首个可见元素
+                    this.e_msgflow__scroll_timer = setTimeout(() => {
                         if (this.closed) return;
+
+                        // 当页面未滚动到底部时显示按钮
+                        if (!is_auto_scrolling) {
+                            const scrollTop = this.e_msgflow.scrollTop;
+                            const scrollHeight = this.e_msgflow.scrollHeight;
+                            const clientHeight = this.e_msgflow.clientHeight;
+                            if (scrollTop + clientHeight < scrollHeight - showThreshold) {
+                                this.e_msgflow_btn_scroll2end.classList.remove('hide');
+                            } else {
+                                this.e_msgflow_btn_scroll2end.classList.add('hide');
+                            }
+                        }
+
+                        // 找到首个可见元素
                         const container = this.e_msgflow;
                         const items = this.li.bindmap.msgs.filter(i => i.msgobj.is_header()).map(i => i.msgobj.msgelement);
                         let firstVisible = null
@@ -7754,12 +8106,14 @@
 
                 // 拖拽上传
                 this.e_msgflow_wrap.addEventListener('dragenter', (event) => {
+                    if (!check_if_contains_file_in_drop_event(event)) return;
                     if (dragging_item) return;
                     event.preventDefault();
                     // this.e_msgflow_wrap.classList.add("drag-active");
                     this.e_msgflow_mark_droparea.classList.remove("hidden");
                 });
                 this.e_msgflow_wrap.addEventListener('dragover', (event) => {
+                    if (!check_if_contains_file_in_drop_event(event)) return;
                     if (dragging_item) return;
                     event.preventDefault();
                     event.dataTransfer.dropEffect = 'copy';
@@ -8827,8 +9181,7 @@
                             temp_parent_element.remove();
                             this.e_container.msgobj = this;
 
-                            // 菜单
-                            this.e_container.addEventListener("contextmenu", (event) => {
+                            const showMenu = (event) => {
                                 const rect = this.e_container.getBoundingClientRect();
                                 const items = [];
 
@@ -8922,7 +9275,11 @@
                                 MenuMark.exec({x: rect.left, y: rect.top + rect.height,}, items, () => {
                                     this.e_container.classList.remove("active");
                                 });
-                            });
+                            };
+
+                            // 菜单
+                            this.e_container.addEventListener("contextmenu", (event) => showMenu(event));
+                            if (_isMobileDevice) bindMenuForMobile(this.e_container, showMenu);
 
                         }
 
@@ -9567,7 +9924,7 @@
 
                         let html = `
 <div class="chat-message-content-rect chat-mcr-file">
-<span class="chat-mcr-file-icon">🗳️</span>
+<span class="chat-mcr-file-icon" draggable="false">🗳️</span>
 <div class="chat-mcr-file-info">
     <span class="chat-mcr-file-info-name"></span>
     <div class="chat-mcr-file-info-others">
@@ -9625,6 +9982,30 @@
                             floatball.dialog.checkToHide(t);
 
                             // floatball.look_download_tasks(t);
+                        });
+
+                        this.e_mcr_icon.addEventListener('dragstart', (event) => { // 拖拽保存
+                            if (event.target.tagName !== "SPAN") {
+                                return;
+                            }
+                            dragging_item = this;
+                            event.dataTransfer.effectAllowed = 'copy';
+
+                            // const content = "这是要生成的文件内容\n可以是文本、JSON等";
+                            // const filename = "example.txt";
+
+                            // const file = new File([content], filename, {type: "text/plain"});
+                            // event.dataTransfer.items.add(file);
+
+                            // const blob = new Blob([content], { type: "text/plain" });
+                            // const url = URL.createObjectURL(blob);
+                            // event.dataTransfer.setData("text/uri-list", url); // URL 作为下载链接
+                            // event.dataTransfer.setData("text/plain", url); // 兼容其他浏览器
+                            // event.dataTransfer.setData("DownloadURL", `text/plain:${filename}:${url}`);
+
+                        });
+                        this.e_mcr_icon.addEventListener('dragend', (event) => {
+                            dragging_item = null;
                         });
 
                     }
@@ -10038,7 +10419,7 @@
 
                 let form = [
                     {type: "title", label: "删除消息："},
-                    {type: "number", label: "多少小时前的", value: 24, min: 0, max: 24 * 30,},
+                    {type: "number", label: "多少小时前的", value: 72, min: 0, max: 24 * 90,},
                     {type: "noticing", label: "", text: "确保他人已读。"},
                 ];
 
@@ -10244,7 +10625,7 @@
                     super.open_page();
                     let html = `
 <div class="activity-rect">
-
+<button class="btn-back-to-left-aside">⮌</button>
 <div class="activity-filter">
     <label>范围<select></select></label>
     <label>日期<input type="date"></label>
@@ -10257,6 +10638,11 @@
 `;
                     this.container.insertAdjacentHTML("beforeend", html);
                     this.activity_rect = this.container.querySelector(":scope div.activity-rect");
+
+                    this.e_btn_back_to_left_aside = this.container.querySelector(":scope button.btn-back-to-left-aside");
+                    this.e_btn_back_to_left_aside.addEventListener("click", (event) => {
+                        this.client.close_content_page();
+                    });
 
                     this.activity_filter = this.activity_rect.querySelector(":scope div.activity-filter");
                     this.activity_filter_group_selector = this.activity_filter.querySelector(":scope select");
@@ -10386,6 +10772,16 @@
                 open_page() {
                     super.open_page();
 
+                    let html = `
+<button class="btn-back-to-left-aside">⮌</button>
+`;
+                    this.container.insertAdjacentHTML("beforeend", html);
+
+                    this.e_btn_back_to_left_aside = this.container.querySelector(":scope button.btn-back-to-left-aside");
+                    this.e_btn_back_to_left_aside.addEventListener("click", (event) => {
+                        this.client.close_content_page();
+                    });
+
                     const tree_headers = [
                         {text: "", width: 40,},
                         {text: "状态", width: 60,},
@@ -10412,12 +10808,12 @@
                             callback: event => this.new_user(),
                         },
                         {type: "section", text: "",},
-                        {
-                            type: "button",
-                            text: "上线情况",
-                            callback: event => this.activity_user(clicking_info),
-                        },
-                        {type: "section", text: "",},
+                        // {
+                        //     type: "button",
+                        //     text: "上线情况",
+                        //     callback: event => this.activity_user(clicking_info),
+                        // },
+                        // {type: "section", text: "",},
                         {
                             type: "button",
                             text: "编辑",
@@ -10434,7 +10830,7 @@
                     if (clicking_info.direction !== TreeWidget.clicking_direction.item) {
                         items[2].disabled = true;
                         items[4].disabled = true;
-                        items[6].disabled = true;
+                        // items[6].disabled = true;
                     }
 
                     return items;
@@ -10705,6 +11101,16 @@
                 open_page() {
                     super.open_page();
 
+                    let html = `
+<button class="btn-back-to-left-aside">⮌</button>
+`;
+                    this.container.insertAdjacentHTML("beforeend", html);
+
+                    this.e_btn_back_to_left_aside = this.container.querySelector(":scope button.btn-back-to-left-aside");
+                    this.e_btn_back_to_left_aside.addEventListener("click", (event) => {
+                        this.client.close_content_page();
+                    });
+
                     const tree_headers = [
                         {text: "", width: 40,},
                         {text: "名称", width: 120,},
@@ -10728,12 +11134,12 @@
                             callback: event => this.new_group(),
                         },
                         {type: "section", text: "",},
-                        {
-                            type: "button",
-                            text: "上线情况",
-                            callback: event => this.activity_group(clicking_info),
-                        },
-                        {type: "section", text: "",},
+                        // {
+                        //     type: "button",
+                        //     text: "上线情况",
+                        //     callback: event => this.activity_group(clicking_info),
+                        // },
+                        // {type: "section", text: "",},
                         {
                             type: "button",
                             text: "删除",
@@ -10743,7 +11149,7 @@
 
                     if (clicking_info.direction !== TreeWidget.clicking_direction.item) {
                         items[2].disabled = true;
-                        items[4].disabled = true;
+                        // items[4].disabled = true;
                     }
 
                     return items;
@@ -10866,6 +11272,16 @@
                 open_page() {
                     super.open_page();
 
+                    let html = `
+<button class="btn-back-to-left-aside">⮌</button>
+`;
+                    this.container.insertAdjacentHTML("beforeend", html);
+
+                    this.e_btn_back_to_left_aside = this.container.querySelector(":scope button.btn-back-to-left-aside");
+                    this.e_btn_back_to_left_aside.addEventListener("click", (event) => {
+                        this.client.close_content_page();
+                    });
+
                     const tree_headers = [
                         {text: "", width: 40,},
                         {text: "用户", width: 120,},
@@ -10936,10 +11352,21 @@
                     let html = `
 <div class="service-status-rect">
 
+<button class="btn-back-to-left-aside">⮌</button>
+
+<div class="service-status-row service-status-row1">
+<span>服务版本：v${checkin_version}</>
+</div>
+
 </div>
 `;
                     this.container.insertAdjacentHTML("beforeend", html);
                     this.service_status_rect = this.container.querySelector(":scope div.service-status-rect");
+
+                    this.e_btn_back_to_left_aside = this.container.querySelector(":scope button.btn-back-to-left-aside");
+                    this.e_btn_back_to_left_aside.addEventListener("click", (event) => {
+                        this.client.close_content_page();
+                    });
 
                 }
 
@@ -10959,6 +11386,8 @@
                     let html = `
 <div class="backup-rect">
 
+<button class="btn-back-to-left-aside">⮌</button>
+
 <div class="backup-row backup-row1">
 <button class="backup-btn-clear-drive">清空网盘</button>
 <button class="backup-btn-reset">重置服务</button>
@@ -10976,6 +11405,11 @@
 `;
                     this.container.insertAdjacentHTML("beforeend", html);
                     this.backup_rect = this.container.querySelector(":scope div.backup-rect");
+
+                    this.e_btn_back_to_left_aside = this.container.querySelector(":scope button.btn-back-to-left-aside");
+                    this.e_btn_back_to_left_aside.addEventListener("click", (event) => {
+                        this.client.close_content_page();
+                    });
 
                     this.e_btn_clear_drive = this.backup_rect.querySelector(":scope button.backup-btn-clear-drive");
                     this.e_btn_clear_drive.addEventListener("click", (event) => {
@@ -11009,7 +11443,6 @@
                     });
 
                 }
-
 
                 clear_drive() {
                     this.loading_mark.show();
@@ -11437,6 +11870,8 @@
 
                 this.aside_left_wrap = this.dashboard_element.querySelector(':scope .aside-left-wrap');
                 if (this.aside_left_wrap) remove_simple_loading_mark(this.aside_left_wrap); // 某些页面没有aside_left
+
+                this.aside_right = this.dashboard_element.querySelector(':scope .aside-right');
             }
 
             is_active() {
@@ -12291,6 +12726,10 @@
             this.header_btn_more_right.addEventListener("click", (event) => {
                 const rect = event.target.getBoundingClientRect();
                 const items = [];
+                items.push(
+                    {type: "button", text: "切换主题", callback: event => this.switch_theme(),},
+                    {type: "section", text: "",},
+                );
                 if (!jumpto.backend_panel) {
                     items.push(
                         {type: "button", text: "进入后台", callback: event => this.open_admin_page(event, true),},
@@ -12406,6 +12845,23 @@
             }
             if (app_name) app_name = " - " + app_name;
             document.title = `${this.name}${app_name}`;
+        }
+
+        switch_theme() {
+            if (is_theme_dark()) {
+                localStorage.removeItem("theme");
+            } else {
+                localStorage.setItem("theme", "dark");
+            }
+            this.apply_theme();
+        }
+
+        apply_theme() {
+            if (is_theme_dark()) {
+                document.body.classList.add('theme-dark');
+            } else {
+                document.body.classList.remove('theme-dark');
+            }
         }
 
         /*
@@ -12594,6 +13050,8 @@
                 // this.clear_selected_panel_id() // 退出登录时不必清理
             }
             this.switch_panel(event);
+
+            this.check_if_need_hide_aside();
         }
 
         current_panel() {
@@ -12726,6 +13184,8 @@
                 this.login_panel.classList.remove("active");
                 this.backend_panel.classList.add("active");
                 this.header_btn_more_right.textContent = `服务管理员`;
+
+                this.check_if_need_hide_aside();
             }
         }
 
@@ -12756,14 +13216,52 @@
 
             this.current_content_page = new li.bindmap.pagetype(this, panel, li);
             this.current_content_page.open_page();
+
+            this.check_if_need_hide_aside();
         }
 
         close_content_page() {
             if (this.current_content_page) this.current_content_page.close_page();
             this.current_content_page = null;
+
+            this.check_if_need_hide_aside();
+        }
+
+        /*
+        * 小屏单面
+        * */
+        check_if_need_hide_aside(left, right) {
+            const cur = this.current_panel();
+            if (cur && cur.wrapper.aside_right) {
+                left = cur.wrapper.aside_left_wrap;
+                right = cur.wrapper.aside_right;
+            } else {
+                return;
+            }
+
+            const width = document.body.clientWidth;
+            // console.log(width);
+            if (width < 767 && _isMobileDevice) {
+                if (this.current_content_page && this.current_content_page.aside_right === right) {
+                    left.classList.add("hidden");
+                    right.classList.remove("hidden");
+                } else {
+                    left.classList.remove("hidden");
+                    right.classList.add("hidden");
+                    left.classList.add("fullscreen");
+                }
+            } else {
+                left.classList.remove("hidden");
+                right.classList.remove("hidden");
+                left.classList.remove("fullscreen");
+            }
         }
 
     }
+
+    window.addEventListener('resize', (event) => {
+        checkin.check_if_need_hide_aside();
+    });
 
     function handlejumpto() {
         if (jumpto.appname === appnames.drive) {
@@ -12831,6 +13329,7 @@
     }
 
     const checkin = new Checkin();
+    checkin.apply_theme();
     initialize();
 
 
