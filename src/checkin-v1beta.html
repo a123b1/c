@@ -2123,6 +2123,7 @@
         .chat-session-msgflow-wrap {
             flex-grow: 1;
             display: flex;
+            flex-direction: column;
             position: relative;
             min-height: 10px;
 
@@ -2489,6 +2490,12 @@
             overflow-wrap: anywhere;
         }
 
+        .chat-mcr-text > div {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
         .chat-mcr-image {
             padding: 6px;
         }
@@ -2665,10 +2672,12 @@
         .md-area-code-wrap {
             display: flex;
             position: relative;
+            flex-direction: column;
+            min-width: 10px;
         }
 
         .md-area-code {
-            min-height: 60px;
+            min-height: 30px;
             min-width: 100px;
             font-size: 12px;
             background-color: rgba(0, 0, 0, 0.05);
@@ -2678,6 +2687,15 @@
             padding: 1px;
             flex-grow: 1;
             cursor: text;
+
+            scrollbar-width: thin;
+            overflow-x: auto;
+            overflow-y: auto;
+            width: 100%;
+
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            word-break: break-all
         }
 
         .theme-dark .md-area-code {
@@ -2708,6 +2726,42 @@
             padding: 4px;
             padding-right: 8px;
             box-sizing: border-box;
+        }
+
+        .md-line-title {
+            font-weight: bold;
+        }
+
+        .md-line-title[data-title-level="1"] {
+            font-size: 30px;
+            padding-top: 4px;
+            padding-bottom: 4px;
+        }
+
+        .md-line-title[data-title-level="2"] {
+            font-size: 24px;
+            padding-top: 3px;
+            padding-bottom: 3px;
+        }
+
+        .md-line-title[data-title-level="3"] {
+            font-size: 20px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+        }
+
+        .md-line-title[data-title-level="4"] {
+            font-size: 16px;
+            padding-top: 1px;
+            padding-bottom: 1px;
+        }
+
+        .md-line-title[data-title-level="5"] {
+            font-size: 13px
+        }
+
+        .md-line-title[data-title-level="6"] {
+            font-size: 10px
         }
 
         span.md-text {
@@ -2794,6 +2848,15 @@
             padding: 2px 4px;
             margin-left: 2px;
             margin-right: 2px;
+
+            font-weight: normal;
+            font-style: normal;
+            text-decoration: none;
+        }
+
+        .theme-dark span.md-text-code {
+            background: rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.8);
         }
 
         span.md-text-at {
@@ -5566,7 +5629,7 @@
                 let url = join_path(this.api_url(), "user",);
                 let body = [];
                 for (const formElement of form) {
-                    body.push(await this._form2json(formElement))
+                    body.push(await this._form2json_user(formElement))
                 }
                 let r = await net_fetcher.nf_post_json(url, body);
                 if (r.status === 200) {
@@ -5586,7 +5649,17 @@
                 throw new Error(await format_error_response(r));
             }
 
-            async _form2json(form, is_edit = false) {
+            async fetch_group_attr(gid) {
+                let url = join_path(this.api_url(), "group", gid);
+                let r = await net_fetcher.nf_get(url,);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async _form2json_user(form, is_edit = false) {
                 if (!is_edit && form["密码"].length === 0) throw new Error("密码");
                 const d = {
                     uid: form["名称"],
@@ -5604,9 +5677,27 @@
                 return d;
             }
 
+            async _form2json_group(form, is_edit = false) {
+                const d = {
+                    gid: form["名称"],
+                };
+                return d;
+            }
+
             async edit_user(form, old_uid) {
                 let url = join_path(this.api_url(), "user", old_uid);
-                let body = await this._form2json(form, true);
+                let body = await this._form2json_user(form, true);
+                let r = await net_fetcher.nf_put_json(url, body);
+                if (r.status === 200) {
+                    let d = await r.json();
+                    return d;
+                }
+                throw new Error(await format_error_response(r));
+            }
+
+            async edit_group(form, old_gid) {
+                let url = join_path(this.api_url(), "group", old_gid);
+                let body = await this._form2json_group(form, true);
                 let r = await net_fetcher.nf_put_json(url, body);
                 if (r.status === 200) {
                     let d = await r.json();
@@ -7965,6 +8056,7 @@
                 // 滚动到末尾按钮
                 const showThreshold = 200;
                 let is_auto_scrolling = false;
+                let is_moving = false;
                 this.e_msgflow_btn_scroll2end = this.container.querySelector(":scope button.chat-session-msgflow-btn-scroll2end");
                 this.e_msgflow_btn_scroll2end.addEventListener('click', () => {
                     is_auto_scrolling = true;
@@ -7978,6 +8070,24 @@
                     }, 500);
                 });
 
+                // 当页面未滚动到底部时显示按钮
+                const check_scroll_to_end = () => {
+                    if (!is_auto_scrolling && !is_moving) {
+                        const scrollTop = this.e_msgflow.scrollTop;
+                        const scrollHeight = this.e_msgflow.scrollHeight;
+                        const clientHeight = this.e_msgflow.clientHeight;
+                        if (scrollTop + clientHeight < scrollHeight - showThreshold) {
+                            this.e_msgflow_btn_scroll2end.classList.remove('hide');
+                            is_moving = true;
+                        } else {
+                            this.e_msgflow_btn_scroll2end.classList.add('hide');
+                            is_moving = true;
+                        }
+                        setTimeout(() => {
+                            is_moving = false;
+                        }, 400);
+                    }
+                };
 
                 // 滚动条
                 this.e_msgflow__load_history_timer = null;
@@ -7995,17 +8105,7 @@
                     this.e_msgflow__scroll_timer = setTimeout(() => {
                         if (this.closed) return;
 
-                        // 当页面未滚动到底部时显示按钮
-                        if (!is_auto_scrolling) {
-                            const scrollTop = this.e_msgflow.scrollTop;
-                            const scrollHeight = this.e_msgflow.scrollHeight;
-                            const clientHeight = this.e_msgflow.clientHeight;
-                            if (scrollTop + clientHeight < scrollHeight - showThreshold) {
-                                this.e_msgflow_btn_scroll2end.classList.remove('hide');
-                            } else {
-                                this.e_msgflow_btn_scroll2end.classList.add('hide');
-                            }
-                        }
+                        check_scroll_to_end();
 
                         // 找到首个可见元素
                         const container = this.e_msgflow;
@@ -8231,6 +8331,10 @@
                 this.refresh();
                 this.start_timer__fetch_unread_msgs(false);
                 this.start_timer__update_read_progress(false);
+
+                setTimeout(() => {
+                    check_scroll_to_end();
+                }, 400);
             }
 
             is_group() {
@@ -9725,15 +9829,15 @@
                                             }
                                         } //
                                         else if (msg.plain_file_name) {
-                                            if (msg.plain_file_name.length > 15) {
-                                                token.textContent = "&" + msg.plain_file_name.slice(0, 15) + "...";
+                                            if (msg.plain_file_name.length > 25) {
+                                                token.textContent = "&" + msg.plain_file_name.slice(0, 25) + "...";
                                             } else {
                                                 token.textContent = "&" + msg.plain_file_name;
                                             }
                                         } //
                                         else if (msg.formated_sys_msg) {
-                                            if (msg.formated_sys_msg.length > 15) {
-                                                token.textContent = "&" + msg.formated_sys_msg.slice(0, 15) + "...";
+                                            if (msg.formated_sys_msg.length > 25) {
+                                                token.textContent = "&" + msg.formated_sys_msg.slice(0, 25) + "...";
                                             } else {
                                                 token.textContent = "&" + msg.formated_sys_msg;
                                             }
@@ -11142,6 +11246,11 @@
                         // {type: "section", text: "",},
                         {
                             type: "button",
+                            text: "编辑",
+                            callback: event => this.edit_group(clicking_info),
+                        },
+                        {
+                            type: "button",
                             text: "删除",
                             callback: event => this.delete_group(clicking_info),
                         },
@@ -11155,16 +11264,27 @@
                     return items;
                 }
 
+                _attrs2columns(attr) {
+                    return [
+                        {text: this.tree1.tree_items.length + 1, selectable: false,},
+                        {text: attr.gid, selectable: true,},
+                        {text: `${attr.users.length}人；${attr.users.join("、")}`, selectable: true,},
+                    ];
+                }
+
                 add_item(attr) {
                     let tree_item = {
                         clickable: false,
-                        columns: [
-                            {text: this.tree1.tree_items.length + 1, selectable: false,},
-                            {text: attr.gid, selectable: true,},
-                            {text: `${attr.users.length}人；${attr.users.join("、")}`, selectable: true,},
-                        ],
+                        columns: this._attrs2columns(attr),
                     };
                     this.tree1.add_item(tree_item);
+                }
+
+                update_item(tree_item, group_attr) {
+                    const columns = this._attrs2columns(group_attr);
+                    columns[0] = tree_item.attr.columns[0];
+                    tree_item.attr.columns = columns;
+                    this.tree1.update_item(tree_item);
                 }
 
                 fetch_list() {
@@ -11183,11 +11303,13 @@
                     });
                 }
 
+                #_template = {
+                    "名称": "",
+                }
+
                 new_group() {
 
-                    const _template = [{
-                        "名称": "",
-                    },]
+                    const _template = [{...this.#_template},]
 
                     let form = [
                         {type: "title", label: "创建分组："},
@@ -11235,6 +11357,69 @@
 
                 activity_group(clicking_info) {
 
+                }
+
+                edit_group(clicking_info) {
+                    const gid = clicking_info.tree_item.attr.columns[1].text;
+                    this.loading_mark.show();
+                    this.client.subviews.admin.fetch_group_attr(gid)
+                        .then(result => {
+                            if (this.closed) return;
+                            this._edit_group(clicking_info, result);
+                            this.remove_loading_mark();
+                        }).catch(error => {
+                        if (this.closed) return;
+                        this.remove_loading_mark();
+                        MessageMark.report(error);
+                    });
+                }
+
+                _edit_group(clicking_info, attr,) {
+                    const _template = {...this.#_template}
+
+                    _template["名称"] = attr.gid;
+
+                    let form = [
+                        {type: "title", label: "编辑分组："},
+                        {type: "textarea", label: "", value: JSON.stringify(_template, null, 2),},
+                    ];
+
+                    const confirm_callback = (fm,) => {
+                        fm.collect_data();
+
+                        try {
+                            let _template = JSON.parse(form[1].value)
+
+                            if (!form_field_checker.ffc_string(_template["名称"])) throw new Error("名称");
+
+                            // fm.remove();
+                            this.__edit_group(clicking_info, fm, _template, attr.gid);
+
+                        } catch (e) {
+                            MessageMark.report(e, fm.rect)
+                        }
+
+                    }
+
+                    FormMark.get_global_input(form, confirm_callback)
+                }
+
+                __edit_group(clicking_info, fm, form, old_gid) {
+                    fm.loading_mark = new LoadingMark(fm.rect);
+                    fm.loading_mark.show();
+                    this.client.subviews.admin.edit_group(form, old_gid)
+                        .then(result => {
+                            if (this.closed) return;
+                            this.update_item(clicking_info.tree_item, result);
+                            // this.remove_loading_mark();
+                            fm.loading_mark.remove();
+                            fm.remove();
+                        }).catch(error => {
+                        if (this.closed) return;
+                        // this.remove_loading_mark();
+                        fm.loading_mark.remove();
+                        MessageMark.report(error, fm.rect);
+                    });
                 }
 
                 delete_group(clicking_info) {
@@ -11556,6 +11741,18 @@
                 line_object.is_blockquote = false;
             }
 
+            if (!line_object.is_blockquote) {
+                const tlMatch = line_text.match(/^\s*(#{1,6})\s?(.*)$/);
+                if (tlMatch) {
+                    line_object.title_level = tlMatch[1].length;
+                    line_text = tlMatch[2];
+                } else {
+                    line_object.title_level = 0;
+                }
+            } else {
+                line_object.title_level = 0;
+            }
+
             // Tokenize: split into text tokens and marker tokens.
             // Markers we support (priority order): '~~', '**', '__', '`', '*'
             const markers = ['~~', '**', '__', '`', '*',];
@@ -11823,7 +12020,7 @@
                     else if (token.type === "code") {
                         parts.push(`<span class="md-text-code">`);
                         if (token.children) resolve_tokens(token.children);
-                        parts.push(token.text);
+                        parts.push(MarkdownResolver.escapeHTML(token.text));
                         parts.push(`</span>`);
                     } //
 
@@ -11845,10 +12042,12 @@
             for (const lineObject of line_objects) {
                 if (lineObject.type === MarkdownResolver.line_object_types.plain_line) {
                     if (lineObject.is_blockquote) parts.push(`<div class="md-line-blockquote">`);
+                    else if (lineObject.title_level > 0) parts.push(`<div class="md-line-title" data-title-level="${lineObject.title_level}">`);
                     parts.push(`<p class="md-line">`);
                     resolve_tokens(lineObject.tokens);
                     parts.push(`</p>`);
                     if (lineObject.is_blockquote) parts.push(`</div>`);
+                    else if (lineObject.title_level > 0) parts.push(`</div>`);
                 } else if (lineObject.type === MarkdownResolver.line_object_types.code_area) {
                     parts.push(`<div class="md-area-code-wrap"><pre class="md-area-code">${MarkdownResolver.escapeHTML(lineObject.data.join("\n"))}</pre><button class="md-area-code-btn-copy">复制</button></div>`);
                 }
