@@ -5349,8 +5349,9 @@
 
 
                 let theme = localStorage.getItem("theme") || ""; // 主题
-                if (form_field_checker.ffc_string(uhj.theme)) {
-                    if (theme.length === 0) theme = uhj.theme;
+                if (form_field_checker.ffc_string(uhj.theme, true)) {
+                    // if (theme.length === 0)
+                    theme = uhj.theme;
                 }
                 localStorage.setItem("theme", theme);
 
