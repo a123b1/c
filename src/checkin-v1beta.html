@@ -2310,7 +2310,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: bottom 0.3s ease;
+            transition: bottom 0.1s ease;
         }
 
         .chat-session-msgflow-btn-scroll2end:hover {
@@ -3653,6 +3653,21 @@
 
 
     /*
+    * url的hash附带的设置
+    * */
+    {
+        const uhj = url_hash_json();
+
+        let theme = localStorage.getItem("theme") || ""; // 主题
+        if (form_field_checker.ffc_string(uhj.theme, true)) {
+            // if (theme.length === 0)
+            theme = uhj.theme;
+        }
+        localStorage.setItem("theme", theme);
+    }
+
+
+    /*
     * 遮罩
     * */
     class BlurMark {
@@ -4109,7 +4124,11 @@
         }
 
         fill() {
-            this.mark.style.background = "rgba(255, 255, 255, 0.7)";
+            if(is_theme_dark()){
+                this.mark.style.background = "rgba(255, 255, 255, 0.1)";
+            }else{
+                this.mark.style.background = "rgba(255, 255, 255, 0.7)";
+            }
             let html = `
 <div class="image-mark-rect">
 
@@ -5348,14 +5367,6 @@
                 const uhj = url_hash_json();
 
 
-                let theme = localStorage.getItem("theme") || ""; // 主题
-                if (form_field_checker.ffc_string(uhj.theme, true)) {
-                    // if (theme.length === 0)
-                    theme = uhj.theme;
-                }
-                localStorage.setItem("theme", theme);
-
-
                 const legacykeys = JSON.parse(localStorage.getItem("legacykeys")) || [];
                 if (form_field_checker.ffc_array(uhj.legacykeys)) {
                     uhj.legacykeys.forEach(i => {
@@ -5372,7 +5383,7 @@
                     } else {
                         if (!legacykeys.includes(currentkey)) legacykeys.unshift(currentkey);
                         if (!legacykeys.includes(uhj.currentkey)) legacykeys.unshift(uhj.currentkey);
-                        // currentkey = uhj.currentkey; // 用本地存储里的加密吧？
+                        currentkey = uhj.currentkey; // 用本地存储里的加密吧？不
                     }
                     this.e_settings_currentkey.value = currentkey;
                 } else {
@@ -7980,7 +7991,7 @@
         <div class="chat-session-msgflow-mark-droparea-image">上传图片</div>
         <div class="chat-session-msgflow-mark-droparea-file">上传文件</div>
     </div>
-    <button class="chat-session-msgflow-btn-scroll2end" title="滚动到底部">∨</button>
+    <button class="chat-session-msgflow-btn-scroll2end hidden" title="滚动到底部">∨</button>
 </div>
 
 <div class="chat-session-inputarea">
@@ -8098,15 +8109,27 @@
                         const scrollHeight = this.e_msgflow.scrollHeight;
                         const clientHeight = this.e_msgflow.clientHeight;
                         if (scrollTop + clientHeight < scrollHeight - showThreshold) {
-                            this.e_msgflow_btn_scroll2end.classList.remove('hide');
+                            this.e_msgflow_btn_scroll2end.classList.remove('hidden');
+                            if (this.e_msgflow_btn_scroll2end.classList.contains("hide")) {
+                                // this.e_msgflow_btn_scroll2end.classList.remove('hide');
+                                setTimeout(() => {
+                                    is_moving = true;
+                                    this.e_msgflow_btn_scroll2end.classList.remove('hide');
+                                }, 0);
+                            }
                             is_moving = true;
                         } else {
-                            this.e_msgflow_btn_scroll2end.classList.add('hide');
+                            if (!this.e_msgflow_btn_scroll2end.classList.contains("hide")) {
+                                this.e_msgflow_btn_scroll2end.classList.add('hide');
+                            }
                             is_moving = true;
                         }
                         setTimeout(() => {
                             is_moving = false;
-                        }, 400);
+                            if (this.e_msgflow_btn_scroll2end.classList.contains("hide")) {
+                                this.e_msgflow_btn_scroll2end.classList.add('hidden');
+                            }
+                        }, 200);
                     }
                 };
 
